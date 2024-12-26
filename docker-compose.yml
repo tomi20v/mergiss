@@ -1,0 +1,12 @@
+version: '3.0'
+services:
+  mergiss:
+    build:
+      context: .
+    ports:
+      - 5173:5173
+    volumes:
+      - ./:/app
+    command: npm run dev
+#    command: tail -F anything
+    tty: true
