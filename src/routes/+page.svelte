@@ -1,4 +1,16 @@
-<SvgIcon type="mdi" path={mdiMerge}></SvgIcon>
+<TopAppBar
+  variant="standard"
+  dense
+  >
+  <Row>
+    <Section>
+      <IconButton class="material-icons">merge</IconButton>
+      <Title>MERGISS</Title>
+    </Section>
+  </Row>
+
+</TopAppBar>
+
 <LayoutGrid>
   <Cell span={12}>
     <h1>Welcome to SvelteKit</h1>
@@ -56,11 +68,11 @@
 
 <script lang="ts">
   import Button, { Label } from '@smui/button';
+  import IconButton from '@smui/icon-button';
   import LayoutGrid, { Cell } from '@smui/layout-grid';
+  import TopAppBar, {Row, Section, Title} from '@smui/top-app-bar';
   import MGissBoard from "$lib/components/MGissBoard.svelte";
   import MGenerator from "$lib/components/MGenerator.svelte";
-  import SvgIcon from "@jamescoyle/svelte-icon";
-  import {mdiMerge} from "@mdi/js";
 
   let clicked = $state(0);
 </script>
