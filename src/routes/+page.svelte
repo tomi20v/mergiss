@@ -49,7 +49,7 @@
     <pre class="status">Clicked: {clicked}</pre>
 
   </Cell>
-  <Cell span="{6}" style="border: 1px solid red;">
+  <Cell span={6} style="border: 1px solid red;">
     teszt
   </Cell>
 </LayoutGrid>
