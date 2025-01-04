@@ -13,7 +13,9 @@
 
 <LayoutGrid>
   <Cell span={12}>
-    <h1>Welcome to SvelteKit</h1>
+    <h1 class="text-3xl underline">
+      Welcome to SvelteKit
+    </h1>
     <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
   </Cell>
   <Cell span={3} style="border: 1px solid gray;">
@@ -67,6 +69,8 @@
 </LayoutGrid>
 
 <script lang="ts">
+  import "../app.css";
+
   import Button, { Label } from '@smui/button';
   import IconButton from '@smui/icon-button';
   import LayoutGrid, { Cell } from '@smui/layout-grid';
@@ -77,7 +81,7 @@
   let clicked = $state(0);
 </script>
 
-<style>
+<style lang="postcss">
     /* Accessing the class with "*" in front limits
       the scope to anything under this component's
       elements. */

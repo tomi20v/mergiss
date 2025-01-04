@@ -1,0 +1,10 @@
+/* not including the base reset as it interferes with SMUI basics. Anyway I need tailwind for the utility classes only */
+/*@tailwind base;*/
+/* neither components */
+/*@tailwind components;*/
+@tailwind utilities;
+
+/** simple css reset as per need */
+body {
+    margin: 0;
+}
