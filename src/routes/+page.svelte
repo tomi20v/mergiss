@@ -14,20 +14,16 @@
 
 <LayoutGrid class="bg-black pt-16">
   <Cell span={3} sstyle="border: 1px solid cyan;">
-    <MGenerator
-      ></MGenerator>
+    <MGenerator></MGenerator>
   </Cell>
   <Cell span={3} sstyle="border: 1px solid gray;">
-    <MGenerator
-      ></MGenerator>
+    <MGenerator disabled ></MGenerator>
   </Cell>
   <Cell span={3} sstyle="border: 1px solid gray;">
-    <MGenerator
-      ></MGenerator>
+    <MGenerator disabled ></MGenerator>
   </Cell>
   <Cell span={3} sstyle="border: 1px solid gray;">
-    <MGenerator
-      ></MGenerator>
+    <MGenerator disabled ></MGenerator>
   </Cell>
 
   <Cell span={2}>
