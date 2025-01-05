@@ -1,3 +1,4 @@
+{#if 1}
 <TopAppBar
   variant="standard"
   dense
@@ -8,33 +9,29 @@
       <Title>MERGISS</Title>
     </Section>
   </Row>
-
 </TopAppBar>
+{/if}
 
-<LayoutGrid>
-  <Cell span={12}>
-    <h1 class="text-3xl underline">
-      Welcome to SvelteKit
-    </h1>
-    <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
-  </Cell>
-  <Cell span={3} style="border: 1px solid gray;">
+<LayoutGrid class="bg-black pt-16">
+  <Cell span={3} sstyle="border: 1px solid cyan;">
     <MGenerator
       ></MGenerator>
   </Cell>
-  <Cell span={3} style="border: 1px solid gray;">
+  <Cell span={3} sstyle="border: 1px solid gray;">
     <MGenerator
       ></MGenerator>
   </Cell>
-  <Cell span={3} style="border: 1px solid gray;">
+  <Cell span={3} sstyle="border: 1px solid gray;">
     <MGenerator
       ></MGenerator>
   </Cell>
-  <Cell span={3} style="border: 1px solid gray;">
+  <Cell span={3} sstyle="border: 1px solid gray;">
     <MGenerator
       ></MGenerator>
   </Cell>
 
+  <Cell span={2}>
+  </Cell>
   <Cell span={8}>
     <MGissBoard
       ></MGissBoard>
