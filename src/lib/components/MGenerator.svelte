@@ -6,7 +6,7 @@
         >
             {#if piece}
             <div class="flex text-xs border-slate-600 border-2 border-dotted">
-                piece<br/>here
+                {piece.color}
 <!--                <Piece {piece} />-->
             </div>
             {/if}
@@ -23,7 +23,7 @@
 <script lang="ts">
 
   import {Image} from "@smui/image-list";
-  import type Piece from "$lib/game/Piece";
+  import Piece from "$lib/game/piece/Piece";
   import {pieceFactory} from "$lib/game/services";
 
   let piece: Piece|null = $state(null);

@@ -1,4 +1,4 @@
-import PieceFactory from "$lib/game/PieceFactory";
+import PieceFactory from "$lib/game/piece/PieceFactory";
 
 const pieceFactory = new PieceFactory();
 
