@@ -5,10 +5,7 @@
                 border-3 border-blue-300 border-double rounded-lg border-l-0 border-r-0"
         >
             {#if piece}
-            <div class="flex text-xs border-slate-600 border-2 border-dotted">
-                {piece.color}
-<!--                <Piece {piece} />-->
-            </div>
+                <MPiece {piece} />
             {/if}
         </div>
     {:else}
@@ -25,6 +22,7 @@
   import {Image} from "@smui/image-list";
   import Piece from "$lib/game/piece/Piece";
   import {pieceFactory} from "$lib/game/services";
+  import MPiece from "$lib/components/MPiece.svelte";
 
   let piece: Piece|null = $state(null);
 
