@@ -31,8 +31,8 @@ const pieceCatalogue: IProtoPiece[] = [
   {
     color: 'cyan',
     pixelMap: [
-      [1,1,0,],
-      [0,1,1,],
+      [0,1,0,],
+      [1,1,1,],
     ],
   },
   {
@@ -43,7 +43,7 @@ const pieceCatalogue: IProtoPiece[] = [
     ],
   },
   {
-    color: 'gray',
+    color: 'slate',
     pixelMap: [
       [1,1,1,],
       [0,0,1,],
