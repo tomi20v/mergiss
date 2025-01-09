@@ -1,7 +1,7 @@
 <div class="flex gap-2 justify-center">
     {#if !disabled}
         <Image src="generator.png" class="w-2/3 cursor-pointer" onclick={onClick} />
-        <div class="flex text-white m-1 justify-center items-center w-1/3
+        <div class="flex text-white m-1 p-2 justify-center items-center w-1/3
                 border-3 border-blue-300 border-double rounded-lg border-x-0"
         >
             {#if piece}

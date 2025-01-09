@@ -1,11 +1,9 @@
-<div class="flex flex-col gap-0">
-    <!--{ piece.color }-->
+<div class="flex grow flex-col gap-0">
     {#each piece.pixelMap as eachRow}
-        <div class="flex flex-row gap-0">
+        <div class="flex grow flex-row gap-0">
             {#each eachRow as eachCell}
-                <!-- @todo fixed 10px must be improved -->
-                <div class="flex {eachCell == 1 ? color: 'bg-transparent'} border border-solid {eachCell ? 'border-slate-700' : 'border-transparent'}"
-                     style="aspect-ratio: 1/1; display: block; width: 12px;"
+                <div class="flex aspect-square grow {eachCell == 1 ? color: 'bg-transparent'}
+                            border border-solid {eachCell ? 'border-slate-700' : 'border-transparent'}"
                 ></div>
             {/each}
         </div>
