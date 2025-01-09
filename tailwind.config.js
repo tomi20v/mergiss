@@ -7,7 +7,7 @@ export default {
   plugins: [],
   safelist: [
     {
-      pattern: /bg-.+-500/,
+      pattern: /bg-.+/,
     }
   ]
 }
