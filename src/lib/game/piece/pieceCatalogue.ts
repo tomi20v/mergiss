@@ -1,54 +1,33 @@
-import type IProtoPiece from "$lib/game/piece/IProtoPiece";
+import type {IProtoMap} from "$lib/game/piece/IProtoMap";
 
-const pieceCatalogue: IProtoPiece[] = [
-  {
-    color: 'purple',
-    pixelMap: [
-      [1,1,1,],
-      [1,0,0,],
-    ],
-  },
-  {
-    color: 'red',
-    pixelMap: [
-      [1,1,1,1,],
-    ],
-  },
-  {
-    color: 'yellow',
-    pixelMap: [
-      [1,1,0,],
-      [0,1,1,],
-    ],
-  },
-  {
-    color: 'green',
-    pixelMap: [
-      [0,1,1,],
-      [1,1,0,],
-    ],
-  },
-  {
-    color: 'cyan',
-    pixelMap: [
-      [0,1,0,],
-      [1,1,1,],
-    ],
-  },
-  {
-    color: 'blue',
-    pixelMap: [
-      [1,1,],
-      [1,1,],
-    ],
-  },
-  {
-    color: 'slate',
-    pixelMap: [
-      [1,1,1,],
-      [0,0,1,],
-    ],
-  },
+const pieceCatalogue: IProtoMap[] = [
+  [
+    [1,1,1,],
+    [1,0,0,],
+  ],
+  [
+    [1,1,1,1,],
+  ],
+  [
+    [1,1,0,],
+    [0,1,1,],
+  ],
+  [
+    [0,1,1,],
+    [1,1,0,],
+  ],
+  [
+    [0,1,0,],
+    [1,1,1,],
+  ],
+  [
+    [1,1,],
+    [1,1,],
+  ],
+  [
+    [1,1,1,],
+    [0,0,1,],
+  ],
 ];
 
 export default pieceCatalogue;
