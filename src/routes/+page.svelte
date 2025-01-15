@@ -33,9 +33,11 @@
       ></MGissBoard>
   </Cell>
 
+  {#if (dev)}
   <Cell span={12} style="border: 1px solid purple; color: white;">
     <ColorSamples />
   </Cell>
+  {/if}
 </LayoutGrid>
 
 <script lang="ts">
@@ -47,6 +49,7 @@
   import MGissBoard from "$lib/components/MGissBoard.svelte";
   import MGenerator from "$lib/components/MGenerator.svelte";
   import ColorSamples from "$lib/components/dev/ColorSamples.svelte";
+  import {dev} from "$app/environment";
 
 </script>
 
