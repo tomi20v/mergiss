@@ -1,7 +1,8 @@
 {
 	"name": "mergiss",
 	"private": true,
-	"version": "0.1.0",
+	"version": "0.1.1",
+	"description": "generator creates pieces when clicked",
 	"type": "module",
 	"prepare": "svelte-kit sync",
 	"scripts": {
