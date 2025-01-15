@@ -1,18 +1,21 @@
 import Piece from "$lib/game/piece/Piece";
 import pieceCatalogue from "$lib/game/piece/pieceCatalogue";
-import type IProtoPiece from "$lib/game/piece/IProtoPiece";
 import {randomArrayItem} from "$lib/util";
 import colors from "$lib/game/colors";
+import type { IProtoMap } from "./IProtoMap";
 
 export default class PieceFactory {
 
-  // @todo create one random piece. At some point we'd need parameters (which pieces are available)
   randomPiece(): Piece {
-    const proto: IProtoPiece = randomArrayItem(pieceCatalogue);
-    const color: string = randomArrayItem(Object.values(colors));
+    const proto: IProtoMap = randomArrayItem(pieceCatalogue);
+    const colorValues = Object.values(colors);
+    const colorRand = Math.floor(Math.random() * colorValues.length);
+    const color: string = colorValues[colorRand];
+    const shadowColor: string = colorValues[colorRand < 8 ? colorRand + 8 : colorRand - 8];
     const piece = new Piece(
+      proto,
       color,
-      proto.pixelMap
+      shadowColor
     );
     return piece;
   }

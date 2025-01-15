@@ -2,8 +2,8 @@
     {#each piece.pixelMap as eachRow}
         <div class="flex grow flex-row gap-px">
             {#each eachRow as eachCell}
-                <div class="flex aspect-square grow {eachCell == 1 ? color: 'bg-transparent'}
-                            border border-solid {eachCell ? 'border-slate-700' : 'border-transparent'}"
+                <div class="flex aspect-square grow"
+                     style="border-radius: 15%; {eachCell ? cellStyle : ''}"
                 ></div>
             {/each}
         </div>
@@ -12,7 +12,6 @@
 <script lang="ts">
 
   let { piece } = $props();
-  let color = $derived('bg-' + piece.color);
   let maxWidth = $derived.by(() => {
     const h = piece.pixelMap.length;
     const w = piece.pixelMap[0].length;
@@ -21,5 +20,9 @@
     }
     return null;
   });
+  // some old formulas
+  // let cellStyle = $derived('background-color: ' + piece.color + '; box-shadow: inset 2px 2px 2px, 1px 1px 1px dimgray');
+  // let cellStyle = $derived('background-color: ' + piece.color + '; box-shadow: inset 2px 2px 2px ' + piece.shadowColor + ', 1px 1px 1px dimgray');
+  let cellStyle = $derived('background-color: ' + piece.color + '; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray');
 
 </script>

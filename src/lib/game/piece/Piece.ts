@@ -2,19 +2,20 @@ import type {IProtoMap} from "$lib/game/piece/IProtoMap";
 
 export default class Piece {
 
-  private pixelMap: IProtoMap;
-  private color: string;
-  private pixelMap: number[][];
+  readonly pixelMap: IProtoMap;
+  readonly color: string;
+  readonly shadowColor: string;
 
   public ts: number = new Date().getTime();
 
   constructor(
     pixelMap: IProtoMap,
     color: string,
-    pixelMap: number[][],
+    shadowColor: string,
   ) {
-    this.color = color;
     this.pixelMap = pixelMap;
+    this.color = color;
+    this.shadowColor = shadowColor;
   }
 
 }
