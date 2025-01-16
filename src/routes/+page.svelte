@@ -8,6 +8,9 @@
       <IconButton class="material-icons">merge</IconButton>
       <Title>MERGISS</Title>
     </Section>
+    <Section align="end" toolbar>
+      <IconButton class="material-icons" onclick={toggleFullScreen}>fullscreen</IconButton>
+    </Section>
   </Row>
 </TopAppBar>
 {/if}
@@ -50,6 +53,40 @@
   import MGenerator from "$lib/components/MGenerator.svelte";
   import ColorSamples from "$lib/components/dev/ColorSamples.svelte";
   import {dev} from "$app/environment";
+
+  let isFullScreen = false;
+
+  function toggleFullScreen() {
+    isFullScreen ? closeFullscreen() : openFullscreen();
+  }
+
+  var elem = document.documentElement;
+
+  /* View in fullscreen */
+  function openFullscreen() {
+    isFullScreen = true;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+      elem.msRequestFullscreen();
+    } else {
+      isFullScreen = false;
+    }
+  }
+
+  /* Close fullscreen */
+  function closeFullscreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) { /* Safari */
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { /* IE11 */
+      document.msExitFullscreen();
+    }
+    isFullScreen = false;
+  }
 
 </script>
 
