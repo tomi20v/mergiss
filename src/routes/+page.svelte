@@ -1,4 +1,3 @@
-{#if 1}
 <TopAppBar
   variant="standard"
   dense
@@ -13,40 +12,34 @@
     </Section>
   </Row>
 </TopAppBar>
-{/if}
 
-<LayoutGrid class="bg-black pt-16">
-  <Cell span={3} sstyle="border: 1px solid cyan;">
-    <MGenerator />
-  </Cell>
-  <Cell span={3} sstyle="border: 1px solid gray;">
-    <MGenerator disabled ></MGenerator>
-  </Cell>
-  <Cell span={3} sstyle="border: 1px solid gray;">
-    <MGenerator disabled ></MGenerator>
-  </Cell>
-  <Cell span={3} sstyle="border: 1px solid gray;">
-    <MGenerator disabled ></MGenerator>
-  </Cell>
-
-  <Cell span={2}>
-  </Cell>
-  <Cell span={8}>
-    <MGissBoard />>
-  </Cell>
-
+<div class="flex flex-col h-screen text-white bg-black" style="">
+  <div class="flex mt-12 p-2 md:p-3 lg:p-4 gap-5 md:p-3 flex-row">
+    <div class="flex">
+      <MGenerator />
+    </div>
+    <div class="flex">
+      <MGenerator />
+    </div>
+    <div class="flex">
+      <MGenerator />
+    </div>
+    <div class="flex">
+      <MGenerator />
+    </div>
+  </div>
+  <div class="flex flex-grow align-middle justify-center items-center" style="xborder: 5px solid green;">
+    <MGissBoard />
+  </div>
   {#if (dev)}
-  <Cell span={12} style="border: 1px solid purple; color: white;">
-    <ColorSamples />
-  </Cell>
+  <ColorSamples />
   {/if}
-</LayoutGrid>
+</div>
 
 <script lang="ts">
   import "../app.css";
 
   import IconButton from '@smui/icon-button';
-  import LayoutGrid, { Cell } from '@smui/layout-grid';
   import TopAppBar, {Row, Section, Title} from '@smui/top-app-bar';
   import MGissBoard from "$lib/components/MGissBoard.svelte";
   import MGenerator from "$lib/components/MGenerator.svelte";
