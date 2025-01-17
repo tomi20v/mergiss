@@ -32,8 +32,7 @@
   <Cell span={2}>
   </Cell>
   <Cell span={8}>
-    <MGissBoard
-      ></MGissBoard>
+    <MGissBoard />>
   </Cell>
 
   {#if (dev)}
@@ -53,6 +52,7 @@
   import MGenerator from "$lib/components/MGenerator.svelte";
   import ColorSamples from "$lib/components/dev/ColorSamples.svelte";
   import {dev} from "$app/environment";
+  import {onMount} from "svelte";
 
   let isFullScreen = false;
 
@@ -60,7 +60,11 @@
     isFullScreen ? closeFullscreen() : openFullscreen();
   }
 
-  var elem = document.documentElement;
+  var elem: object = {};
+
+  onMount(() => {
+    elem = document.documentElement;
+  })
 
   /* View in fullscreen */
   function openFullscreen() {
