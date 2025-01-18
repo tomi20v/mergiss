@@ -26,7 +26,7 @@
 
   let piece: Piece|null = $state(null);
 
-  let { disabled } = $props();
+  let { disabled = false } = $props();
 
   function onClick() {
     piece = pieceFactory.randomPiece();
