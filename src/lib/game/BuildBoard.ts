@@ -14,9 +14,9 @@ export default class BuildBoard {
     this.sizeX = sizeX;
     this.sizeY = sizeY;
 
-    for (let x=0; x<this.sizeX; x++) {
+    for (let x=0; x<this.sizeY; x++) {
       const row: number[] = [];
-      for (let y=0; y<this.sizeY; y++) {
+      for (let y=0; y<this.sizeX; y++) {
         row.push(0);
       }
       this.fields.push(row);
