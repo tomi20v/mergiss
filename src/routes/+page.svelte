@@ -1,3 +1,6 @@
+<svelte:window
+        onresize={onResize}
+/>
 <TopAppBar
   variant="standard"
   dense
@@ -28,12 +31,16 @@
       <MGenerator />
     </div>
   </div>
-  <div class="flex flex-grow align-middle justify-center items-center" style="xborder: 5px solid green;">
-    <MGissBoard />
+  <div class="flex flex-grow align-middle justify-center items-center"
+       style="xborder: 5px solid green; overflow: hidden;"
+  >
+    <MGissBoard boardHeight={boardHeight} />
   </div>
-  {#if (dev)}
-  <ColorSamples />
-  {/if}
+  <div id="bottom-container">
+    {#if (dev)}
+    <ColorSamples />
+    {/if}
+  </div>
 </div>
 
 <script lang="ts">
@@ -48,16 +55,34 @@
   import {onMount} from "svelte";
 
   let isFullScreen = false;
+  let boardHeight = $state(400);
 
   function toggleFullScreen() {
     isFullScreen ? closeFullscreen() : openFullscreen();
   }
 
-  var elem: object = {};
+  var documentElement!: HTMLElement;
+
+  let topContainer: HTMLElement|null = null;
+  let bottomContainer: HTMLElement|null = null;
 
   onMount(() => {
-    elem = document.documentElement;
+    documentElement = document.documentElement;
+    topContainer = document.querySelector("#top-container");
+    bottomContainer = document.querySelector("#bottom-container");
+    onResize();
   })
+
+  function onResize() {
+    if (!topContainer || !bottomContainer) {
+      return;
+    }
+    const windowHeight = window.innerHeight;
+    const topContainerHeight = topContainer.offsetTop + topContainer.offsetHeight;
+    const bottomContainerHeight = bottomContainer.offsetHeight;
+    // boardContainerHeight
+    boardHeight = windowHeight - topContainerHeight - bottomContainerHeight;
+  }
 
   /* View in fullscreen */
   function openFullscreen() {
