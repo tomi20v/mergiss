@@ -2,12 +2,13 @@
   {#each board.fields as row, rowIndex}
   <div class="flex gap-0 justify-center">
     {#each row as field, fieldIndex}
-      <div class="flex xbg-stone-500"
+      <div class="flex ggrow xbg-stone-500"
            style="color: white;
-           width: 5%; max-width: 5%; aspect-ratio: 1;
+           aspect-ratio: 1;
            background-size: 100%;
            background-image: url({backgroundImageOf(rowIndex, fieldIndex)});
            "
+           style:width="{width}"
       >
       </div>
     {/each}
@@ -18,14 +19,25 @@
 
   import BuildBoard from "$lib/game/BuildBoard";
 
-  // @todo max-width should also be set based on grid size
+  let { boardWidth, boardHeight } = $props();
+
   let board: BuildBoard = $state(new BuildBoard(5,5));
   // let board: BuildBoard = $state(new BuildBoard(10,10));
+  // let board: BuildBoard = $state(new BuildBoard(30,20));
+  // let board: BuildBoard = $state(new BuildBoard(40,20));
   // let board: BuildBoard = $state(new BuildBoard(15,15));
   // let board: BuildBoard = $state(new BuildBoard(42,42));
 
   function backgroundImageOf(i: number, j: number): string {
     return `grid/${String.fromCharCode(i%6 + 65)}${j%6+1}.png`;
   }
+
+  let width = $derived.by(() => {
+    const perWidth = Math.floor(boardWidth / (board.sizeX+1));
+    const perHeight = Math.floor(boardHeight / (board.sizeY+1));
+    const ret = Math.min(perWidth, perHeight);
+    return ret + 'px';
+  })
+
 
 </script>

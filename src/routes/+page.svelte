@@ -34,9 +34,9 @@
   <div class="flex flex-grow align-middle justify-center items-center"
        style="xborder: 5px solid green; overflow: hidden;"
   >
-    <MGissBoard boardHeight={boardHeight} />
+    <MGissBoard boardWidth={boardWidth} boardHeight={boardHeight} />
   </div>
-  <div id="bottom-container">
+  <div id="bottom-container" class="p-2 border" >
     {#if (dev)}
     <ColorSamples />
     {/if}
@@ -55,6 +55,7 @@
   import {onMount} from "svelte";
 
   let isFullScreen = false;
+  let boardWidth = $state(400);
   let boardHeight = $state(400);
 
   function toggleFullScreen() {
@@ -78,10 +79,12 @@
       return;
     }
     const windowHeight = window.innerHeight;
+    const windowWidth = window.innerWidth;
     const topContainerHeight = topContainer.offsetTop + topContainer.offsetHeight;
     const bottomContainerHeight = bottomContainer.offsetHeight;
     // boardContainerHeight
     boardHeight = windowHeight - topContainerHeight - bottomContainerHeight;
+    boardWidth = windowWidth;
   }
 
   /* View in fullscreen */
