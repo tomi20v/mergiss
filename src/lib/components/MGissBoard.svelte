@@ -33,8 +33,10 @@
   }
 
   let width = $derived.by(() => {
-    const perWidth = Math.floor(boardWidth / (board.sizeX+1));
-    const perHeight = Math.floor(boardHeight / (board.sizeY+1));
+    const extraWidth = board.sizeX >= 5 ? 2.2 : 1.8;
+    const extraHeight = board.sizeY >= 5 ? 1 : 1.8;
+    const perWidth = Math.floor(boardWidth / (board.sizeX+extraWidth));
+    const perHeight = Math.floor(boardHeight / (board.sizeY+extraHeight));
     const ret = Math.min(perWidth, perHeight);
     return ret + 'px';
   })

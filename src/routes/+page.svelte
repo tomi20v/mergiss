@@ -55,6 +55,7 @@
   import {onMount} from "svelte";
 
   let isFullScreen = false;
+  let boardHeight = $state(400);
   let boardWidth = $state(400);
   let boardHeight = $state(400);
 
