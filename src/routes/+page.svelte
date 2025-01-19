@@ -11,29 +11,27 @@
       <Title>MERGISS</Title>
     </Section>
     <Section align="end" toolbar>
-      <IconButton class="material-icons" onclick={toggleFullScreen}>fullscreen</IconButton>
+      <IconButton class="material-icons" onclick={onToggleFullScreen}>fullscreen</IconButton>
     </Section>
   </Row>
 </TopAppBar>
 
-<div class="flex flex-col h-screen text-white bg-black" style="">
-  <div class="flex mt-12 p-2 md:p-3 lg:p-4 gap-5 md:p-3 flex-row">
+<div class="flex flex-col h-screen text-white bg-black" >
+  <div id="top-container" class="flex mt-12 p-2 md:p-3 lg:p-4 gap-5 flex-row" >
     <div class="flex">
       <MGenerator />
     </div>
     <div class="flex">
-      <MGenerator />
+      <MGenerator disabled />
     </div>
     <div class="flex">
-      <MGenerator />
+      <MGenerator disabled />
     </div>
     <div class="flex">
-      <MGenerator />
+      <MGenerator disabled />
     </div>
   </div>
-  <div class="flex flex-grow align-middle justify-center items-center"
-       style="xborder: 5px solid green; overflow: hidden;"
-  >
+  <div class="flex flex-grow align-middle justify-center items-center" >
     <MGissBoard boardWidth={boardWidth} boardHeight={boardHeight} />
   </div>
   <div id="bottom-container" class="p-2 border" >
@@ -57,11 +55,6 @@
   let isFullScreen = false;
   let boardHeight = $state(400);
   let boardWidth = $state(400);
-  let boardHeight = $state(400);
-
-  function toggleFullScreen() {
-    isFullScreen ? closeFullscreen() : openFullscreen();
-  }
 
   var documentElement!: HTMLElement;
 
@@ -88,15 +81,24 @@
     boardWidth = windowWidth;
   }
 
+  function onToggleFullScreen() {
+    if (isFullScreen) {
+      closeFullscreen()
+    } else {
+      openFullscreen();
+    }
+  }
+
   /* View in fullscreen */
   function openFullscreen() {
+    if (!documentElement) return;
     isFullScreen = true;
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) { /* Safari */
-      elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) { /* IE11 */
-      elem.msRequestFullscreen();
+    if (documentElement.requestFullscreen) {
+      documentElement.requestFullscreen();
+    } else if (documentElement.webkitRequestFullscreen) { /* Safari */
+      documentElement.webkitRequestFullscreen();
+    } else if (documentElement.msRequestFullscreen) { /* IE11 */
+      documentElement.msRequestFullscreen();
     } else {
       isFullScreen = false;
     }
