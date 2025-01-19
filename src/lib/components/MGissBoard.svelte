@@ -1,4 +1,14 @@
-<div class="flex flex-grow flex-col gap-0 text-white justify-center align-middle">
+<div class="flex flex-grow flex-col gap-0 text-white justify-center align-middle relative">
+  {#if (dev)}
+    <div class="flex flex-row gap-1 absolute top-0 right-0 bg-red-600 justify-center align-middle" >
+      <button onclick={resizeRemoveColumn}>dec</button>
+      <div class="flex flex-col gap-1 position=relative">
+        <button onclick={resizeRemoveRow}>dec</button>
+        <button onclick={resizeAddRow}>add</button>
+      </div>
+      <button onclick={resizeAddColumn}>add</button>
+    </div>
+  {/if}
   {#each board.fields as row, rowIndex}
   <div class="flex gap-0 justify-center">
     {#each row as field, fieldIndex}
@@ -14,23 +24,22 @@
     {/each}
   </div>
   {/each}
+  {board}
 </div>
 <script lang="ts">
 
   import BuildBoard from "$lib/game/BuildBoard";
+  import {dev} from "$app/environment";
 
   let { boardWidth, boardHeight } = $props();
 
+  // @todo this is not reactive like this, change it
   let board: BuildBoard = $state(new BuildBoard(5,5));
   // let board: BuildBoard = $state(new BuildBoard(10,10));
   // let board: BuildBoard = $state(new BuildBoard(30,20));
   // let board: BuildBoard = $state(new BuildBoard(40,20));
   // let board: BuildBoard = $state(new BuildBoard(15,15));
   // let board: BuildBoard = $state(new BuildBoard(42,42));
-
-  function backgroundImageOf(i: number, j: number): string {
-    return `grid/${String.fromCharCode(i%6 + 65)}${j%6+1}.png`;
-  }
 
   let width = $derived.by(() => {
     const extraWidth = board.sizeX >= 5 ? 2.2 : 1.8;
@@ -41,5 +50,21 @@
     return ret + 'px';
   })
 
+  function backgroundImageOf(i: number, j: number): string {
+    return `grid/${String.fromCharCode(i%6 + 65)}${j%6+1}.png`;
+  }
+
+  function resizeAddColumn() {
+    board.addColumn();
+  }
+  function resizeRemoveColumn() {
+    board.removeColumn();
+  }
+  function resizeAddRow() {
+    board.addRow();
+  }
+  function resizeRemoveRow() {
+    board.removeRow();
+  }
 
 </script>

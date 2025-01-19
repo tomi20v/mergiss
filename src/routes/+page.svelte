@@ -31,7 +31,7 @@
       <MGenerator disabled />
     </div>
   </div>
-  <div class="flex flex-grow align-middle justify-center items-center" >
+  <div class="flex flex-grow align-middle justify-center items-center pl-10 pr-10" >
     <MGissBoard boardWidth={boardWidth} boardHeight={boardHeight} />
   </div>
   <div id="bottom-container" class="p-2 border" >
@@ -42,6 +42,7 @@
 </div>
 
 <script lang="ts">
+
   import "../app.css";
 
   import IconButton from '@smui/icon-button';
