@@ -96,9 +96,13 @@
     isFullScreen = true;
     if (documentElement.requestFullscreen) {
       documentElement.requestFullscreen();
+    // @ts-expect-error legacy
     } else if (documentElement.webkitRequestFullscreen) { /* Safari */
+    // @ts-expect-error legacy
       documentElement.webkitRequestFullscreen();
+    // @ts-expect-error legacy
     } else if (documentElement.msRequestFullscreen) { /* IE11 */
+    // @ts-expect-error legacy
       documentElement.msRequestFullscreen();
     } else {
       isFullScreen = false;
@@ -109,9 +113,13 @@
   function closeFullscreen() {
     if (document.exitFullscreen) {
       document.exitFullscreen();
+    // @ts-expect-error legacy
     } else if (document.webkitExitFullscreen) { /* Safari */
+    // @ts-expect-error legacy
       document.webkitExitFullscreen();
+    // @ts-expect-error legacy
     } else if (document.msExitFullscreen) { /* IE11 */
+    // @ts-expect-error legacy
       document.msExitFullscreen();
     }
     isFullScreen = false;

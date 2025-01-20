@@ -11,7 +11,7 @@
   {/if}
   {#each board.fields as row, rowIndex}
   <div class="flex gap-0 justify-center">
-    {#each row as field, fieldIndex}
+    {#each row as _, fieldIndex}
       <div class="flex ggrow xbg-stone-500"
            style="color: white;
            aspect-ratio: 1;

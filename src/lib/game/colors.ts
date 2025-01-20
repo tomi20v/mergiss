@@ -1,6 +1,6 @@
 import tailwindColors from 'tailwindcss/colors';
 
-const colors: object = {
+const colors: {[key:string]: string} = {
   black: tailwindColors.black, // 0
   white: tailwindColors.white, // 1
   red: tailwindColors.red[600], // 2
