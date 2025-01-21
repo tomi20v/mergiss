@@ -19,6 +19,7 @@
            background-image: url({backgroundImageOf(rowIndex, fieldIndex)});
            "
            style:width="{width}"
+           transition:elasticTransition|global
       >
       </div>
     {/each}
@@ -29,6 +30,7 @@
 
   import {dev} from "$app/environment";
   import {onMount} from "svelte";
+  import elasticTransition from "$lib/transitions/elasticTransition";
 
   type FieldType = number;
 
@@ -75,6 +77,7 @@
   function resizeAddColumn() {
     sizeX++;
     fields.forEach(each => each.push(emptyField()));
+    // fields.forEach(each => setTimeout(() => each.push(emptyField()), 400*Math.random()));
   }
   function resizeRemoveColumn() {
     if (sizeX <= 5) {
@@ -82,6 +85,8 @@
     }
     sizeX--;
     fields.forEach(each => each.pop());
+    // funky effect :D
+    // fields.forEach(each => setTimeout(() => each.pop(), 400*Math.random()));
   }
   function resizeAddRow() {
     sizeY++;
