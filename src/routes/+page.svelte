@@ -1,4 +1,6 @@
-{#if 1}
+<svelte:window
+        onresize={onResize}
+/>
 <TopAppBar
   variant="standard"
   dense
@@ -9,68 +11,99 @@
       <Title>MERGISS</Title>
     </Section>
     <Section align="end" toolbar>
-      <IconButton class="material-icons" onclick={toggleFullScreen}>fullscreen</IconButton>
+      <IconButton class="material-icons" onclick={onToggleFullScreen}>fullscreen</IconButton>
     </Section>
   </Row>
 </TopAppBar>
-{/if}
 
-<LayoutGrid class="bg-black pt-16">
-  <Cell span={3} sstyle="border: 1px solid cyan;">
-    <MGenerator />
-  </Cell>
-  <Cell span={3} sstyle="border: 1px solid gray;">
-    <MGenerator disabled ></MGenerator>
-  </Cell>
-  <Cell span={3} sstyle="border: 1px solid gray;">
-    <MGenerator disabled ></MGenerator>
-  </Cell>
-  <Cell span={3} sstyle="border: 1px solid gray;">
-    <MGenerator disabled ></MGenerator>
-  </Cell>
-
-  <Cell span={2}>
-  </Cell>
-  <Cell span={8}>
-    <MGissBoard
-      ></MGissBoard>
-  </Cell>
-
-  {#if (dev)}
-  <Cell span={12} style="border: 1px solid purple; color: white;">
+<div class="flex flex-col h-screen text-white bg-black" >
+  <div id="top-container" class="flex mt-12 p-2 md:p-3 lg:p-4 gap-5 flex-row" >
+    <div class="flex">
+      <MGenerator />
+    </div>
+    <div class="flex">
+      <MGenerator disabled />
+    </div>
+    <div class="flex">
+      <MGenerator disabled />
+    </div>
+    <div class="flex">
+      <MGenerator disabled />
+    </div>
+  </div>
+  <div class="flex flex-grow align-middle justify-center items-center pl-10 pr-10" >
+    <MGissBoard boardWidth={boardWidth} boardHeight={boardHeight} />
+  </div>
+  <div id="bottom-container" class="p-2 border" >
+    {#if (dev)}
     <ColorSamples />
-  </Cell>
-  {/if}
-</LayoutGrid>
+    {/if}
+  </div>
+</div>
 
 <script lang="ts">
+
   import "../app.css";
 
   import IconButton from '@smui/icon-button';
-  import LayoutGrid, { Cell } from '@smui/layout-grid';
   import TopAppBar, {Row, Section, Title} from '@smui/top-app-bar';
   import MGissBoard from "$lib/components/MGissBoard.svelte";
   import MGenerator from "$lib/components/MGenerator.svelte";
   import ColorSamples from "$lib/components/dev/ColorSamples.svelte";
   import {dev} from "$app/environment";
+  import {onMount} from "svelte";
 
   let isFullScreen = false;
+  let boardHeight = $state(400);
+  let boardWidth = $state(400);
 
-  function toggleFullScreen() {
-    isFullScreen ? closeFullscreen() : openFullscreen();
+  var documentElement!: HTMLElement;
+
+  let topContainer: HTMLElement|null = null;
+  let bottomContainer: HTMLElement|null = null;
+
+  onMount(() => {
+    documentElement = document.documentElement;
+    topContainer = document.querySelector("#top-container");
+    bottomContainer = document.querySelector("#bottom-container");
+    onResize();
+  })
+
+  function onResize() {
+    if (!topContainer || !bottomContainer) {
+      return;
+    }
+    const windowHeight = window.innerHeight;
+    const windowWidth = window.innerWidth;
+    const topContainerHeight = topContainer.offsetTop + topContainer.offsetHeight;
+    const bottomContainerHeight = bottomContainer.offsetHeight;
+    // boardContainerHeight
+    boardHeight = windowHeight - topContainerHeight - bottomContainerHeight;
+    boardWidth = windowWidth;
   }
 
-  var elem = document.documentElement;
+  function onToggleFullScreen() {
+    if (isFullScreen) {
+      closeFullscreen()
+    } else {
+      openFullscreen();
+    }
+  }
 
   /* View in fullscreen */
   function openFullscreen() {
+    if (!documentElement) return;
     isFullScreen = true;
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) { /* Safari */
-      elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) { /* IE11 */
-      elem.msRequestFullscreen();
+    if (documentElement.requestFullscreen) {
+      documentElement.requestFullscreen();
+    // @ts-expect-error legacy
+    } else if (documentElement.webkitRequestFullscreen) { /* Safari */
+    // @ts-expect-error legacy
+      documentElement.webkitRequestFullscreen();
+    // @ts-expect-error legacy
+    } else if (documentElement.msRequestFullscreen) { /* IE11 */
+    // @ts-expect-error legacy
+      documentElement.msRequestFullscreen();
     } else {
       isFullScreen = false;
     }
@@ -80,9 +113,13 @@
   function closeFullscreen() {
     if (document.exitFullscreen) {
       document.exitFullscreen();
+    // @ts-expect-error legacy
     } else if (document.webkitExitFullscreen) { /* Safari */
+    // @ts-expect-error legacy
       document.webkitExitFullscreen();
+    // @ts-expect-error legacy
     } else if (document.msExitFullscreen) { /* IE11 */
+    // @ts-expect-error legacy
       document.msExitFullscreen();
     }
     isFullScreen = false;
