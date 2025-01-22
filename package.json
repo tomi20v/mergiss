@@ -1,8 +1,8 @@
 {
 	"name": "mergiss",
 	"private": true,
-	"version": "0.2.0",
-	"description": "I can switch to fullscreen",
+	"version": "0.3.0",
+	"description": "Piece is draggable, shows a scaled up dragging image",
 	"type": "module",
 	"prepare": "svelte-kit sync",
 	"scripts": {
