@@ -18,7 +18,7 @@
            background-size: 100%;
            background-image: url({backgroundImageOf(rowIndex, fieldIndex)});
            "
-           style:width="{width}"
+           style:width="{width}px"
            transition:elasticTransition|global
       >
       </div>
@@ -31,6 +31,7 @@
   import {dev} from "$app/environment";
   import {onMount} from "svelte";
   import elasticTransition from "$lib/transitions/elasticTransition";
+  import store from "$lib/store.svelte";
 
   type FieldType = number;
 
@@ -48,7 +49,7 @@
   let sizeY: number = $state(sY);
   let fields: FieldType[][] = $state([]);
 
-  let width = $derived.by(() => {
+  let width: number = $derived.by(() => {
     // this makes sure we update the width when the table size changes
     // const s = serial;
     const extraWidth = sizeX >= 5 ? 2.2 : 1.8;
@@ -56,7 +57,11 @@
     const perWidth = Math.floor(boardWidth / (sizeX+extraWidth));
     const perHeight = Math.floor(boardHeight / (sizeY+extraHeight));
     const ret = Math.min(perWidth, perHeight);
-    return ret + 'px';
+    return ret;
+  })
+
+  $effect(() => {
+    store.mergeBoardCellWidth = width;
   })
 
   onMount(() => {
