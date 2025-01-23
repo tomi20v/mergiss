@@ -26,8 +26,9 @@
                 <div class="flex w-0"></div>
             {/if}
             {#each eachRow as eachCell}
-            <div class="flex aspect-square grow"
-                 style="border-radius: 15%; {eachCell ? cellStyle : ''}">
+            <div class="flex aspect-square grow piece-cell {eachCell ? 'piece-cell-full' : 'piece-cell-empty'}"
+                 style="border-radius: 15%; {eachCell ? cellStyle : ''}"
+            >
             </div>
             {/each}
         </div>
@@ -35,7 +36,10 @@
 </div>
 <script lang="ts">
 
-  let { piece } = $props();
+  import store from "$lib/store.svelte";
+  import PieceType from "$lib/game/piece/Piece";
+
+  let { piece }: { piece: PieceType } = $props();
   let w = $derived(piece.pixelMap[0].length);
   let maxWidth = $derived.by(() => {
     const h = piece.pixelMap.length;
@@ -57,18 +61,10 @@
     isDragging = false;
   }
 
-  // const draggable: Action<
-  //   HTMLElement,
-  //   undefined,
-  //   {}
-  // > = (node) => {
-  //
-  // }
-
   function onDragStart(event: DragEvent) {
     isDragging = true;
 
-// Ensure the target is an HTMLElement
+    // Ensure the target is an HTMLElement
     const target = event.currentTarget as HTMLElement;
     if (!target) return;
 
@@ -77,12 +73,14 @@
     // Create a custom drag image
     const dragImage = target.cloneNode(true) as HTMLElement;
     dragImage.style.position = 'absolute';
-    dragImage.style.top = '999px';
-    dragImage.style.left = '99px';
+    dragImage.style.top = '-9999px';
+    dragImage.style.left = '-9999px';
     dragImage.style.opacity = '1'; // Ensure the drag image is visible
     dragImage.style.zIndex = '9999'; // Ensure the drag image is visible
-    dragImage.style.minWidth = '299px'; // Ensure the drag image is visible
-    console.log('DI', dragImage);
+    // dragImage.style.width = store.mergeBoardCellWidth + 'px'; // Ensure the drag image is visible
+    // Ensure the drag image is same size as the board. Due to relative gaps we set the size of the whole
+    dragImage.style.width = store.mergeBoardCellWidth * w + 'px';
+
     document.body.appendChild(dragImage);
 
     // Set the custom drag image
