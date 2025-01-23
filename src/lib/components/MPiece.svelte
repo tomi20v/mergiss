@@ -41,9 +41,9 @@
 
   let { piece }: { piece: PieceType } = $props();
   let w = $derived(piece.pixelMap[0].length);
+  let h = $derived(piece.pixelMap.length);
   let maxWidth = $derived.by(() => {
-    const h = piece.pixelMap.length;
-    const w = piece.pixelMap[0].length;
+    // const w = piece.pixelMap[0].length;
     if ((h >2) || (w <= 2)) {
       return "66%";
     }
@@ -62,6 +62,7 @@
   }
 
   function onDragStart(event: DragEvent) {
+
     isDragging = true;
 
     // Ensure the target is an HTMLElement
@@ -79,17 +80,25 @@
     dragImage.style.zIndex = '9999'; // Ensure the drag image is visible
     // dragImage.style.width = store.mergeBoardCellWidth + 'px'; // Ensure the drag image is visible
     // Ensure the drag image is same size as the board. Due to relative gaps we set the size of the whole
-    dragImage.style.width = store.mergeBoardCellWidth * w + 'px';
+    const draggedWidth = store.mergeBoardCellWidth * w;
+    dragImage.style.width = draggedWidth + 'px';
+
+    // Set the custom drag image and cursor offset. Would be nicer to retain cursor offset at click time
+    // event.dataTransfer?.setDragImage(dragImage, store.mergeBoardCellWidth * w / 2, store.mergeBoardCellWidth * h / 2);
+    const originalWidth = target.offsetWidth;
+    event.dataTransfer?.setDragImage(
+      dragImage,
+      event.offsetX * draggedWidth / originalWidth,
+      event.offsetY * draggedWidth / originalWidth
+    );
 
     document.body.appendChild(dragImage);
 
-    // Set the custom drag image
-    event.dataTransfer?.setDragImage(dragImage, 0, 0);
-
-    // Clean up the custom drag image after the drag ends
+    // Clean up the custom drag image after setting it for drag
     setTimeout(() => {
       document.body.removeChild(dragImage);
     });
+
   }
 
 </script>
