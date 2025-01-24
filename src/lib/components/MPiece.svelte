@@ -40,10 +40,9 @@
   import PieceType from "$lib/game/piece/Piece";
 
   let { piece }: { piece: PieceType } = $props();
-  let w = $derived(piece.pixelMap[0].length);
-  let h = $derived(piece.pixelMap.length);
-  let maxWidth = $derived.by(() => {
-    // const w = piece.pixelMap[0].length;
+  let w = $derived<number>(piece.pixelMap[0].length);
+  let h = $derived<number>(piece.pixelMap.length);
+  let maxWidth = $derived.by<string|null>(() => {
     if ((h >2) || (w <= 2)) {
       return "66%";
     }
@@ -52,7 +51,19 @@
   // some old formulas
   // let cellStyle = $derived('background-color: ' + piece.color + '; box-shadow: inset 2px 2px 2px, 1px 1px 1px dimgray');
   // let cellStyle = $derived('background-color: ' + piece.color + '; box-shadow: inset 2px 2px 2px ' + piece.shadowColor + ', 1px 1px 1px dimgray');
-  let cellStyle = $derived('background-color: ' + piece.color + '; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray');
+  let cellStyle = $derived<string>('background-color: ' + piece.color + '; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray');
+
+  let dragAtX: number = $derived.by<number>(() => {
+    const row = piece.pixelMap[dragAtY];
+    let i = 0;
+    for (i=row.length-1; i>0; i--) {
+      if (row[i]) {
+        break;
+      }
+    }
+    return i;
+  })
+  let dragAtY = $derived<number>(piece.pixelMap.length-1);
 
   let isDragging = $state(false);
   let scale = 1.2;
@@ -83,14 +94,12 @@
     const draggedWidth = store.mergeBoardCellWidth * w;
     dragImage.style.width = draggedWidth + 'px';
 
-    // Set the custom drag image and cursor offset. Would be nicer to retain cursor offset at click time
-    // event.dataTransfer?.setDragImage(dragImage, store.mergeBoardCellWidth * w / 2, store.mergeBoardCellWidth * h / 2);
-    const originalWidth = target.offsetWidth;
     event.dataTransfer?.setDragImage(
       dragImage,
-      event.offsetX * draggedWidth / originalWidth,
-      event.offsetY * draggedWidth / originalWidth
+      (dragAtX + 0.5) * store.mergeBoardCellWidth,
+      (dragAtY + 0.5) * store.mergeBoardCellWidth
     );
+    event.dataTransfer.effectAllowed = "move"
 
     document.body.appendChild(dragImage);
 
