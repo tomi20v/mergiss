@@ -1,25 +1,31 @@
 <div class="flex flex-grow flex-col gap-0 text-white justify-center align-middle relative">
   {#if (dev)}
-    <div class="flex flex-row gap-1 absolute top-0 right-0 bg-red-600 justify-center align-middle" >
-      <button onclick={resizeRemoveColumn}>dec</button>
-      <div class="flex flex-col gap-1 position=relative">
-        <button onclick={resizeRemoveRow}>dec</button>
-        <button onclick={resizeAddRow}>add</button>
+    <div class="flex flex-col gap-1 absolute top-0 right-0 bg-red-600 justify-center align-middle" >
+      <div class="flex flex-row gap-1 items-center justify-center">
+        <button onclick={resizeRemoveColumn}>dec</button>
+        <div class="flex flex-col gap-1 position=relative">
+          <button onclick={resizeRemoveRow}>dec</button>
+          <button onclick={resizeAddRow}>add</button>
+        </div>
+        <button onclick={resizeAddColumn}>add</button>
       </div>
-      <button onclick={resizeAddColumn}>add</button>
+      <div>{JSON.stringify(pieceAt)}</div>
     </div>
   {/if}
-  {#each fields as row, rowIndex}
+  {#each fields as row, iY}
   <div class="flex gap-0 justify-center">
-    {#each row as _, fieldIndex}
+    {#each row as _, iX}
       <div class="flex ggrow xbg-stone-500"
            style="color: white;
            aspect-ratio: 1;
            background-size: 100%;
-           background-image: url({backgroundImageOf(rowIndex, fieldIndex)});
+           background-image: url({backgroundImageOf(iX, iY)});
            "
            style:width="{width}px"
            transition:elasticTransition|global
+           ondragenter={() => onDragEnter(iX, iY)}
+           ondragleave={() => onDragLeave(iX, iY)}
+           role="none"
       >
       </div>
     {/each}
@@ -49,6 +55,13 @@
   let sizeY: number = $state(sY);
   let fields: FieldType[][] = $state([]);
 
+  type PosAtType = {
+    atX: number;
+    atY: number;
+  }
+
+  let pieceAt: PosAtType|null = $state(null);
+
   let width: number = $derived.by(() => {
     // this makes sure we update the width when the table size changes
     // const s = serial;
@@ -71,12 +84,23 @@
     );
   })
 
+  function backgroundImageOf(atX: number, atY: number): string {
+    return `grid/${String.fromCharCode(atY%6 + 65)}${atX%6+1}.png`;
+  }
+
   function emptyField(): FieldType {
     return 0;
   }
 
-  function backgroundImageOf(i: number, j: number): string {
-    return `grid/${String.fromCharCode(i%6 + 65)}${j%6+1}.png`;
+  function onDragEnter(atX: number, atY: number) {
+    // e.dataTransfer.dropEffect = "move";
+    // console.log('dragEnter', atX, atY);
+    pieceAt = {atX, atY};
+  }
+  function onDragLeave(atX: number, atY: number) {
+    if ((pieceAt?.atX === atX) && (pieceAt?.atY === atY)) {
+      pieceAt = null;
+    }
   }
 
   function resizeAddColumn() {
