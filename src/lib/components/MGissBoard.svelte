@@ -1,4 +1,4 @@
-<div class="flex flex-grow flex-col gap-0 text-white justify-center align-middle relative">
+<div class="flex flex-grow flex-col gap-0 p-2 text-white justify-center align-middle relative">
   {#if (dev)}
     <div class="flex flex-col gap-1 absolute top-0 right-0 bg-red-600 justify-center align-middle" >
       <div class="flex flex-row gap-1 items-center justify-center">
@@ -23,8 +23,10 @@
            "
            style:width="{width}px"
            transition:elasticTransition|global
-           ondragenter={() => onDragEnter(iX, iY)}
-           ondragleave={() => onDragLeave(iX, iY)}
+           ondragenter={(e) => onDragEnter(e, iX, iY)}
+           ondragleave={(e) => onDragLeave(e, iX, iY)}
+           ondragover={onDragOver}
+           ondrop={() => onDrop(iX, iY)}
            role="none"
       >
       </div>
@@ -38,6 +40,7 @@
   import {onMount} from "svelte";
   import elasticTransition from "$lib/transitions/elasticTransition";
   import store from "$lib/store.svelte";
+  import Position from "$lib/components/Position";
 
   type FieldType = number;
 
@@ -92,15 +95,21 @@
     return 0;
   }
 
-  function onDragEnter(atX: number, atY: number) {
+  function onDragEnter(e, atX: number, atY: number) {
+    // doesn't seem to take effect
     // e.dataTransfer.dropEffect = "move";
-    // console.log('dragEnter', atX, atY);
-    pieceAt = {atX, atY};
+    console.debug("I'll need this to dynamically mark where the piece will be dropped, so leving here");
   }
-  function onDragLeave(atX: number, atY: number) {
-    if ((pieceAt?.atX === atX) && (pieceAt?.atY === atY)) {
-      pieceAt = null;
-    }
+  function onDragLeave(e, atX: number, atY: number) {
+    console.debug("I'll need thisto dynamically mark where the piece will be dropped, so leving here");
+  }
+  function onDragOver(e: DragEvent) {
+    // important: calling preventDefault enables dropping here
+    e.preventDefault();
+  }
+  function onDrop(atX: number, atY: number) {
+    // @todo now implement receiving the piece here
+    console.log('onDrop', atX, atY);
   }
 
   function resizeAddColumn() {
