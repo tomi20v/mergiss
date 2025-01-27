@@ -25,7 +25,7 @@
            transition:elasticTransition|global
            ondragenter={(e) => onDragEnter(e, iX, iY)}
            ondragleave={(e) => onDragLeave(e, iX, iY)}
-           ondragover={onDragOver}
+           ondragover={(e) => onDragOver(e, iX, iY)}
            ondrop={() => onDrop(iX, iY)}
            role="none"
       >
@@ -58,12 +58,7 @@
   let sizeY: number = $state(sY);
   let fields: FieldType[][] = $state([]);
 
-  type PosAtType = {
-    atX: number;
-    atY: number;
-  }
-
-  let pieceAt: PosAtType|null = $state(null);
+  let pieceAt: Position|null = $state(null);
 
   let width: number = $derived.by(() => {
     // this makes sure we update the width when the table size changes
@@ -98,14 +93,22 @@
   function onDragEnter(e, atX: number, atY: number) {
     // doesn't seem to take effect
     // e.dataTransfer.dropEffect = "move";
-    console.debug("I'll need this to dynamically mark where the piece will be dropped, so leving here");
+    console.debug("I'll need this to dynamically mark where the piece will be dropped, so leaving it here");
+    // todo make "dropMark" here
   }
   function onDragLeave(e, atX: number, atY: number) {
-    console.debug("I'll need thisto dynamically mark where the piece will be dropped, so leving here");
+    if (pieceAt?.equals(atX, atY)) {
+      pieceAt = null;
+    }
+    // @todo we can shall "dropMark" here too?
   }
-  function onDragOver(e: DragEvent) {
+  function onDragOver(e: DragEvent, atX: number, atY: number) {
     // important: calling preventDefault enables dropping here
     e.preventDefault();
+    // using the conditional it is measurably faster, eg. 0.01 vs 0.03
+    if (!pieceAt?.equals(atX, atY)) {
+      pieceAt = new Position(atX, atY);
+    }
   }
   function onDrop(atX: number, atY: number) {
     // @todo now implement receiving the piece here
