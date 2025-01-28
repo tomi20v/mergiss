@@ -38,6 +38,7 @@
 
   import store from "$lib/store.svelte";
   import PieceType from "$lib/game/piece/Piece";
+  import Position from "$lib/components/Position";
 
   let { piece }: { piece: PieceType } = $props();
   let w = $derived<number>(piece.pixelMap[0].length);
@@ -99,7 +100,10 @@
       (dragAtX + 0.5) * store.mergeBoardCellWidth,
       (dragAtY + 0.5) * store.mergeBoardCellWidth
     );
-    event.dataTransfer.effectAllowed = "move"
+    // this doesn't seem to work but triggers possibly null error
+    // event.dataTransfer.effectAllowed = "all";
+
+    event.dataTransfer?.setData("dragAt", JSON.stringify(new Position(dragAtX, dragAtY)));
 
     document.body.appendChild(dragImage);
 

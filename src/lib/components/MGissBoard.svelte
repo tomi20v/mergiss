@@ -26,7 +26,7 @@
            ondragenter={(e) => onDragEnter(e, iX, iY)}
            ondragleave={(e) => onDragLeave(e, iX, iY)}
            ondragover={(e) => onDragOver(e, iX, iY)}
-           ondrop={() => onDrop(iX, iY)}
+           ondrop={(e) => onDrop(e, iX, iY)}
            role="none"
       >
       </div>
@@ -90,13 +90,13 @@
     return 0;
   }
 
-  function onDragEnter(e, atX: number, atY: number) {
+  function onDragEnter(e: DragEvent, atX: number, atY: number) {
     // doesn't seem to take effect
     // e.dataTransfer.dropEffect = "move";
     console.debug("I'll need this to dynamically mark where the piece will be dropped, so leaving it here");
     // todo make "dropMark" here
   }
-  function onDragLeave(e, atX: number, atY: number) {
+  function onDragLeave(e: DragEvent, atX: number, atY: number) {
     if (pieceAt?.equals(atX, atY)) {
       pieceAt = null;
     }
@@ -110,9 +110,9 @@
       pieceAt = new Position(atX, atY);
     }
   }
-  function onDrop(atX: number, atY: number) {
+  function onDrop(e: DragEvent, atX: number, atY: number) {
     // @todo now implement receiving the piece here
-    console.log('onDrop', atX, atY);
+    console.log('onDrop', e.dataTransfer?.getData("dragAt"), atX, atY);
   }
 
   function resizeAddColumn() {
