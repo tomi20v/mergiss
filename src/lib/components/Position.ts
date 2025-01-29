@@ -1,10 +1,21 @@
+// @todo move out of components
 export default class Position {
-  atX: number;
-  atY: number;
+
+  readonly atX: number;
+  readonly atY: number;
+
+  static fromJSON(json: string): Position {
+    const data = JSON.parse(json);
+    return new Position(data.atX, data.atY);
+  }
 
   constructor(atX: number, atY: number) {
     this.atX = atX;
     this.atY = atY;
+  }
+
+  clone(): Position {
+    return new Position(this.atX, this.atY);
   }
 
   equalsTo(other: Position): boolean {
@@ -18,8 +29,8 @@ export default class Position {
     )
   }
 
-  clone(): Position {
-    return new Position(this.atX, this.atY);
+  sub(other: Position): Position {
+    return new Position(this.atX - other.atX, this.atY - other.atY);
   }
 
 }

@@ -6,7 +6,13 @@ export default class Piece {
   readonly color: string;
   readonly shadowColor: string;
 
-  public ts: number = new Date().getTime();
+  readonly ts: number = new Date().getTime();
+  // public ts: number = uniqueId();
+
+  static fromJSON(json: string): Piece {
+    const data = JSON.parse(json);
+    return new Piece(data.pixelMap, data.color, data.shadowColor);
+  }
 
   constructor(
     pixelMap: IProtoMap,
@@ -16,6 +22,15 @@ export default class Piece {
     this.pixelMap = pixelMap;
     this.color = color;
     this.shadowColor = shadowColor;
+  }
+
+  sizeX(): number {
+    // return this.pixelMap.length > 0 ? this.pixelMap[0].length : 0;
+    return this.pixelMap[0]?.length;
+  }
+
+  sizeY(): number {
+    return this.pixelMap.length;
   }
 
 }
