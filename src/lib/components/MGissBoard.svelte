@@ -15,7 +15,7 @@
   {#each fields as row, iY}
   <div class="flex gap-0 justify-center">
     {#each row as _, iX}
-      <div class="flex ggrow xbg-stone-500"
+      <div class="flex"
            style="color: white;
            aspect-ratio: 1;
            background-size: 100%;
@@ -31,8 +31,8 @@
       >
         {#if (fields[iY][iX])}
           <div
-            class="flex grow bg-stone-500"
-            style="border-radius: 15%; background-color: gray; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray"
+            class="flex grow bg-stone-500 m-0.5"
+            style="border-radius: 15%; background-color: {fields[iY][iX]}; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray"
           ></div>
         {/if}
       </div>
@@ -49,7 +49,7 @@
   import Position from "$lib/components/Position";
   import Piece from "$lib/game/piece/Piece";
 
-  type FieldType = number;
+  type FieldType = string|null;
 
   let { boardWidth, boardHeight } = $props();
 
@@ -94,11 +94,11 @@
   }
 
   function emptyField(): FieldType {
-    return 0;
+    return null;
   }
 
   function coloredField(color: string): FieldType {
-    return 1;
+    return color;
   }
 
   function fitsOnBoard(piece: Piece, position: Position): boolean {
@@ -168,7 +168,7 @@
   }
   function resizeAddRow() {
     sizeY++;
-    const row: number[] = [];
+    const row: FieldType[] = [];
     for (let x=0; x<sizeX; x++) {
       row.push(emptyField());
     }
