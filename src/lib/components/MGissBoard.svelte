@@ -48,13 +48,14 @@
   import store from "$lib/store.svelte";
   import Position from "$lib/components/Position";
   import Piece from "$lib/game/piece/Piece";
+  import {uiBus} from "$lib/util";
 
   type FieldType = string|null;
 
   let { boardWidth, boardHeight } = $props();
 
   // @todo these shall go into some game state ("save") management
-  const sX = 6, sY = 6;
+  const sX = 5, sY = 5;
   // const sX = 10, sY = 10;
   // const sX = 30, sY = 20;
   // const sX = 40, sY = 20;
@@ -137,6 +138,8 @@
       return;
     }
     putOnBoard(piece, piecePosition);
+    pieceAt = null;
+    uiBus.emit('piece.drop', {origin: 'mergeBoard', pieceId: piece.originalTs});
   }
 
   function putOnBoard(piece: Piece, position: Position) {

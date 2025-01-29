@@ -23,13 +23,31 @@
   import Piece from "$lib/game/piece/Piece";
   import {pieceFactory} from "$lib/game/services";
   import MPiece from "$lib/components/MPiece.svelte";
+  import {onDestroy, onMount} from "svelte";
+  import {uiBus} from "$lib/util";
 
   let piece: Piece|null = $state(null);
 
   let { disabled = false } = $props();
 
+  onMount(() => {
+    uiBus.on('piece.drop', onPieceDrop);
+  })
+
+  onDestroy(() => {
+    uiBus.off('piece.drop', onPieceDrop);
+  })
+
   function onClick() {
     piece = pieceFactory.randomPiece();
+  }
+
+  // emitted by board or similar. If the current generated piece was dropped, remove it.
+  function onPieceDrop(eventData: {origin: string, pieceId: number}) {
+    if (! piece || !eventData.pieceId || (piece.ts !== eventData.pieceId)) {
+      return;
+    }
+    piece = null;
   }
 
 </script>

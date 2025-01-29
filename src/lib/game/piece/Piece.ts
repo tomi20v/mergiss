@@ -9,9 +9,14 @@ export default class Piece {
   readonly ts: number = new Date().getTime();
   // public ts: number = uniqueId();
 
+  // when re-constructed from JSON, this originalTs will hold original value
+  originalTs: number = 0;
+
   static fromJSON(json: string): Piece {
     const data = JSON.parse(json);
-    return new Piece(data.pixelMap, data.color, data.shadowColor);
+    const ret = new Piece(data.pixelMap, data.color, data.shadowColor);
+    ret.originalTs = data.ts;
+    return ret;
   }
 
   constructor(
@@ -25,8 +30,7 @@ export default class Piece {
   }
 
   sizeX(): number {
-    // return this.pixelMap.length > 0 ? this.pixelMap[0].length : 0;
-    return this.pixelMap[0]?.length;
+    return this.pixelMap[0]?.length || 0;
   }
 
   sizeY(): number {
