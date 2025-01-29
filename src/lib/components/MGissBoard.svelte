@@ -30,7 +30,10 @@
            role="none"
       >
         {#if (fields[iY][iX])}
-          !!!
+          <div
+            class="flex grow bg-stone-500"
+            style="border-radius: 15%; background-color: gray; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray"
+          ></div>
         {/if}
       </div>
     {/each}
@@ -100,7 +103,7 @@
 
   function fitsOnBoard(piece: Piece, position: Position): boolean {
     return (position.atX >= 0) && ((position.atX + piece.sizeX()) <= sizeX) &&
-            (position.atY >= 0) && ((position.atY + piece.sizeY()) <= sizeY);
+           (position.atY >= 0) && ((position.atY + piece.sizeY()) <= sizeY);
   }
 
   function onDragEnter(e: DragEvent, atX: number, atY: number) {
@@ -116,7 +119,7 @@
     // @todo we can shall "dropMark" here too?
   }
   function onDragOver(e: DragEvent, atX: number, atY: number) {
-    // important: calling preventDefault enables dropping here
+    // important: calling preventDefault enables dropping here at all
     e.preventDefault();
     // using the conditional it is measurably faster, eg. 0.01 vs 0.03
     if (!pieceAt?.equals(atX, atY)) {
