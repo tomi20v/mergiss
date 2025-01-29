@@ -29,6 +29,9 @@
            ondrop={(e) => onDrop(e, iX, iY)}
            role="none"
       >
+        {#if (fields[iY][iX])}
+          !!!
+        {/if}
       </div>
     {/each}
   </div>
@@ -41,6 +44,7 @@
   import elasticTransition from "$lib/transitions/elasticTransition";
   import store from "$lib/store.svelte";
   import Position from "$lib/components/Position";
+  import Piece from "$lib/game/piece/Piece";
 
   type FieldType = number;
 
@@ -90,11 +94,19 @@
     return 0;
   }
 
+  function coloredField(color: string): FieldType {
+    return 1;
+  }
+
+  function fitsOnBoard(piece: Piece, position: Position): boolean {
+    return true;
+  }
+
   function onDragEnter(e: DragEvent, atX: number, atY: number) {
-    // doesn't seem to take effect
+    // doesn't seem to do anything
     // e.dataTransfer.dropEffect = "move";
-    console.debug("I'll need this to dynamically mark where the piece will be dropped, so leaving it here");
-    // todo make "dropMark" here
+    // @todo make "dropMark" here
+    // pieceAt = new Position(atX, atY);
   }
   function onDragLeave(e: DragEvent, atX: number, atY: number) {
     if (pieceAt?.equals(atX, atY)) {
@@ -110,9 +122,30 @@
       pieceAt = new Position(atX, atY);
     }
   }
-  function onDrop(e: DragEvent, atX: number, atY: number) {
-    // @todo now implement receiving the piece here
-    console.log('onDrop', e.dataTransfer?.getData("dragAt"), atX, atY);
+  function onDrop(e: DragEvent, droppedAtX: number, droppedAtY: number) {
+    const piece = Piece.fromJSON(e.dataTransfer?.getData("piece")||'');
+    let piecePosition = new Position(droppedAtX, droppedAtY);
+    const dragAt = Position.fromJSON(e.dataTransfer?.getData("dragAt")||'');
+    if (dragAt) {
+      piecePosition = piecePosition.sub(dragAt);
+    }
+    if (!fitsOnBoard(piece, piecePosition)) {
+      return;
+    }
+    putOnBoard(piece, piecePosition);
+  }
+
+  function putOnBoard(piece: Piece, position: Position) {
+    // console.log('put on board: ', piece, position);
+    for (let pieceY=0; pieceY<piece.sizeY(); pieceY++) {
+      for (let pieceX=0; pieceX<piece.sizeX(); pieceX++) {
+        const boardX = position.atX + pieceX;
+        const boardY = position.atY + pieceY;
+        if (piece.pixelMap[pieceY][pieceX]) {
+          fields[boardY][boardX] = coloredField(piece.color);
+        }
+      }
+    }
   }
 
   function resizeAddColumn() {
