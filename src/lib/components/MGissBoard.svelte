@@ -99,7 +99,8 @@
   }
 
   function fitsOnBoard(piece: Piece, position: Position): boolean {
-    return true;
+    return (position.atX >= 0) && ((position.atX + piece.sizeX()) <= sizeX) &&
+            (position.atY >= 0) && ((position.atY + piece.sizeY()) <= sizeY);
   }
 
   function onDragEnter(e: DragEvent, atX: number, atY: number) {
