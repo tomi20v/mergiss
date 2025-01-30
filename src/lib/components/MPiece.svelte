@@ -1,7 +1,7 @@
 <div class="flex flex-grow flex-col gap-0.5"
      style="cursor: grab; transform: scale({isDragging ? scale : 1});"
      style:max-width="{maxWidth}"
-     style:opacity="{isDragging ? 0 : 1}"
+     _style:opacity="{isDragging ? 0 : 1}"
      draggable={true}
      ondragstart={onDragStart}
      ondragend={onDragEnd}
@@ -40,7 +40,19 @@
   import PieceType from "$lib/game/piece/Piece";
   import Position from "$lib/components/Position";
 
-  let { piece }: { piece: PieceType } = $props();
+  const DragAtOptions = {
+    topLeft: 0,
+    bottomRight: 1,
+  }
+
+  // const DragAtSetting = DragAtOptions.bottomRight;
+  const DragAtSetting = DragAtOptions.topLeft;
+
+  let {
+    piece
+  }: {
+    piece: PieceType
+  } = $props();
   let w = $derived<number>(piece.pixelMap[0].length);
   let h = $derived<number>(piece.pixelMap.length);
   let maxWidth = $derived.by<string|null>(() => {
@@ -57,14 +69,34 @@
   let dragAtX: number = $derived.by<number>(() => {
     const row = piece.pixelMap[dragAtY];
     let i = 0;
-    for (i=row.length-1; i>0; i--) {
-      if (row[i]) {
-        break;
-      }
+    switch (DragAtSetting) {
+      case DragAtOptions.bottomRight:
+        for (i=row.length-1; i>0; i--) {
+          if (row[i]) {
+            break;
+          }
+        }
+        return i;
+      default:
+        // DragAtOptions.topLeft
+        for (i=0; i<row.length; i++) {
+          if (row[i]) {
+            break;
+          }
+        }
+        return i;
     }
-    return i;
   })
-  let dragAtY = $derived<number>(piece.pixelMap.length-1);
+  let dragAtY: number = $derived.by<number>(() => {
+    const pixelMap = piece.pixelMap;
+    switch (DragAtSetting) {
+      case DragAtOptions.bottomRight:
+        return pixelMap.length - 1;
+      default:
+        // DragAtOptions.topLeft
+        return 0;
+    }
+  })
 
   let isDragging = $state(false);
   let scale = 1.2;
@@ -104,6 +136,10 @@
     // event.dataTransfer.effectAllowed = "all";
 
     event.dataTransfer?.setData("dragAt", JSON.stringify(new Position(dragAtX, dragAtY)));
+    // event.dataTransfer?.setData("dragAtX", JSON.stringify(dragAtX));
+    // event.dataTransfer?.setData("dragAtY", JSON.stringify(dragAtY));
+    event.dataTransfer?.setData("piece", JSON.stringify(piece));
+    event.dataTransfer?.setData("source", "???");
 
     document.body.appendChild(dragImage);
 
