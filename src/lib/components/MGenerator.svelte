@@ -43,8 +43,8 @@
   }
 
   // emitted by board or similar. If the current generated piece was dropped, remove it.
-  function onPieceDrop(eventData: {origin: string, pieceId: number}) {
-    if (! piece || !eventData.pieceId || (piece.ts !== eventData.pieceId)) {
+  function onPieceDrop(eventData: {origin: string, piece: Piece}) {
+    if (! piece || (piece.uniqueId !== eventData.piece?.originalUniqueId)) {
       return;
     }
     piece = null;
