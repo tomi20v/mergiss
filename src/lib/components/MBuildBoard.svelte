@@ -139,7 +139,7 @@
     }
     putOnBoard(piece, piecePosition);
     pieceAt = null;
-    uiBus.emit('piece.drop', {origin: 'mergeBoard', pieceId: piece.originalTs});
+    uiBus.emit('piece.drop', {origin: 'mergeBoard', piece});
   }
 
   function putOnBoard(piece: Piece, position: Position) {

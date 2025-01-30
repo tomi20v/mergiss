@@ -1,7 +1,7 @@
 <div class="flex flex-grow flex-col gap-0.5"
      style="cursor: grab; transform: scale({isDragging ? scale : 1});"
      style:max-width="{maxWidth}"
-     _style:opacity="{isDragging ? 0 : 1}"
+     style:opacity="{isDragging ? 0 : 1}"
      draggable={true}
      ondragstart={onDragStart}
      ondragend={onDragEnd}
@@ -13,16 +13,16 @@
                 the gapping make these cases uneven and things start jumping around
                 HOWEVER it still jumps between empty and having a piece which might happen when dragging later?
                 -->
-            {#if (w<1)}
+            {#if (piece.sizeX()<1)}
                 <div class="flex w-0"></div>
             {/if}
-            {#if (w<2)}
+            {#if (piece.sizeX()<2)}
                 <div class="flex w-0"></div>
             {/if}
-            {#if (w<3)}
+            {#if (piece.sizeX()<3)}
                 <div class="flex w-0"></div>
             {/if}
-            {#if (w<4)}
+            {#if (piece.sizeX()<4)}
                 <div class="flex w-0"></div>
             {/if}
             {#each eachRow as eachCell}
@@ -45,6 +45,8 @@
     bottomRight: 1,
   }
 
+  // for mobile, bottom right would work better, at least for right handed ppl. For others, bottom left. For screens
+  //    top left seems better to minimize mouse travel :D But top center would even be better. Anyway make this a setting
   // const DragAtSetting = DragAtOptions.bottomRight;
   const DragAtSetting = DragAtOptions.topLeft;
 
@@ -53,10 +55,8 @@
   }: {
     piece: PieceType
   } = $props();
-  let w = $derived<number>(piece.pixelMap[0].length);
-  let h = $derived<number>(piece.pixelMap.length);
   let maxWidth = $derived.by<string|null>(() => {
-    if ((h >2) || (w <= 2)) {
+    if ((piece.sizeY() >2) || (piece.sizeX() <= 2)) {
       return "66%";
     }
     return null;
@@ -124,7 +124,7 @@
     dragImage.style.zIndex = '9999'; // Ensure the drag image is visible
     // dragImage.style.width = store.mergeBoardCellWidth + 'px'; // Ensure the drag image is visible
     // Ensure the drag image is same size as the board. Due to relative gaps we set the size of the whole
-    const draggedWidth = store.mergeBoardCellWidth * w;
+    const draggedWidth = store.mergeBoardCellWidth * piece.sizeX();
     dragImage.style.width = draggedWidth + 'px';
 
     event.dataTransfer?.setDragImage(
@@ -136,8 +136,6 @@
     // event.dataTransfer.effectAllowed = "all";
 
     event.dataTransfer?.setData("dragAt", JSON.stringify(new Position(dragAtX, dragAtY)));
-    // event.dataTransfer?.setData("dragAtX", JSON.stringify(dragAtX));
-    // event.dataTransfer?.setData("dragAtY", JSON.stringify(dragAtY));
     event.dataTransfer?.setData("piece", JSON.stringify(piece));
     event.dataTransfer?.setData("source", "???");
 
