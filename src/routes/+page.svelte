@@ -22,7 +22,7 @@
       <MGenerator />
     </div>
     <div class="flex">
-      <MGenerator disabled />
+      <MGenerator />
     </div>
     <div class="flex">
       <MGenerator disabled />
@@ -47,7 +47,7 @@
 
   import IconButton from '@smui/icon-button';
   import TopAppBar, {Row, Section, Title} from '@smui/top-app-bar';
-  import MGissBoard from "$lib/components/MGissBoard.svelte";
+  import MGissBoard from "$lib/components/MBuildBoard.svelte";
   import MGenerator from "$lib/components/MGenerator.svelte";
   import ColorSamples from "$lib/components/dev/ColorSamples.svelte";
   import {dev} from "$app/environment";
