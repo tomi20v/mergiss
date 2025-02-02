@@ -1,10 +1,15 @@
+<svelte:window
+        onwheel={onWheel}
+        onmousemove={onMouseMove}
+        onmouseup={onMouseUp}
+/>
+
 <div class="flex flex-grow flex-col"
      style="row-gap: 2px; cursor: grab; transform: scale({dragging ? 1.2 : 1});"
      style:max-width="{maxWidth}"
-     style:opacity="{isDragging ? 0 : 1}"
-     draggable={true}
-     ondragstart={onDragStart}
-     ondragend={onDragEnd}
+     style:opacity="{dragging ? 0 : 1}"
+     draggable={false}
+     onmousedown={onMouseDown}
      role="none"
 >
     {#each piece.pixelMap as eachRow}
@@ -22,7 +27,6 @@
 
   import store from "$lib/store.svelte";
   import PieceType from "$lib/game/piece/Piece";
-  import Position from "$lib/components/Position";
 
   const DragAtOptions = {
     topLeft: 0,
@@ -61,8 +65,8 @@
           }
         }
         return i;
+      case DragAtOptions.topLeft:
       default:
-        // DragAtOptions.topLeft
         for (i=0; i<row.length; i++) {
           if (row[i]) {
             break;
@@ -76,34 +80,37 @@
     switch (DragAtSetting) {
       case DragAtOptions.bottomRight:
         return pixelMap.length - 1;
+      case DragAtOptions.topLeft:
       default:
-        // DragAtOptions.topLeft
         return 0;
     }
   })
+  let dragging = $state(false);
+  let dragImage!: HTMLElement;
+  let dragRotation = $state(0);
 
-  let isDragging = $state(false);
-  let scale = 1.2;
+  function onMouseDown(event: MouseEvent) {
 
-  function onDragEnd() {
-    isDragging = false;
-  }
+    if (dragging) {
+      return;
+    }
 
-  function onDragStart(event: DragEvent) {
-
-    isDragging = true;
+    dragging = true;
+    dragRotation = 0;
 
     // Ensure the target is an HTMLElement
     const target = event.currentTarget as HTMLElement;
-    if (!target) return;
-
-    target.style.opacity = '0';
+    if (!target) {
+      return;
+    }
 
     // Create a custom drag image
-    const dragImage = target.cloneNode(true) as HTMLElement;
+    dragImage = target.cloneNode(true) as HTMLElement;
     dragImage.style.position = 'absolute';
     dragImage.style.top = '-9999px';
-    dragImage.style.left = '-9999px';
+    dragImage.style.left = '0';
+    // dragImage.style.top = '200px';
+    // dragImage.style.left = '100px';
     dragImage.style.opacity = '1'; // Ensure the drag image is visible
     dragImage.style.zIndex = '9999'; // Ensure the drag image is visible
     // dragImage.style.width = store.mergeBoardCellWidth + 'px'; // Ensure the drag image is visible
@@ -111,25 +118,36 @@
     const draggedWidth = store.mergeBoardCellWidth * piece.sizeX();
     dragImage.style.width = draggedWidth + 'px';
 
-    event.dataTransfer?.setDragImage(
-      dragImage,
-      (dragAtX + 0.5) * store.mergeBoardCellWidth,
-      (dragAtY + 0.5) * store.mergeBoardCellWidth
-    );
-    // this doesn't seem to work but triggers possibly null error
-    // event.dataTransfer.effectAllowed = "all";
-
-    event.dataTransfer?.setData("dragAt", JSON.stringify(new Position(dragAtX, dragAtY)));
-    event.dataTransfer?.setData("piece", JSON.stringify(piece));
-    event.dataTransfer?.setData("source", "???");
-
     document.body.appendChild(dragImage);
 
-    // Clean up the custom drag image after setting it for drag
-    setTimeout(() => {
-      document.body.removeChild(dragImage);
-    });
+  }
 
+  function onMouseUp(_: MouseEvent) {
+    if (!dragging) {
+      return;
+    }
+    dragging = false;
+    document.body.removeChild(dragImage);
+    console.log('mouseUp');
+  }
+
+  function onMouseMove(event: MouseEvent) {
+    if (!dragging || !dragImage) {
+      return;
+    }
+    dragImage.style.left = (event.clientX - (dragAtX + 0.5) * store.mergeBoardCellWidth ) + 'px';
+    dragImage.style.top = (event.clientY - (dragAtY + 0.5) * store.mergeBoardCellWidth ) + 'px';
+    console.log('mouseMove', event.clientX, event.clientY, dragAtX, dragAtY, store.mergeBoardCellWidth);
+  }
+
+  function onWheel(event: WheelEvent) {
+    console.log('onWheel');
+    if (!dragging) {
+      return;
+    }
+    // event.preventDefault();
+    dragRotation += event.deltaY > 0 ? 90 : -90;
+    dragImage.style.transform = `rotate(${dragRotation}deg)`;
   }
 
 </script>
