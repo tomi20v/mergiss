@@ -1,5 +1,5 @@
-<div class="flex flex-grow flex-col gap-0.5"
-     style="cursor: grab; transform: scale({isDragging ? scale : 1});"
+<div class="flex flex-grow flex-col"
+     style="row-gap: 2px; cursor: grab; transform: scale({dragging ? 1.2 : 1});"
      style:max-width="{maxWidth}"
      style:opacity="{isDragging ? 0 : 1}"
      draggable={true}
@@ -8,23 +8,7 @@
      role="none"
 >
     {#each piece.pixelMap as eachRow}
-        <div class="flex grow flex-row gap-0.5">
-            <!-- we need these shims so things don't "jump around" when piece width changes between 2 and 4 - otherwise
-                the gapping make these cases uneven and things start jumping around
-                HOWEVER it still jumps between empty and having a piece which might happen when dragging later?
-                -->
-            {#if (piece.sizeX()<1)}
-                <div class="flex w-0"></div>
-            {/if}
-            {#if (piece.sizeX()<2)}
-                <div class="flex w-0"></div>
-            {/if}
-            {#if (piece.sizeX()<3)}
-                <div class="flex w-0"></div>
-            {/if}
-            {#if (piece.sizeX()<4)}
-                <div class="flex w-0"></div>
-            {/if}
+        <div class="flex grow flex-row" style="column-gap: 2px;">
             {#each eachRow as eachCell}
             <div class="flex aspect-square grow piece-cell {eachCell ? 'piece-cell-full' : 'piece-cell-empty'}"
                  style="border-radius: 15%; {eachCell ? cellStyle : ''}"

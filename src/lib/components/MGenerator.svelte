@@ -3,7 +3,9 @@
         <Image src="generator.png" class="w-2/3 cursor-pointer" onclick={onClick} draggable="false" />
         <div class="flex text-white m-1 justify-center items-center w-1/3
                 border-3 border-blue-300 border-double rounded-lg border-x-0"
-             style="padding: 8px; { piece ? 'padding-left: 5px; padding-right: 5px;' : '' }"
+             style:padding="{margin}px"
+             style:padding-left="{marginX}px"
+             style:padding-right="{marginX}px"
         >
             {#if piece}
                 <MPiece {piece} />
@@ -30,6 +32,9 @@
   let piece: Piece|null = $state(null);
 
   let { disabled = false } = $props();
+
+  let margin = $derived(8);
+  let marginX = $derived(piece ? margin - piece.sizeX()+1 : margin);
 
   onMount(() => {
     uiBus.on('piece.drop', onPieceDrop);
