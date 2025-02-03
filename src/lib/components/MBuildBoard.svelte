@@ -88,6 +88,7 @@
       {length: sizeX},
       () => Array.from({length: sizeY}, emptyField)
     );
+    uiBus.on('pieceDrop', onPieceDrop);
   })
 
   function backgroundImageOf(atX: number, atY: number): string {
@@ -127,19 +128,19 @@
       pieceAt = new Position(atX, atY);
     }
   }
-  function onDrop(e: DragEvent, droppedAtX: number, droppedAtY: number) {
-    const piece = Piece.fromJSON(e.dataTransfer?.getData("piece")||'');
-    let piecePosition = new Position(droppedAtX, droppedAtY);
-    const dragAt = Position.fromJSON(e.dataTransfer?.getData("dragAt")||'');
-    if (dragAt) {
-      piecePosition = piecePosition.sub(dragAt);
-    }
-    if (!fitsOnBoard(piece, piecePosition)) {
+
+  function onPieceDrop(eventData: {piece: Piece, dragAt: Position}) {
+    // console.log('pieceDrop', pieceAt);
+    if (!pieceAt) {
       return;
     }
-    putOnBoard(piece, piecePosition);
+    const piecePosition = pieceAt.sub(eventData.dragAt);
+    if (!fitsOnBoard(eventData.piece, piecePosition)) {
+      return;
+    }
+    putOnBoard(eventData.piece, piecePosition);
     pieceAt = null;
-    uiBus.emit('piece.drop', {origin: 'mergeBoard', piece});
+    uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: eventData.piece});
   }
 
   function putOnBoard(piece: Piece, position: Position) {

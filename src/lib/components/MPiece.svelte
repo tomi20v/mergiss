@@ -27,6 +27,8 @@
 
   import store from "$lib/store.svelte";
   import PieceType from "$lib/game/piece/Piece";
+  import {uiBus} from "$lib/util";
+  import Position from "$lib/components/Position";
 
   const DragAtOptions = {
     topLeft: 0,
@@ -128,7 +130,8 @@
     }
     dragging = false;
     document.body.removeChild(dragImage);
-    console.log('mouseUp');
+    // putting in a setTimeout results in better sequence: mouseUp here, enter on other (board cell), onPieceDrop on other (board)
+    setTimeout(() => uiBus.emit('pieceDrop', {piece, dragAt: new Position(dragAtX, dragAtY)}));
   }
 
   function onMouseMove(event: MouseEvent) {
@@ -137,7 +140,7 @@
     }
     dragImage.style.left = (event.clientX - (dragAtX + 0.5) * store.mergeBoardCellWidth ) + 'px';
     dragImage.style.top = (event.clientY - (dragAtY + 0.5) * store.mergeBoardCellWidth ) + 'px';
-    console.log('mouseMove', event.clientX, event.clientY, dragAtX, dragAtY, store.mergeBoardCellWidth);
+    // console.log('mouseMove', event.clientX, event.clientY, dragAtX, dragAtY, store.mergeBoardCellWidth);
   }
 
   function onWheel(event: WheelEvent) {

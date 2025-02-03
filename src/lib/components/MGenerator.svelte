@@ -37,11 +37,11 @@
   let marginX = $derived(piece ? margin - piece.sizeX()+1 : margin);
 
   onMount(() => {
-    uiBus.on('piece.drop', onPieceDrop);
+    uiBus.on('pieceDropped', onPieceDropped);
   })
 
   onDestroy(() => {
-    uiBus.off('piece.drop', onPieceDrop);
+    uiBus.off('pieceDropped', onPieceDropped);
   })
 
   function onClick() {
@@ -49,7 +49,7 @@
   }
 
   // emitted by board or similar. If the current generated piece was dropped, remove it.
-  function onPieceDrop(eventData: {origin: string, piece: Piece}) {
+  function onPieceDropped(eventData: {origin: string, piece: Piece}) {
     if (! piece || (piece.uniqueId !== eventData.piece?.originalUniqueId)) {
       return;
     }
