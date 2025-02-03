@@ -23,10 +23,10 @@
            "
            style:width="{width}px"
            transition:elasticTransition|global
-           ondragenter={(e) => onDragEnter(e, iX, iY)}
-           ondragleave={(e) => onDragLeave(e, iX, iY)}
-           ondragover={(e) => onDragOver(e, iX, iY)}
-           ondrop={(e) => onDrop(e, iX, iY)}
+           onmouseenter={(e) => onMouseEnter(e, iX, iY)}
+           onmouseleave={(e) => onMouseLeave(e, iX, iY)}
+           onmouseover={(e) => onMouseOver(e, iX, iY)}
+           onfocus={() => null}
            role="none"
       >
         {#if (fields[iY][iX])}
@@ -108,25 +108,26 @@
            (position.atY >= 0) && ((position.atY + piece.sizeY()) <= sizeY);
   }
 
-  function onDragEnter(e: DragEvent, atX: number, atY: number) {
+  function onMouseEnter(e: MouseEvent, atX: number, atY: number) {
     // doesn't seem to do anything
     // e.dataTransfer.dropEffect = "move";
     // @todo make "dropMark" here
     // pieceAt = new Position(atX, atY);
+    if (!pieceAt?.equals(atX, atY)) {
+      pieceAt = new Position(atX, atY);
+    }
   }
-  function onDragLeave(e: DragEvent, atX: number, atY: number) {
+  function onMouseLeave(e: MouseEvent, atX: number, atY: number) {
     if (pieceAt?.equals(atX, atY)) {
       pieceAt = null;
     }
     // @todo we can shall "dropMark" here too?
   }
-  function onDragOver(e: DragEvent, atX: number, atY: number) {
-    // important: calling preventDefault enables dropping here at all
-    e.preventDefault();
-    // using the conditional it is measurably faster, eg. 0.01 vs 0.03
-    if (!pieceAt?.equals(atX, atY)) {
-      pieceAt = new Position(atX, atY);
-    }
+  function onMouseOver(e: MouseEvent, atX: number, atY: number) {
+    // using the conditional it is measurably faster vs always creating a new Position, eg. 0.01 vs 0.03
+    // if (!pieceAt?.equals(atX, atY)) {
+    //   pieceAt = new Position(atX, atY);
+    // }
   }
 
   function onPieceDrop(eventData: {piece: Piece, dragAt: Position}) {
