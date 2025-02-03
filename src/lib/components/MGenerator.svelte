@@ -50,10 +50,9 @@
 
   // emitted by board or similar. If the current generated piece was dropped, remove it.
   function onPieceDropped(eventData: {origin: string, piece: Piece}) {
-    if (! piece || (piece.uniqueId !== eventData.piece?.originalUniqueId)) {
-      return;
+    if (piece?.equals(eventData.piece)) {
+      piece = null;
     }
-    piece = null;
   }
 
 </script>
