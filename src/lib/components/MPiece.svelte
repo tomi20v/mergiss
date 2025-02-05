@@ -130,7 +130,8 @@
     if (!dragging) {
       return;
     }
-    dragging = false;
+    // this eliminates flickering between mouseup and removing the piece (if it is to be removed)
+    setTimeout(() => dragging = false, 1);
     document.body.removeChild(dragImage);
     // putting in a setTimeout results in better sequence: mouseUp here, enter on other (board cell), onPieceDrop on other (board)
     setTimeout(() => uiBus.emit('pieceDrop', {piece, dragAt: new Position(dragAtX, dragAtY)}));
