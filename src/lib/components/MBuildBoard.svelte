@@ -33,6 +33,7 @@
           <div
             class="flex grow bg-stone-500 m-0.5"
             style="border-radius: 15%; background-color: {fields[iY][iX]}; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray"
+            in:blur={{duration: 200}}
           ></div>
         {/if}
       </div>
@@ -49,6 +50,7 @@
   import Position from "$lib/components/Position";
   import Piece from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util";
+  import {blur} from "svelte/transition";
 
   type FieldType = string|null;
 

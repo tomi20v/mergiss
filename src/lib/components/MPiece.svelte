@@ -3,7 +3,6 @@
         onmousemove={onMouseMove}
         onmouseup={onMouseUp}
 />
-
 <div class="flex flex-grow flex-col"
      style="row-gap: 2px; cursor: grab; transform: scale({dragging ? 1.2 : 1});"
      style:max-width="{maxWidth}"
@@ -11,6 +10,7 @@
      draggable={false}
      onmousedown={onMouseDown}
      role="none"
+     in:blur={{delay: 1, duration: 500, easing: bounceOut}}
 >
     {#each piece.pixelMap as eachRow}
         <div class="flex grow flex-row" style="column-gap: 2px;">
@@ -29,6 +29,8 @@
   import PieceType from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util";
   import Position from "$lib/components/Position";
+  import {blur} from "svelte/transition";
+  import {bounceOut} from "svelte/easing";
 
   const DragAtOptions = {
     topLeft: 0,

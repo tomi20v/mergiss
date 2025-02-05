@@ -45,7 +45,9 @@
   })
 
   function onClick() {
-    piece = pieceFactory.randomPiece();
+    // this will trigger in/out transitions
+    piece = null;
+    setTimeout(() => piece = pieceFactory.randomPiece(), 1);
   }
 
   // emitted by board or similar. If the current generated piece was dropped, remove it.
