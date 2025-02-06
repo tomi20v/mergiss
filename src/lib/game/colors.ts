@@ -19,4 +19,14 @@ const colors: {[key:string]: string} = {
   lightBlue: tailwindColors.blue[300], // 15
 };
 
+const randomColorPair = (): { color: string, otherColor: string } => {
+  const colorValues = Object.values(colors);
+  const colorRand = Math.floor(Math.random() * colorValues.length);
+  const color: string = colorValues[colorRand];
+  const otherColor: string = colorValues[colorRand < 8 ? colorRand + 8 : colorRand - 8];
+  return {color, otherColor};
+}
+
+export {randomColorPair};
+
 export default colors;
