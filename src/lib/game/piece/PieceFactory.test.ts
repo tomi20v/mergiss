@@ -1,11 +1,18 @@
-import {afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {afterEach, beforeEach, describe, expect, test, vi, type Mock } from "vitest";
 import PieceFactory from "$lib/game/piece/PieceFactory";
-import {randomColorPair} from "$lib/game/colors";
+import pieceCatalogue from "$lib/game/piece/pieceCatalogue";
+import {getUniqueId, randomArrayItem} from "$lib/util";
 
 const anyColor = 'anyColor', anyOtherColor = 'anyOtherColor';
 vi.mock('$lib/game/colors', () => ({
   randomColorPair: vi.fn(() => ({color: anyColor, otherColor: anyOtherColor}))
 }));
+vi.mock('$lib/util', () => ({
+  randomArrayItem: vi.fn(),
+  getUniqueId: vi.fn()
+}));
+
+const anyUniqueId = 1836;
 
 describe('PieceFactory.ts', () => {
 
@@ -19,13 +26,14 @@ describe('PieceFactory.ts', () => {
 
     const pieceFactory = new PieceFactory();
 
-    it('should create', () => {
+    test.each(pieceCatalogue)('should create', (eachProtoMap) => {
+      (randomArrayItem as Mock).mockReturnValue(eachProtoMap);
+      (getUniqueId as Mock).mockReturnValue(anyUniqueId);
       const p = pieceFactory.randomPiece();
-      expect(randomColorPair).toBeCalled();
-      expect(p.pixelMap.length).toBeGreaterThan(0);
+      expect(p.pixelMap).to.equal(eachProtoMap);
       expect(p.color).to.equal(anyColor);
       expect(p.shadowColor).to.equal(anyOtherColor);
-      expect(p.uniqueId).not.to.equal(0);
+      expect(p.uniqueId).to.equal(anyUniqueId);
       expect(p.originalUniqueId).to.equal(0);
     });
 
