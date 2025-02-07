@@ -1,4 +1,7 @@
-<div class="flex flex-grow flex-col gap-0 p-2 text-white justify-center align-middle relative">
+<svelte:window
+        onmousemove={onMouseMove}
+/>
+<div bind:this={elem} class="flex flex-grow flex-col gap-0 p-2 text-white justify-center align-middle relative">
   {#if (dev)}
     <div class="flex flex-col gap-1 absolute top-0 right-0 bg-red-600 justify-center align-middle" >
       <div class="flex flex-row gap-1 items-center justify-center">
@@ -25,7 +28,7 @@
   import {coloredField, emptyField, type FieldType} from "$lib/components/FieldType";
 
   let { boardWidth, boardHeight } = $props();
-
+  let elem: HTMLElement;
   // @todo these shall go into some game state ("save") management
   const sX = 5, sY = 5;
   // const sX = 10, sY = 10;
@@ -53,8 +56,8 @@
 
   onMount(() => {
     fields = Array.from(
-      {length: sizeX},
-      () => Array.from({length: sizeY}, emptyField)
+            {length: sizeX},
+            () => Array.from({length: sizeY}, emptyField)
     );
     uiBus.on('pieceDrop', onPieceDrop);
   })
@@ -76,6 +79,27 @@
     putOnBoard(eventData.piece, piecePosition);
     pieceAt = null;
     uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: eventData.piece});
+  }
+
+  function onMouseMove(event: MouseEvent) {
+    const field = elem.querySelector('.m-board-field');
+    const p = field?.getBoundingClientRect();
+    const w = width;
+    if (!p || event.clientX < p.left || event.clientY < p.top) {
+      pieceAt = null;
+      return;
+    }
+    const relX = Math.floor((event.clientX - p.left) / w);
+    const relY = Math.floor((event.clientY - p.top) / w);
+    if ((relX < sizeX) && (relY < sizeY)) {
+      // using the conditional it is measurably faster vs always creating a new Position, eg. 0.01 vs 0.03
+      if (!pieceAt?.equals(relX, relY)) {
+        pieceAt = new Position(relX, relY);
+      }
+    }
+    else {
+      pieceAt = null;
+    }
   }
 
   function putOnBoard(piece: Piece, position: Position) {
