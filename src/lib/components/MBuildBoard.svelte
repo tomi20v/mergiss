@@ -12,47 +12,17 @@
       <div>{JSON.stringify(pieceAt)}</div>
     </div>
   {/if}
-  {#each fields as row, iY}
-  <div class="flex gap-0 justify-center">
-    {#each row as _, iX}
-      <div class="flex"
-           style="color: white;
-           aspect-ratio: 1;
-           background-size: 100%;
-           background-image: url({backgroundImageOf(iX, iY)});
-           "
-           style:width="{width}px"
-           transition:elasticTransition|global
-           onmouseenter={(e) => onMouseEnter(e, iX, iY)}
-           onmouseleave={(e) => onMouseLeave(e, iX, iY)}
-           onmouseover={(e) => onMouseOver(e, iX, iY)}
-           onfocus={() => null}
-           role="none"
-      >
-        {#if (fields[iY][iX])}
-          <div
-            class="flex grow bg-stone-500 m-0.5"
-            style="border-radius: 15%; background-color: {fields[iY][iX]}; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray"
-            in:blur={{duration: 200}}
-          ></div>
-        {/if}
-      </div>
-    {/each}
-  </div>
-  {/each}
+  <MBoardFields fields={fields} width={width} />
 </div>
 <script lang="ts">
 
   import {dev} from "$app/environment";
   import {onMount} from "svelte";
-  import elasticTransition from "$lib/transitions/elasticTransition";
-  import store from "$lib/store.svelte";
   import Position from "$lib/components/Position";
   import Piece from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util";
-  import {blur} from "svelte/transition";
-
-  type FieldType = string|null;
+  import MBoardFields from "$lib/components/MBoardFields.svelte";
+  import {coloredField, emptyField, type FieldType} from "$lib/components/FieldType";
 
   let { boardWidth, boardHeight } = $props();
 
@@ -81,10 +51,6 @@
     return ret;
   })
 
-  $effect(() => {
-    store.mergeBoardCellWidth = width;
-  })
-
   onMount(() => {
     fields = Array.from(
       {length: sizeX},
@@ -93,43 +59,9 @@
     uiBus.on('pieceDrop', onPieceDrop);
   })
 
-  function backgroundImageOf(atX: number, atY: number): string {
-    return `grid/${String.fromCharCode(atY%6 + 65)}${atX%6+1}.png`;
-  }
-
-  function emptyField(): FieldType {
-    return null;
-  }
-
-  function coloredField(color: string): FieldType {
-    return color;
-  }
-
   function fitsOnBoard(piece: Piece, position: Position): boolean {
     return (position.atX >= 0) && ((position.atX + piece.sizeX()) <= sizeX) &&
            (position.atY >= 0) && ((position.atY + piece.sizeY()) <= sizeY);
-  }
-
-  function onMouseEnter(e: MouseEvent, atX: number, atY: number) {
-    // doesn't seem to do anything
-    // e.dataTransfer.dropEffect = "move";
-    // @todo make "dropMark" here
-    // pieceAt = new Position(atX, atY);
-    if (!pieceAt?.equals(atX, atY)) {
-      pieceAt = new Position(atX, atY);
-    }
-  }
-  function onMouseLeave(e: MouseEvent, atX: number, atY: number) {
-    if (pieceAt?.equals(atX, atY)) {
-      pieceAt = null;
-    }
-    // @todo we can shall "dropMark" here too?
-  }
-  function onMouseOver(e: MouseEvent, atX: number, atY: number) {
-    // using the conditional it is measurably faster vs always creating a new Position, eg. 0.01 vs 0.03
-    // if (!pieceAt?.equals(atX, atY)) {
-    //   pieceAt = new Position(atX, atY);
-    // }
   }
 
   function onPieceDrop(eventData: {piece: Piece, dragAt: Position}) {
