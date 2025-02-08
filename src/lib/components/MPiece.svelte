@@ -4,7 +4,7 @@
         onmouseup={onMouseUp}
 />
 <div class="flex flex-grow flex-col"
-     style="row-gap: 2px; cursor: grab; transform: scale({dragging ? 1.2 : 1});"
+     style="row-gap: 2px; cursor: grab; transform: scale({dragging ? 1.2 : 1}); pointer-events: inherit;"
      style:max-width="{maxWidth}"
      style:opacity="{dragging ? 0 : 1}"
      draggable={false}
@@ -35,12 +35,14 @@
   const DragAtOptions = {
     topLeft: 0,
     bottomRight: 1,
+    bottomMiddle: 2,
   }
 
   // for mobile, bottom right would work better, at least for right handed ppl. For others, bottom left. For screens
   //    top left seems better to minimize mouse travel :D But top center would even be better. Anyway make this a setting
   // const DragAtSetting = DragAtOptions.bottomRight;
-  const DragAtSetting = DragAtOptions.topLeft;
+  const DragAtSetting = DragAtOptions.bottomMiddle;
+  // const DragAtSetting = DragAtOptions.topLeft;
 
   let {
     piece
@@ -70,19 +72,27 @@
         }
         return i;
       case DragAtOptions.topLeft:
-      default:
         for (i=0; i<row.length; i++) {
           if (row[i]) {
             break;
           }
         }
         return i;
+      case DragAtOptions.bottomMiddle:
+      default:
+        for (i=Math.floor(row.length/2); i<row.length; i++) {
+          if (row[i]) {
+            break;
+          }
+        }
+        return Math.min(i, row.length);
     }
   })
   let dragAtY: number = $derived.by<number>(() => {
     const pixelMap = piece.pixelMap;
     switch (DragAtSetting) {
       case DragAtOptions.bottomRight:
+      case DragAtOptions.bottomMiddle:
         return pixelMap.length - 1;
       case DragAtOptions.topLeft:
       default:
@@ -121,6 +131,7 @@
     // Ensure the drag image is same size as the board. Due to relative gaps we set the size of the whole
     const draggedWidth = store.mergeBoardCellWidth * piece.sizeX();
     dragImage.style.width = draggedWidth + 'px';
+    dragImage.style.transformOrigin = ((dragAtX + 0.5) * store.mergeBoardCellWidth) + 'px ' + ((dragAtY + 0.5) * store.mergeBoardCellWidth) + 'px';
 
     document.body.appendChild(dragImage);
 
@@ -141,6 +152,7 @@
     if (!dragging || !dragImage) {
       return;
     }
+    // @todo don't use mergeboardcellwidth here
     dragImage.style.left = (event.clientX - (dragAtX + 0.5) * store.mergeBoardCellWidth ) + 'px';
     dragImage.style.top = (event.clientY - (dragAtY + 0.5) * store.mergeBoardCellWidth ) + 'px';
     // console.log('mouseMove', event.clientX, event.clientY, dragAtX, dragAtY, store.mergeBoardCellWidth);
