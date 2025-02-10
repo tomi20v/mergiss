@@ -114,4 +114,27 @@ describe('ArrayIterator', () => {
 
   })
 
+  it('returns another iterator if array', () => {
+    const otherArray = [[],anyArray,[]];
+    let current: ArrayIterator<number[] extends (infer U)[] ? U : undefined>|number[]|undefined;
+    const x = new ArrayIterator<number[]>(otherArray);
+    x.reset();
+    current = x.current;
+    expect(current).to.be.instanceof(ArrayIterator);
+    expect(current?.length).to.equal(0);
+    current = x.next();
+    expect(current).to.be.instanceof(ArrayIterator);
+    expect(current?.length).to.equal(4);
+    current = x.end();
+    expect(current).to.be.instanceof(ArrayIterator);
+    expect(current?.length).to.equal(0);
+  })
+
+  it('returns a reverse iterator', () => {
+    const x = a.reverse();
+    expect(x.length).to.equal(a.length);
+    expect(x.reset()).to.equal(a.end());
+    expect(x.end()).to.equal(a.reset());
+  })
+
 })
