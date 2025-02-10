@@ -84,7 +84,7 @@ describe('ArrayIterator', () => {
     expect(r.position).to.equal(0);
   })
 
-  it.skip('returns undefined after end FW/REV', () => {
+  it('returns undefined after end FW/REV', () => {
     [a,r].forEach(x => {
       x.end();
       const result = x.next();
