@@ -23,7 +23,7 @@ export default class ArrayIterator <T> {
   }
 
   end(): T|undefined {
-    this._position = Math.max(0, this.a.length - 1);
+    this._position = this.reverse ? 0 : Math.max(0, this.a.length - 1);
     return this.current;
   }
 
@@ -32,14 +32,20 @@ export default class ArrayIterator <T> {
       return undefined;
     }
     const p = this.position||0;
-    this._position = p + 1 < this.length
-      ? p + 1
-      : undefined;
+    if (this.reverse) {
+      this._position = p > 0 ? p - 1 : undefined;
+    }
+    else {
+      this._position = p + 1 < this.length ? p + 1 : undefined;
+    }
     return this.current;
   }
 
   reset(): T|undefined {
-    this._position = 0;
+    // with an empty this.a _position always remains undefined so just check the other case
+    if (this.length > 0) {
+      this._position = this.reverse ? this.length - 1 : 0;
+    }
     return this.current;
   }
 
