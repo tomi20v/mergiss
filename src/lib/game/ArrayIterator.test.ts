@@ -93,4 +93,25 @@ describe('ArrayIterator', () => {
     })
   })
 
+  it('handles empty array', () => {
+    a = new ArrayIterator([]);
+    r = new ArrayIterator([], true);
+    [a,r].forEach(x => {
+      expect(x.length).to.equal(0);
+      expect(x.position).to.equal(undefined);
+      expect(x.current).to.equal(undefined);
+      x.reset();
+      expect(x.position).to.equal(undefined);
+      expect(x.current).to.equal(undefined);
+      const result = x.next();
+      expect(result).to.equal(undefined);
+      expect(x.position).to.equal(undefined);
+      expect(x.current).to.equal(undefined);
+      x.end();
+      expect(x.position).to.equal(undefined);
+      expect(x.current).to.equal(undefined);
+    })
+
+  })
+
 })

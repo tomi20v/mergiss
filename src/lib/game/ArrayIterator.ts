@@ -23,7 +23,10 @@ export default class ArrayIterator <T> {
   }
 
   end(): T|undefined {
-    this._position = this.reverse ? 0 : Math.max(0, this.a.length - 1);
+    // with an empty this.a _position always remains undefined so just check the other case
+    if (this.length > 0) {
+      this._position = this.reverse ? 0 : Math.max(0, this.a.length - 1);
+    }
     return this.current;
   }
 
