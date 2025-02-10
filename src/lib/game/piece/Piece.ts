@@ -28,6 +28,10 @@ export default class Piece {
     this.originalUniqueId = originalUniqueId;
   }
 
+  equals(other: Piece): boolean {
+    return this.uniqueId === other.uniqueId;
+  }
+
   sizeX(): number {
     return this.pixelMap[0]?.length || 0;
   }
