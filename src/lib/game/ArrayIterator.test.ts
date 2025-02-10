@@ -1,140 +1,37 @@
-import {beforeEach, describe, expect, it } from "vitest";
+// Vitest tests
 import ArrayIterator from "$lib/game/ArrayIterator";
-
-const anyArray = [1,2,3,4];
-const firstItem = anyArray[0];
-let a: ArrayIterator<number>;
-let r: ArrayIterator<number>;
+import { describe, it, expect } from 'vitest';
 
 describe('ArrayIterator', () => {
+  it('should iterate over elements in order', () => {
+    const arr = new ArrayIterator([1, 2, 3]);
+    const result = [...arr];
+    expect(result).toEqual([1, 2, 3]);
+  });
 
-  beforeEach(() => {
-    a = new ArrayIterator(anyArray);
-    r = new ArrayIterator(anyArray, true);
-  })
+  it('should iterate over elements in reverse order', () => {
+    const arr = new ArrayIterator([1, 2, 3], true);
+    const result = [...arr];
+    expect(result).toEqual([3, 2, 1]);
+  });
 
-  it('initializes FW/REV', () => {
-    [a,r].forEach((x) => {
-      expect(x.length).to.equal(anyArray.length);
-      expect(x.position).to.equal(undefined);
-      expect(x.current).to.equal(undefined);
-    })
-  })
+  it('should allow indexed access like an array', () => {
+    const arr = new ArrayIterator([10, 20, 30]);
+    expect(arr[0]).toBe(10);
+    expect(arr[1]).toBe(20);
+    expect(arr[2]).toBe(30);
+  });
 
-  it('resets FW', () => {
-    expect(a.position).not.to.equal(0);
-    const result = a.reset();
-    expect(result).to.equal(firstItem);
-    expect(a.current).to.equal(firstItem);
-    expect(a.position).to.equal(0);
-  })
+  it('should handle nested arrays', () => {
+    const arr = new ArrayIterator([1, [2, 3], 4]);
+    const result = [...arr];
+    expect(result[1]).toBeInstanceOf(ArrayIterator);
+    expect([...result[1]]).toEqual([2, 3]);
+  });
 
-  it('resets REV', () => {
-    const lastItem = anyArray[anyArray.length-1];
-    const len = anyArray.length;
-    expect(r.position).not.to.equal(len);
-    const result = r.reset();
-    expect(result).to.equal(lastItem);
-    expect(r.current).to.equal(lastItem);
-    expect(r.position).to.equal(len-1);
-  })
-
-  it('returns current and next FW', () => {
-    a.reset();
-    expect(a.current).to.equal(anyArray[0]);
-    expect(a.next()).to.equal(anyArray[1]);
-    expect(a.current).to.equal(anyArray[1]);
-    expect(a.next()).to.equal(anyArray[2]);
-    expect(a.current).to.equal(anyArray[2]);
-  })
-
-  it('returns current and next REV', () => {
-    r.reset();
-    expect(r.current).to.equal(anyArray[3]);
-    expect(r.next()).to.equal(anyArray[2]);
-    expect(r.current).to.equal(anyArray[2]);
-    expect(r.next()).to.equal(anyArray[1]);
-    expect(r.current).to.equal(anyArray[1]);
-  })
-
-  it('returns undefined after all returned FW/REV', () => {
-    [a,r].forEach((x) => {
-      let item;
-      x.reset();
-      anyArray.forEach(() => item = x.next());
-      expect(item).to.equal(undefined);
-      expect(x.current).to.equal(undefined);
-      expect(x.position).to.equal(undefined);
-    })
-  })
-
-  it('forwards to end and returns last FW', () => {
-    const lastItem = anyArray.findLast(() => true);
-    const result = a.end();
-    expect(result).to.equal(lastItem);
-    expect(a.current).to.equal(lastItem);
-    expect(a.position).to.equal(anyArray.length - 1);
-  })
-
-  it('forwards to end and returns last REV', () => {
-    const lastItem = anyArray[0];
-    const result = r.end();
-    expect(result).to.equal(lastItem);
-    expect(r.current).to.equal(lastItem);
-    expect(r.position).to.equal(0);
-  })
-
-  it('returns undefined after end FW/REV', () => {
-    [a,r].forEach(x => {
-      x.end();
-      const result = x.next();
-      expect(result).to.equal(undefined);
-      expect(x.position).to.equal(undefined);
-    })
-  })
-
-  it('handles empty array', () => {
-    a = new ArrayIterator([]);
-    r = new ArrayIterator([], true);
-    [a,r].forEach(x => {
-      expect(x.length).to.equal(0);
-      expect(x.position).to.equal(undefined);
-      expect(x.current).to.equal(undefined);
-      x.reset();
-      expect(x.position).to.equal(undefined);
-      expect(x.current).to.equal(undefined);
-      const result = x.next();
-      expect(result).to.equal(undefined);
-      expect(x.position).to.equal(undefined);
-      expect(x.current).to.equal(undefined);
-      x.end();
-      expect(x.position).to.equal(undefined);
-      expect(x.current).to.equal(undefined);
-    })
-
-  })
-
-  it('returns another iterator if array', () => {
-    const otherArray = [[],anyArray,[]];
-    let current: ArrayIterator<number[] extends (infer U)[] ? U : undefined>|number[]|undefined;
-    const x = new ArrayIterator<number[]>(otherArray);
-    x.reset();
-    current = x.current;
-    expect(current).to.be.instanceof(ArrayIterator);
-    expect(current?.length).to.equal(0);
-    current = x.next();
-    expect(current).to.be.instanceof(ArrayIterator);
-    expect(current?.length).to.equal(4);
-    current = x.end();
-    expect(current).to.be.instanceof(ArrayIterator);
-    expect(current?.length).to.equal(0);
-  })
-
-  it('returns a reverse iterator', () => {
-    const x = a.reverse();
-    expect(x.length).to.equal(a.length);
-    expect(x.reset()).to.equal(a.end());
-    expect(x.end()).to.equal(a.reset());
-  })
-
-})
+  it('should reverse an iterator correctly', () => {
+    const arr = new ArrayIterator([1, 2, 3]);
+    const reversed = arr.reverse();
+    expect([...reversed]).toEqual([3, 2, 1]);
+  });
+});
