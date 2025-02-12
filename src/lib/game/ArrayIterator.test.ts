@@ -1,5 +1,5 @@
 // Vitest tests
-import ArrayIterator from "$lib/game/ArrayIterator";
+import ArrayIterator, {rotate2D} from "$lib/game/ArrayIterator";
 import { describe, it, expect } from 'vitest';
 
 describe('ArrayIterator', () => {
@@ -34,4 +34,27 @@ describe('ArrayIterator', () => {
     const reversed = arr.reverse();
     expect([...reversed]).toEqual([3, 2, 1]);
   });
+
+});
+
+describe('rotate2D() rotates data', () => {
+
+  it('should rotate a non-square 2D array', () => {
+    const arr = new ArrayIterator([
+      [1, 2, 3, 4],
+      [5, 6, 7, 8]
+    ]);
+    const rotated = rotate2D(arr);
+    const unpacked = [];
+    for (const each of rotated) {
+      unpacked.push([...each]);
+    }
+    expect(unpacked).toEqual([
+      [5, 1],
+      [6, 2],
+      [7, 3],
+      [8, 4]
+    ]);
+  });
+
 });
