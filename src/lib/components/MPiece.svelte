@@ -145,7 +145,7 @@
     setTimeout(() => dragging = false, 1);
     document.body.removeChild(dragImage);
     // putting in a setTimeout results in better sequence: mouseUp here, enter on other (board cell), onPieceDrop on other (board)
-    setTimeout(() => uiBus.emit('pieceDrop', {piece, dragAt: new Position(dragAtX, dragAtY)}));
+    setTimeout(() => uiBus.emit('pieceDrop', {piece, dragAt: new Position(dragAtX, dragAtY, dragRotation)}));
   }
 
   function onMouseMove(event: MouseEvent) {
@@ -159,7 +159,6 @@
   }
 
   function onWheel(event: WheelEvent) {
-    console.log('onWheel');
     if (!dragging) {
       return;
     }
