@@ -28,7 +28,7 @@
   import store from "$lib/store.svelte";
   import PieceType from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util";
-  import Position from "$lib/components/Position";
+  import Position from "$lib/game/geometry/Position";
   import {blur} from "svelte/transition";
   import {bounceOut} from "svelte/easing";
 

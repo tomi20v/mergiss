@@ -21,7 +21,7 @@
 
   import {dev} from "$app/environment";
   import {onMount} from "svelte";
-  import Position from "$lib/components/Position";
+  import Position from "$lib/game/geometry/Position";
   import Piece from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util";
   import MBoardFields from "$lib/components/MBoardFields.svelte";
