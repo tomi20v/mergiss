@@ -26,6 +26,8 @@
   import {uiBus} from "$lib/util";
   import MBoardFields from "$lib/components/MBoardFields.svelte";
   import {coloredField, emptyField, type FieldType} from "$lib/components/FieldType";
+  import { FlatteningIterator, } from "@tomi20v/iterators";
+  import {move, rotateCoords} from "@tomi20v/iterators";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -62,23 +64,38 @@
     uiBus.on('pieceDrop', onPieceDrop);
   })
 
-  function fitsOnBoard(piece: Piece, position: Position): boolean {
-    return (position.atX >= 0) && ((position.atX + piece.sizeX()) <= sizeX) &&
-           (position.atY >= 0) && ((position.atY + piece.sizeY()) <= sizeY);
+  function fitsOnBoard(iterator: FlatteningIterator<number>): boolean {
+    for (const i of iterator) {
+      if (i.value && (i.x < 0 || i.x >= sizeX || i.y < 0 || i.y >= sizeY)) {
+        return false;
+      }
+    }
+    return true;
   }
 
-  function onPieceDrop(eventData: {piece: Piece, dragAt: Position}) {
-    // console.log('pieceDrop', pieceAt);
+  function onPieceDrop({piece, dragAt}: {piece: Piece, dragAt: Position}) {
+    // console.log('pieceDrop', pieceAt, dragAt);
     if (!pieceAt) {
       return;
     }
-    const piecePosition = pieceAt.sub(eventData.dragAt);
-    if (!fitsOnBoard(eventData.piece, piecePosition)) {
+    const piecePosition = pieceAt.sub(dragAt);
+    const iterator = new FlatteningIterator<number>(piece.pixelMap, ['y', 'x']);
+    iterator.use(
+            move({x: -dragAt.atX, y: -dragAt.atY})
+    ).use(
+            rotateCoords(dragAt.rotXY),
+    ).use(
+            move({x: dragAt.atX, y: dragAt.atY}),
+    ).use(
+            move({x: piecePosition.atX, y: piecePosition.atY})
+    );
+
+    if (!fitsOnBoard(iterator)) {
       return;
     }
-    putOnBoard(eventData.piece, piecePosition);
+    putOnBoard(piece, iterator);
     pieceAt = null;
-    uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: eventData.piece});
+    uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
   }
 
   function onMouseMove(event: MouseEvent) {
@@ -102,16 +119,12 @@
     }
   }
 
-  function putOnBoard(piece: Piece, position: Position) {
-    // console.log('put on board: ', piece, position);
-    for (let pieceY=0; pieceY<piece.sizeY(); pieceY++) {
-      for (let pieceX=0; pieceX<piece.sizeX(); pieceX++) {
-        const boardX = position.atX + pieceX;
-        const boardY = position.atY + pieceY;
-        if (piece.pixelMap[pieceY][pieceX]) {
-          fields[boardY][boardX] = coloredField(piece.color);
-        }
+  function putOnBoard(piece: Piece, iterator: FlatteningIterator<number>) {
+    for (const i of iterator) {
+      if (!i.value) {
+        continue;
       }
+      fields[i.y][i.x] = coloredField(piece.color);
     }
   }
 
