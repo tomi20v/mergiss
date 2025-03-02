@@ -132,6 +132,7 @@
     const draggedWidth = store.mergeBoardCellWidth * piece.sizeX();
     dragImage.style.width = draggedWidth + 'px';
     dragImage.style.transformOrigin = ((dragAtX + 0.5) * store.mergeBoardCellWidth) + 'px ' + ((dragAtY + 0.5) * store.mergeBoardCellWidth) + 'px';
+    dragImage.style.transition = "transform .3s cubic-bezier(0.64, 0.57, 0.67, 1.53)";
 
     document.body.appendChild(dragImage);
 
@@ -165,6 +166,7 @@
     // event.preventDefault();
     dragRotation += event.deltaY > 0 ? 90 : -90;
     dragImage.style.transform = `rotate(${dragRotation}deg)`;
+    dragImage.style.transition = "all .3sease-in";
   }
 
 </script>
