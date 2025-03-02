@@ -12,7 +12,7 @@
         </div>
         <button onclick={resizeAddColumn}>add</button>
       </div>
-      <div>{JSON.stringify(pieceAt)}</div>
+      <div>{JSON.stringify(cursorAt)}</div>
     </div>
   {/if}
   <MBoardFields fields={fields} width={width} />
@@ -43,7 +43,7 @@
   let sizeY: number = $state(sY);
   let fields: FieldType[][] = $state([]);
 
-  let pieceAt: Position|null = $state(null);
+  let cursorAt: Position|null = $state(null);
 
   let width: number = $derived.by(() => {
     // this makes sure we update the width when the table size changes
@@ -74,28 +74,26 @@
   }
 
   function onPieceDrop({piece, dragAt}: {piece: Piece, dragAt: Position}) {
-    // console.log('pieceDrop', pieceAt, dragAt);
-    if (!pieceAt) {
+
+    if (!cursorAt) {
       return;
     }
-    const piecePosition = pieceAt.sub(dragAt);
-    const iterator = new FlatteningIterator<number>(piece.pixelMap, ['y', 'x']);
-    iterator.use(
-            move({x: -dragAt.atX, y: -dragAt.atY})
-    ).use(
-            rotateCoords(dragAt.rotXY),
-    ).use(
-            move({x: dragAt.atX, y: dragAt.atY}),
-    ).use(
-            move({x: piecePosition.atX, y: piecePosition.atY})
-    );
+
+    const iterator = piece.getFlatIterator()
+      .use(
+        move({x: -dragAt.atX, y: -dragAt.atY}),
+        rotateCoords(dragAt.rotXY),
+        move({x: cursorAt.atX, y: cursorAt.atY})
+      );
 
     if (!fitsOnBoard(iterator)) {
       return;
     }
+
     putOnBoard(piece, iterator);
-    pieceAt = null;
+    cursorAt = null;
     uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
+
   }
 
   function onMouseMove(event: MouseEvent) {
@@ -103,19 +101,19 @@
     const p = field?.getBoundingClientRect();
     const w = width;
     if (!p || event.clientX < p.left || event.clientY < p.top) {
-      pieceAt = null;
+      cursorAt = null;
       return;
     }
     const relX = Math.floor((event.clientX - p.left) / w);
     const relY = Math.floor((event.clientY - p.top) / w);
     if ((relX < sizeX) && (relY < sizeY)) {
       // using the conditional it is measurably faster vs always creating a new Position, eg. 0.01 vs 0.03
-      if (!pieceAt?.equals(relX, relY)) {
-        pieceAt = new Position(relX, relY);
+      if (!cursorAt?.equals(relX, relY)) {
+        cursorAt = new Position(relX, relY);
       }
     }
     else {
-      pieceAt = null;
+      cursorAt = null;
     }
   }
 

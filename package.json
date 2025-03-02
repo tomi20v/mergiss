@@ -43,7 +43,7 @@
     "vitest": "^2.0.4"
   },
   "dependencies": {
-    "@tomi20v/iterators": "^0.12.2",
+    "@tomi20v/iterators": "^0.14.0",
     "eventemitter3": "^5.0.1",
     "svelte-material-ui": "^8.0.0-beta.3"
   }

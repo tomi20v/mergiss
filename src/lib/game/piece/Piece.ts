@@ -1,5 +1,6 @@
 import type {IProtoMap} from "$lib/game/piece/IProtoMap";
 import {getUniqueId} from "$lib/util";
+import { FlatteningIterator } from "@tomi20v/iterators";
 
 export default class Piece {
 
@@ -26,6 +27,10 @@ export default class Piece {
     this.color = color;
     this.shadowColor = shadowColor;
     this.originalUniqueId = originalUniqueId;
+  }
+
+  getFlatIterator(): FlatteningIterator<number> {
+    return new FlatteningIterator<number>(this.pixelMap, ['y', 'x']);
   }
 
   equals(other: Piece): boolean {
