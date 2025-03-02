@@ -1,10 +1,12 @@
 // @todo move out of components
+import {angleToOrthogonal, type OrthogonalAngle} from "$lib/game/geometry/angleToOrthogonal";
+
 export default class Position {
 
   readonly atX: number;
   readonly atY: number;
   // degrees
-  readonly rotXY: number;
+  readonly rotXY: OrthogonalAngle;
 
   static fromJSON(json: string): Position {
     const data = JSON.parse(json);
@@ -14,7 +16,8 @@ export default class Position {
   constructor(atX: number, atY: number, rotXY: number = 0) {
     this.atX = atX;
     this.atY = atY;
-    this.rotXY = rotXY;
+    // might or not be a good idea normalizing here but let's try
+    this.rotXY = angleToOrthogonal(rotXY);
   }
 
   clone(): Position {

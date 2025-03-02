@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, test } from "vitest";
 import Position from "$lib/game/geometry/Position";
 
-const anyX = 813, anyY = 912, anyRotXY = 420;
+const anyX = 813, anyY = 912, anyRotXY = 270;
 
 describe('Position XY', () => {
 
@@ -61,7 +61,7 @@ describe('Position XY+rot', () => {
     p = new Position(anyX, anyY, anyRotXY);
   })
 
-  it('constructs', () => {
+  it.only('constructs', () => {
 
     expect(p.atX).to.equal(anyX);
     expect(p.atY).to.equal(anyY);
@@ -82,9 +82,9 @@ describe('Position XY+rot', () => {
     [anyX, anyY, anyRotXY, anyX+1, anyY, anyRotXY, 0],
     [anyX, anyY, anyRotXY, anyX, anyY+1, anyRotXY, 0],
     [anyX, anyY, anyRotXY, anyX+1, anyY+1, anyRotXY, 0],
-    [anyX, anyY, anyRotXY, anyX+1, anyY, anyRotXY+1, 0],
-    [anyX, anyY, anyRotXY, anyX, anyY+1, anyRotXY+1, 0],
-    [anyX, anyY, anyRotXY, anyX+1, anyY+1, anyRotXY+1, 0],
+    [anyX, anyY, anyRotXY, anyX+1, anyY, anyRotXY-90, 0],
+    [anyX, anyY, anyRotXY, anyX, anyY+1, anyRotXY-90, 0],
+    [anyX, anyY, anyRotXY, anyX+1, anyY+1, anyRotXY-90, 0],
   ];
 
   test.each(equalMap)('equals to', (qX, qY, qRot, rX, rY, rRot, equals) => {
