@@ -2,13 +2,15 @@
         onwheel={onWheel}
         onmousemove={onMouseMove}
         onmouseup={onMouseUp}
+        onmousedown={onMouseDown}
+        onkeydown={onkeydown}
 />
 <div class="flex flex-grow flex-col"
      style="row-gap: 2px; cursor: grab; transform: scale({dragging ? 1.2 : 1}); pointer-events: inherit;"
      style:max-width="{maxWidth}"
      style:opacity="{dragging ? 0 : 1}"
      draggable={false}
-     onmousedown={onMouseDown}
+     onmousedown={dragStart}
      role="none"
      in:blur={{delay: 1, duration: 500, easing: bounceOut}}
 >
@@ -31,6 +33,7 @@
   import Position from "$lib/game/geometry/Position";
   import {blur} from "svelte/transition";
   import {bounceOut} from "svelte/easing";
+  import Mouse from "$lib/Mouse";
 
   const DragAtOptions = {
     topLeft: 0,
@@ -58,7 +61,7 @@
   // some old formulas
   // let cellStyle = $derived('background-color: ' + piece.color + '; box-shadow: inset 2px 2px 2px, 1px 1px 1px dimgray');
   // let cellStyle = $derived('background-color: ' + piece.color + '; box-shadow: inset 2px 2px 2px ' + piece.shadowColor + ', 1px 1px 1px dimgray');
-  let cellStyle = $derived<string>('background-color: ' + piece.color + '; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray');
+  let cellStyle = $derived<string>('background-color: ' + piece.color + '; box-shadow: inset 2px 2px 3px white, 1px 1px 3px dimgray');
 
   let dragAtX: number = $derived.by<number>(() => {
     const row = piece.pixelMap[dragAtY];
@@ -99,17 +102,23 @@
         return 0;
     }
   })
-  let dragging = $state(false);
+  let dragButton = $state(Mouse.NOBUTTON);
+  let dragging = $derived(dragButton !== Mouse.NOBUTTON);
   let dragImage!: HTMLElement;
   let dragRotation = $state(0);
 
-  function onMouseDown(event: MouseEvent) {
+  function dragDrop() {
+    // this eliminates flickering between mouseup and removing the piece (if it is to be removed)
+    setTimeout(() => dragButton = Mouse.NOBUTTON, 1);
+    document.body.removeChild(dragImage);
+    // putting in a setTimeout results in better sequence: mouseUp here, enter on other (board cell), onPieceDrop on other (board)
+    setTimeout(() => uiBus.emit('pieceDrop', {piece, dragAt: new Position(dragAtX, dragAtY, dragRotation)}));
+  }
 
-    if (dragging) {
-      return;
-    }
+  // specific mouse down on piece itself (fires before generic onMouseDown)
+  function dragStart(event: MouseEvent) {
 
-    dragging = true;
+    dragButton = event.button;
     dragRotation = 0;
 
     // Ensure the target is an HTMLElement
@@ -138,15 +147,27 @@
 
   }
 
-  function onMouseUp(_: MouseEvent) {
-    if (!dragging) {
-      return;
+  function onkeydown(event: KeyboardEvent) {
+    switch (event.key) {
+      case 'r':
+        rotate(true);
+        break;
+      case 'R':
+        rotate(false);
+        break;
     }
-    // this eliminates flickering between mouseup and removing the piece (if it is to be removed)
-    setTimeout(() => dragging = false, 1);
-    document.body.removeChild(dragImage);
-    // putting in a setTimeout results in better sequence: mouseUp here, enter on other (board cell), onPieceDrop on other (board)
-    setTimeout(() => uiBus.emit('pieceDrop', {piece, dragAt: new Position(dragAtX, dragAtY, dragRotation)}));
+  }
+
+  // generic mouse down handler
+  function onMouseDown(event: MouseEvent) {
+    // while dragging, any button left to the dragging button should rotate CCW, and any button to the right rotate CW
+    // plus, shift changes rotate direction
+    // - when dragging with LMB then MMB and RMB rotate CW (right)
+    // - when dragging with RMB then LMB and MMB  rotate CCW (left)
+    // - when dragging with MMB then LMB rotates CCW and RMB rotates CW
+    if (dragging && (event.button !== dragButton)) {
+      rotate(event.shiftKey !== (event.button > dragButton));
+    }
   }
 
   function onMouseMove(event: MouseEvent) {
@@ -159,14 +180,23 @@
     // console.log('mouseMove', event.clientX, event.clientY, dragAtX, dragAtY, store.mergeBoardCellWidth);
   }
 
-  function onWheel(event: WheelEvent) {
-    if (!dragging) {
-      return;
+  function onMouseUp(_: MouseEvent) {
+    if (dragging && _.button === dragButton) {
+      dragDrop();
     }
-    // event.preventDefault();
-    dragRotation += event.deltaY > 0 ? 90 : -90;
-    dragImage.style.transform = `rotate(${dragRotation}deg)`;
-    dragImage.style.transition = "all .3sease-in";
+  }
+
+  function onWheel(event: WheelEvent) {
+    if (dragging) {
+      rotate(event.shiftKey !== (event.deltaY > 0));
+    }
+  }
+
+  function rotate(clockwise: boolean) {
+    if (dragging) {
+      dragRotation += clockwise ? 90 : -90;
+      dragImage.style.transform = `rotate(${dragRotation}deg)`;
+    }
   }
 
 </script>
