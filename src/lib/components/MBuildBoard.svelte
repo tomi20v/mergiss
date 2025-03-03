@@ -1,4 +1,7 @@
-<div class="flex flex-grow flex-col gap-0 p-2 text-white justify-center align-middle relative">
+<svelte:window
+        onmousemove={onMouseMove}
+/>
+<div bind:this={elem} class="flex flex-grow flex-col gap-0 p-2 text-white justify-center align-middle relative">
   {#if (dev)}
     <div class="flex flex-col gap-1 absolute top-0 right-0 bg-red-600 justify-center align-middle" >
       <div class="flex flex-row gap-1 items-center justify-center">
@@ -9,51 +12,25 @@
         </div>
         <button onclick={resizeAddColumn}>add</button>
       </div>
-      <div>{JSON.stringify(pieceAt)}</div>
+      <div>{JSON.stringify(cursorAt)}</div>
     </div>
   {/if}
-  {#each fields as row, iY}
-  <div class="flex gap-0 justify-center">
-    {#each row as _, iX}
-      <div class="flex"
-           style="color: white;
-           aspect-ratio: 1;
-           background-size: 100%;
-           background-image: url({backgroundImageOf(iX, iY)});
-           "
-           style:width="{width}px"
-           transition:elasticTransition|global
-           ondragenter={(e) => onDragEnter(e, iX, iY)}
-           ondragleave={(e) => onDragLeave(e, iX, iY)}
-           ondragover={(e) => onDragOver(e, iX, iY)}
-           ondrop={(e) => onDrop(e, iX, iY)}
-           role="none"
-      >
-        {#if (fields[iY][iX])}
-          <div
-            class="flex grow bg-stone-500 m-0.5"
-            style="border-radius: 15%; background-color: {fields[iY][iX]}; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray"
-          ></div>
-        {/if}
-      </div>
-    {/each}
-  </div>
-  {/each}
+  <MBoardFields fields={fields} width={width} />
 </div>
 <script lang="ts">
 
   import {dev} from "$app/environment";
   import {onMount} from "svelte";
-  import elasticTransition from "$lib/transitions/elasticTransition";
-  import store from "$lib/store.svelte";
-  import Position from "$lib/components/Position";
+  import Position from "$lib/game/geometry/Position";
   import Piece from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util";
-
-  type FieldType = string|null;
+  import MBoardFields from "$lib/components/MBoardFields.svelte";
+  import {coloredField, emptyField, type FieldType} from "$lib/components/FieldType";
+  import { FlatteningIterator, } from "@tomi20v/iterators";
+  import {move, rotateCoords} from "@tomi20v/iterators";
 
   let { boardWidth, boardHeight } = $props();
-
+  let elem: HTMLElement;
   // @todo these shall go into some game state ("save") management
   const sX = 5, sY = 5;
   // const sX = 10, sY = 10;
@@ -66,7 +43,7 @@
   let sizeY: number = $state(sY);
   let fields: FieldType[][] = $state([]);
 
-  let pieceAt: Position|null = $state(null);
+  let cursorAt: Position|null = $state(null);
 
   let width: number = $derived.by(() => {
     // this makes sure we update the width when the table size changes
@@ -79,79 +56,73 @@
     return ret;
   })
 
-  $effect(() => {
-    store.mergeBoardCellWidth = width;
-  })
-
   onMount(() => {
     fields = Array.from(
-      {length: sizeX},
-      () => Array.from({length: sizeY}, emptyField)
+            {length: sizeX},
+            () => Array.from({length: sizeY}, emptyField)
     );
+    uiBus.on('pieceDrop', onPieceDrop);
   })
 
-  function backgroundImageOf(atX: number, atY: number): string {
-    return `grid/${String.fromCharCode(atY%6 + 65)}${atX%6+1}.png`;
-  }
-
-  function emptyField(): FieldType {
-    return null;
-  }
-
-  function coloredField(color: string): FieldType {
-    return color;
-  }
-
-  function fitsOnBoard(piece: Piece, position: Position): boolean {
-    return (position.atX >= 0) && ((position.atX + piece.sizeX()) <= sizeX) &&
-           (position.atY >= 0) && ((position.atY + piece.sizeY()) <= sizeY);
-  }
-
-  function onDragEnter(e: DragEvent, atX: number, atY: number) {
-    // doesn't seem to do anything
-    // e.dataTransfer.dropEffect = "move";
-    // @todo make "dropMark" here
-    // pieceAt = new Position(atX, atY);
-  }
-  function onDragLeave(e: DragEvent, atX: number, atY: number) {
-    if (pieceAt?.equals(atX, atY)) {
-      pieceAt = null;
+  function fitsOnBoard(iterator: FlatteningIterator<number>): boolean {
+    for (const i of iterator) {
+      if (i.value && (i.x < 0 || i.x >= sizeX || i.y < 0 || i.y >= sizeY)) {
+        return false;
+      }
     }
-    // @todo we can shall "dropMark" here too?
+    return true;
   }
-  function onDragOver(e: DragEvent, atX: number, atY: number) {
-    // important: calling preventDefault enables dropping here at all
-    e.preventDefault();
-    // using the conditional it is measurably faster, eg. 0.01 vs 0.03
-    if (!pieceAt?.equals(atX, atY)) {
-      pieceAt = new Position(atX, atY);
-    }
-  }
-  function onDrop(e: DragEvent, droppedAtX: number, droppedAtY: number) {
-    const piece = Piece.fromJSON(e.dataTransfer?.getData("piece")||'');
-    let piecePosition = new Position(droppedAtX, droppedAtY);
-    const dragAt = Position.fromJSON(e.dataTransfer?.getData("dragAt")||'');
-    if (dragAt) {
-      piecePosition = piecePosition.sub(dragAt);
-    }
-    if (!fitsOnBoard(piece, piecePosition)) {
+
+  function onPieceDrop({piece, dragAt}: {piece: Piece, dragAt: Position}) {
+
+    if (!cursorAt) {
       return;
     }
-    putOnBoard(piece, piecePosition);
-    pieceAt = null;
-    uiBus.emit('piece.drop', {origin: 'mergeBoard', piece});
+
+    const iterator = piece.getFlatIterator()
+      .use(
+        move({x: -dragAt.atX, y: -dragAt.atY}),
+        rotateCoords(dragAt.rotXY),
+        move({x: cursorAt.atX, y: cursorAt.atY})
+      );
+
+    if (!fitsOnBoard(iterator)) {
+      return;
+    }
+
+    putOnBoard(piece, iterator);
+    cursorAt = null;
+    uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
+
   }
 
-  function putOnBoard(piece: Piece, position: Position) {
-    // console.log('put on board: ', piece, position);
-    for (let pieceY=0; pieceY<piece.sizeY(); pieceY++) {
-      for (let pieceX=0; pieceX<piece.sizeX(); pieceX++) {
-        const boardX = position.atX + pieceX;
-        const boardY = position.atY + pieceY;
-        if (piece.pixelMap[pieceY][pieceX]) {
-          fields[boardY][boardX] = coloredField(piece.color);
-        }
+  function onMouseMove(event: MouseEvent) {
+    const field = elem.querySelector('.m-board-field');
+    const p = field?.getBoundingClientRect();
+    const w = width;
+    if (!p || event.clientX < p.left || event.clientY < p.top) {
+      cursorAt = null;
+      return;
+    }
+    const relX = Math.floor((event.clientX - p.left) / w);
+    const relY = Math.floor((event.clientY - p.top) / w);
+    if ((relX < sizeX) && (relY < sizeY)) {
+      // using the conditional it is measurably faster vs always creating a new Position, eg. 0.01 vs 0.03
+      if (!cursorAt?.equals(relX, relY)) {
+        cursorAt = new Position(relX, relY);
       }
+    }
+    else {
+      cursorAt = null;
+    }
+  }
+
+  function putOnBoard(piece: Piece, iterator: FlatteningIterator<number>) {
+    for (const i of iterator) {
+      if (!i.value) {
+        continue;
+      }
+      fields[i.y][i.x] = coloredField(piece.color);
     }
   }
 

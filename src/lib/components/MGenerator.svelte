@@ -1,8 +1,11 @@
 <div class="flex gap-2 justify-center" style="user-select: none;" >
     {#if !disabled}
         <Image src="generator.png" class="w-2/3 cursor-pointer" onclick={onClick} draggable="false" />
-        <div class="flex text-white m-1 p-2 justify-center items-center w-1/3
+        <div class="flex text-white m-1 justify-center items-center w-1/3
                 border-3 border-blue-300 border-double rounded-lg border-x-0"
+             style:padding="{margin}px"
+             style:padding-left="{marginX}px"
+             style:padding-right="{marginX}px"
         >
             {#if piece}
                 <MPiece {piece} />
@@ -30,24 +33,28 @@
 
   let { disabled = false } = $props();
 
+  let margin = $derived(8);
+  let marginX = $derived(piece ? margin - piece.sizeX()+1 : margin);
+
   onMount(() => {
-    uiBus.on('piece.drop', onPieceDrop);
+    uiBus.on('pieceDropped', onPieceDropped);
   })
 
   onDestroy(() => {
-    uiBus.off('piece.drop', onPieceDrop);
+    uiBus.off('pieceDropped', onPieceDropped);
   })
 
   function onClick() {
-    piece = pieceFactory.randomPiece();
+    // this will trigger in/out transitions
+    piece = null;
+    setTimeout(() => piece = pieceFactory.randomPiece(), 1);
   }
 
   // emitted by board or similar. If the current generated piece was dropped, remove it.
-  function onPieceDrop(eventData: {origin: string, piece: Piece}) {
-    if (! piece || (piece.uniqueId !== eventData.piece?.originalUniqueId)) {
-      return;
+  function onPieceDropped(eventData: {origin: string, piece: Piece}) {
+    if (piece?.equals(eventData.piece)) {
+      piece = null;
     }
-    piece = null;
   }
 
 </script>

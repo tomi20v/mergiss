@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.3.1",
-  "description": "Added vitest tests",
+  "version": "0.4.0",
+  "description": "Piece can be rotated while dragging",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
@@ -43,6 +43,7 @@
     "vitest": "^2.0.4"
   },
   "dependencies": {
+    "@tomi20v/iterators": "^0.14.0",
     "eventemitter3": "^5.0.1",
     "svelte-material-ui": "^8.0.0-beta.3"
   }
