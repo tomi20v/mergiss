@@ -1,5 +1,6 @@
 <svelte:window
         onresize={onResize}
+        oncontextmenu={event => event.preventDefault()}
 />
 <TopAppBar
   variant="standard"
