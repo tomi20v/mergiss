@@ -6,7 +6,7 @@ import type {IProtoMap} from "$lib/game/piece/IProtoMap";
 const anyProtoMap = [[1,0],[1,1]];
 const anyColor = 'anyColor';
 const anyShadowColor = 'anyShadowColor';
-const anyUniqueId = 12487;
+const anyUniqueId = '12487';
 
 describe('Piece.ts', () => {
 
@@ -18,7 +18,7 @@ describe('Piece.ts', () => {
       expect(p.pixelMap).toEqual(eachProtoMap);
       expect(p.color).toEqual(anyColor);
       expect(p.shadowColor).toEqual(anyShadowColor);
-      expect(p.originalUniqueId).toEqual(0);
+      expect(p.originalUniqueId).toEqual('');
     });
 
     it('should return sizeX', () => {
