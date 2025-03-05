@@ -3,17 +3,17 @@ export type FieldType = {
   group: number;
 };
 
-function emptyField(): FieldType {
+function emptyField(group = 0): FieldType {
   return {
     color: null,
-    group: 0,
+    group,
   };
 }
 
-function coloredField(color: string): FieldType {
+function coloredField(color: string, group = 0): FieldType {
   return {
     color,
-    group: 0,
+    group,
   };
 }
 
