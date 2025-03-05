@@ -1,11 +1,20 @@
-export type FieldType = string|null;
+export type FieldType = {
+  color: string|null;
+  group: number;
+};
 
 function emptyField(): FieldType {
-  return null;
+  return {
+    color: null,
+    group: 0,
+  };
 }
 
 function coloredField(color: string): FieldType {
-  return color;
+  return {
+    color,
+    group: 0,
+  };
 }
 
 export {emptyField, coloredField}

@@ -12,10 +12,10 @@
                  onfocus={() => null}
                  role="none"
             >
-                {#if (fields[iY][iX])}
+                {#if (fields[iY][iX].color)}
                     <div
                             class="flex grow bg-stone-500 m-0.5 m-board-field-inner"
-                            style="border-radius: 15%; background-color: {fields[iY][iX]}; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray"
+                            style="border-radius: 15%; background-color: {fields[iY][iX].color}; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray"
                             in:blur={{duration: 200}}
                     ></div>
                 {/if}
