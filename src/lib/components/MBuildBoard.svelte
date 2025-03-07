@@ -28,7 +28,7 @@
   import {coloredField, emptyField, type FieldType} from "$lib/game/FieldType";
   import { FlatteningIterator, } from "@tomi20v/iterators";
   import {move, rotateCoords} from "@tomi20v/iterators";
-  import Group from "$lib/game/Group.svelte.js";
+  import Group from "$lib/game/Group";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -120,16 +120,12 @@
   }
 
   function putOnBoard(piece: Piece, iterator: FlatteningIterator<number>) {
-    // @todo here I'll have to handle upgrades and possible boosts or similar, and give more TTL accordingly
-    // const group = new GroupSvelte(cursorAt!.atX, cursorAt!.atY, piece.weight, piece.weight);
-    // 4.5 seems to have nicer css animation \@/
-    const group = new Group(cursorAt!.atX, cursorAt!.atY, piece.weight, piece.weight+0.5);
+    const group = Group.fromPiece(new Position(cursorAt!.atX, cursorAt!.atY), piece);
     for (const i of iterator) {
       if (i.value) {
         fields[i.y][i.x] = coloredField(piece.color, group.group);
       }
     }
-    group.startTimer();
     groups.push(group);
   }
 
