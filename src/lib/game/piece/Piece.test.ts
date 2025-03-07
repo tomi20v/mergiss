@@ -55,4 +55,9 @@ describe('Piece.ts', () => {
     expect(p.originalUniqueId).toEqual(anyUniqueId);
   })
 
+  it('should return weight', () => {
+    const p = new Piece([[1,0],[1,1]], anyColor, anyShadowColor);
+    expect(p.weight).toEqual(3);
+  })
+
 })

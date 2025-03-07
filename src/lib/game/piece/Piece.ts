@@ -29,6 +29,10 @@ export default class Piece {
     this.originalUniqueId = originalUniqueId;
   }
 
+  get weight(): number {
+    return this.pixelMap.reduce((acc, row) => acc + row.reduce((a, b) => a + b, 0), 0);
+  }
+
   getFlatIterator(): FlatteningIterator<number> {
     return new FlatteningIterator<number>(this.pixelMap, ['y', 'x']);
   }
