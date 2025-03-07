@@ -1,7 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, test } from "vitest";
 import Piece from "$lib/game/piece/Piece";
 import pieceCatalogue from "$lib/game/piece/pieceCatalogue";
 import type {IProtoMap} from "$lib/game/piece/IProtoMap";
+import { FlatteningIterator } from "@tomi20v/iterators";
 
 const anyProtoMap = [[1,0],[1,1]];
 const anyColor = 'anyColor';
@@ -58,6 +59,29 @@ describe('Piece.ts', () => {
   it('should return weight', () => {
     const p = new Piece([[1,0],[1,1]], anyColor, anyShadowColor);
     expect(p.weight).toEqual(3);
+  })
+
+  it('should return flat iterator', () => {
+    const p = new Piece(anyProtoMap, anyColor, anyShadowColor);
+    const iter = p.getFlatIterator();
+    expect(iter).toBeInstanceOf(FlatteningIterator);
+    expect((iter as any).data).toEqual(anyProtoMap);
+    expect((iter as any).dimensions).toEqual(['y', 'x']);
+  })
+
+  it('should test equality', () => {
+    const p1 = new Piece(anyProtoMap, anyColor, anyShadowColor);
+    expect(p1.equals(p1)).toBe(true);
+  })
+
+  test.each([
+    new Piece(anyProtoMap, anyColor, anyShadowColor),
+    new Piece(anyProtoMap.concat([1,0]), anyColor, anyShadowColor),
+    new Piece(anyProtoMap, anyColor, anyShadowColor),
+    new Piece(anyProtoMap, anyColor, anyShadowColor),
+  ])('should return false when not equal', (otherPiece) => {
+    const p1 = new Piece(anyProtoMap, anyColor, anyShadowColor);
+    expect(p1.equals(otherPiece)).toBe(false);
   })
 
 })
