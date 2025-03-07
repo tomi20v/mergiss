@@ -15,7 +15,7 @@
       <div>{JSON.stringify(cursorAt)}</div>
     </div>
   {/if}
-  <MBoardFields fields={fields} width={width} />
+  <MBoardFields fields={fields} groups={groups} width={width} />
 </div>
 <script lang="ts">
 
@@ -25,9 +25,10 @@
   import Piece from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util";
   import MBoardFields from "$lib/components/MBoardFields.svelte";
-  import {coloredField, emptyField, type FieldType} from "$lib/components/FieldType";
+  import {coloredField, emptyField, type FieldType} from "$lib/game/FieldType";
   import { FlatteningIterator, } from "@tomi20v/iterators";
   import {move, rotateCoords} from "@tomi20v/iterators";
+  import Group from "$lib/game/Group.svelte.js";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -42,6 +43,7 @@
   let sizeX: number = $state(sX);
   let sizeY: number = $state(sY);
   let fields: FieldType[][] = $state([]);
+  const groups: Group[] = $state([]);
 
   let cursorAt: Position|null = $state(null);
 
@@ -118,12 +120,17 @@
   }
 
   function putOnBoard(piece: Piece, iterator: FlatteningIterator<number>) {
+    // @todo here I'll have to handle upgrades and possible boosts or similar, and give more TTL accordingly
+    // const group = new GroupSvelte(cursorAt!.atX, cursorAt!.atY, piece.weight, piece.weight);
+    // 4.5 seems to have nicer css animation \@/
+    const group = new Group(cursorAt!.atX, cursorAt!.atY, piece.weight, piece.weight+0.5);
     for (const i of iterator) {
-      if (!i.value) {
-        continue;
+      if (i.value) {
+        fields[i.y][i.x] = coloredField(piece.color, group.group);
       }
-      fields[i.y][i.x] = coloredField(piece.color);
     }
+    group.startTimer();
+    groups.push(group);
   }
 
   function resizeAddColumn() {
@@ -157,3 +164,4 @@
   }
 
 </script>
+
