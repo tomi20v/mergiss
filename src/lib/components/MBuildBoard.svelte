@@ -64,6 +64,7 @@
             () => Array.from({length: sizeY}, emptyField)
     );
     uiBus.on('pieceDrop', onPieceDrop);
+    uiBus.on('groupExpired', onGroupExpired);
   })
 
   function fitsOnBoard(iterator: FlatteningIterator<number>): boolean {
@@ -75,27 +76,17 @@
     return true;
   }
 
-  function onPieceDrop({piece, dragAt}: {piece: Piece, dragAt: Position}) {
-
-    if (!cursorAt) {
-      return;
+  function onGroupExpired(group: Group) {
+    const index = groups.indexOf(group);
+    for (const row of fields) {
+      for (const field of row) {
+        if (field.group == group.group) {
+          field.color = null;
+          field.group = 0;
+        }
+      }
     }
-
-    const iterator = piece.getFlatIterator()
-      .use(
-        move({x: -dragAt.atX, y: -dragAt.atY}),
-        rotateCoords(dragAt.rotXY),
-        move({x: cursorAt.atX, y: cursorAt.atY})
-      );
-
-    if (!fitsOnBoard(iterator)) {
-      return;
-    }
-
-    putOnBoard(piece, iterator);
-    cursorAt = null;
-    uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
-
+    delete groups[index];
   }
 
   function onMouseMove(event: MouseEvent) {
@@ -127,6 +118,29 @@
       }
     }
     groups.push(group);
+  }
+
+  function onPieceDrop({piece, dragAt}: {piece: Piece, dragAt: Position}) {
+
+    if (!cursorAt) {
+      return;
+    }
+
+    const iterator = piece.getFlatIterator()
+      .use(
+        move({x: -dragAt.atX, y: -dragAt.atY}),
+        rotateCoords(dragAt.rotXY),
+        move({x: cursorAt.atX, y: cursorAt.atY})
+      );
+
+    if (!fitsOnBoard(iterator)) {
+      return;
+    }
+
+    putOnBoard(piece, iterator);
+    cursorAt = null;
+    uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
+
   }
 
   function resizeAddColumn() {

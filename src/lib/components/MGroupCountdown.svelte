@@ -8,7 +8,7 @@
   import Group from "$lib/game/Group.js";
   import { onMount, onDestroy } from "svelte";
   import colors from "$lib/game/colors";
-  // import { Timer } from "node:timers";
+  import {uiBus} from "$lib/util";
 
   let {group, color}: {group: Group, color: string} = $props();
   let ttl = $state(0);
@@ -17,16 +17,18 @@
   onMount(() => {
     ttl = group.ttl;
     /**
-     * Not very efficient as we display only whole seconds over 5 seconds. However there won't be soooo many groups.
+     * Not very efficient as we mostly/always display whole seconds only. However, there won't be many groups.
+     * We run a 0.1 timer to ensure no jumps in the countdown (with 1sec it jumps from initial 5 to 3)
      * Using a common timer source would be efficient but then all timers would jump at the same time on the screen
-     * Using a second based timer and switching it to decimal seconds at 5sec would ease the excess timers
-     * ALSO it might or might not be the best idea to put this here to always run automatically, might refactor later
      */
     interval = setInterval(() => {
-      ttl -= 0.1;
+      // we round to one decimal to avoid ugly 0.099999997 etc values
+      ttl = Math.floor((ttl-0.1)*10) / 10;
       if (ttl <= 0) {
         ttl = 0;
         clearInterval(interval as unknown as number);
+        // defer this as it will erase group and group.ttl setting would result in error
+        setTimeout(() => uiBus.emit('groupExpired', group));
       }
       group.ttl = ttl;
     }, 100) as unknown as number;
