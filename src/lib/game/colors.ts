@@ -23,10 +23,16 @@ const randomColorPair = (): { color: string, otherColor: string } => {
   const colorValues = Object.values(colors);
   const colorRand = Math.floor(Math.random() * colorValues.length);
   const color: string = colorValues[colorRand];
-  const otherColor: string = colorValues[colorRand < 8 ? colorRand + 8 : colorRand - 8];
+  const otherColor = complementerColorOf(color);
   return {color, otherColor};
 }
 
-export {randomColorPair};
+const complementerColorOf = (color: string): string => {
+  const colorValues = Object.values(colors);
+  const colorRand = colorValues.indexOf(color);
+  return colorValues[colorRand < 8 ? colorRand + 8 : colorRand - 8];
+}
+
+export {randomColorPair, complementerColorOf};
 
 export default colors;

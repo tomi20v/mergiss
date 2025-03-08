@@ -29,12 +29,12 @@
   import {onDestroy, onMount} from "svelte";
   import {uiBus} from "$lib/util";
 
-  let piece: Piece|null = $state(null);
-
   let { disabled = false } = $props();
 
+  let piece: Piece|null = $state(null);
+
   let margin = $derived(8);
-  let marginX = $derived(piece ? margin - piece.sizeX()+1 : margin);
+  let marginX = $derived(piece ? margin - (piece as Piece).sizeX()+1 : margin);
 
   onMount(() => {
     uiBus.on('pieceDropped', onPieceDropped);

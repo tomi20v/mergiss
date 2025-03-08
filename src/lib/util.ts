@@ -4,13 +4,7 @@ const randomArrayItem = <T> (arr: Array<T>): T => arr[Math.floor(Math.random() *
 
 const uiBus: EventEmitter = new EventEmitter();
 
-let uniqueIdSeq = 1;
-const getUniqueId = (): number => {
-  return uniqueIdSeq++;
-}
-
 export {
   randomArrayItem,
   uiBus,
-  getUniqueId
 }

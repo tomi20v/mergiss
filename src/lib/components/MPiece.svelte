@@ -134,7 +134,8 @@
     dragImage.style.left = '0';
     // dragImage.style.top = '200px';
     // dragImage.style.left = '100px';
-    dragImage.style.opacity = '1'; // Ensure the drag image is visible
+    // dragImage.style.opacity = '1'; // Ensure the drag image is visible
+    dragImage.style.opacity = '0.9'; // Ensure the drag image is visible
     dragImage.style.zIndex = '9999'; // Ensure the drag image is visible
     // dragImage.style.width = store.mergeBoardCellWidth + 'px'; // Ensure the drag image is visible
     // Ensure the drag image is same size as the board. Due to relative gaps we set the size of the whole

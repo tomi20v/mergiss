@@ -61,7 +61,19 @@ describe('Position XY+rot', () => {
     p = new Position(anyX, anyY, anyRotXY);
   })
 
-  it.only('constructs', () => {
+  it('constructs from json', () => {
+    const json = JSON.stringify({
+      atX: anyX,
+      atY: anyY,
+      rotXY: anyRotXY
+    });
+    const q = Position.fromJSON(json);
+    expect(q.atX).to.equal(anyX);
+    expect(q.atY).to.equal(anyY);
+    expect(q.rotXY).to.equal(anyRotXY);
+  })
+
+  it('constructs', () => {
 
     expect(p.atX).to.equal(anyX);
     expect(p.atY).to.equal(anyY);

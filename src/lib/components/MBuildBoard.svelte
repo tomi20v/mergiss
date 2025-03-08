@@ -15,7 +15,7 @@
       <div>{JSON.stringify(cursorAt)}</div>
     </div>
   {/if}
-  <MBoardFields fields={fields} width={width} />
+  <MBoardFields fields={fields} groups={groups} width={width} />
 </div>
 <script lang="ts">
 
@@ -25,9 +25,10 @@
   import Piece from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util";
   import MBoardFields from "$lib/components/MBoardFields.svelte";
-  import {coloredField, emptyField, type FieldType} from "$lib/components/FieldType";
+  import {coloredField, emptyField, type FieldType} from "$lib/game/FieldType";
   import { FlatteningIterator, } from "@tomi20v/iterators";
   import {move, rotateCoords} from "@tomi20v/iterators";
+  import Group from "$lib/game/Group";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -42,6 +43,7 @@
   let sizeX: number = $state(sX);
   let sizeY: number = $state(sY);
   let fields: FieldType[][] = $state([]);
+  const groups: Group[] = $state([]);
 
   let cursorAt: Position|null = $state(null);
 
@@ -62,6 +64,7 @@
             () => Array.from({length: sizeY}, emptyField)
     );
     uiBus.on('pieceDrop', onPieceDrop);
+    uiBus.on('groupExpired', onGroupExpired);
   })
 
   function fitsOnBoard(iterator: FlatteningIterator<number>): boolean {
@@ -73,27 +76,17 @@
     return true;
   }
 
-  function onPieceDrop({piece, dragAt}: {piece: Piece, dragAt: Position}) {
-
-    if (!cursorAt) {
-      return;
+  function onGroupExpired(group: Group) {
+    const index = groups.indexOf(group);
+    for (const row of fields) {
+      for (const field of row) {
+        if (field.group == group.group) {
+          field.color = null;
+          field.group = 0;
+        }
+      }
     }
-
-    const iterator = piece.getFlatIterator()
-      .use(
-        move({x: -dragAt.atX, y: -dragAt.atY}),
-        rotateCoords(dragAt.rotXY),
-        move({x: cursorAt.atX, y: cursorAt.atY})
-      );
-
-    if (!fitsOnBoard(iterator)) {
-      return;
-    }
-
-    putOnBoard(piece, iterator);
-    cursorAt = null;
-    uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
-
+    delete groups[index];
   }
 
   function onMouseMove(event: MouseEvent) {
@@ -118,12 +111,36 @@
   }
 
   function putOnBoard(piece: Piece, iterator: FlatteningIterator<number>) {
+    const group = Group.fromPiece(new Position(cursorAt!.atX, cursorAt!.atY), piece);
     for (const i of iterator) {
-      if (!i.value) {
-        continue;
+      if (i.value) {
+        fields[i.y][i.x] = coloredField(piece.color, group.group);
       }
-      fields[i.y][i.x] = coloredField(piece.color);
     }
+    groups.push(group);
+  }
+
+  function onPieceDrop({piece, dragAt}: {piece: Piece, dragAt: Position}) {
+
+    if (!cursorAt) {
+      return;
+    }
+
+    const iterator = piece.getFlatIterator()
+      .use(
+        move({x: -dragAt.atX, y: -dragAt.atY}),
+        rotateCoords(dragAt.rotXY),
+        move({x: cursorAt.atX, y: cursorAt.atY})
+      );
+
+    if (!fitsOnBoard(iterator)) {
+      return;
+    }
+
+    putOnBoard(piece, iterator);
+    cursorAt = null;
+    uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
+
   }
 
   function resizeAddColumn() {
@@ -157,3 +174,4 @@
   }
 
 </script>
+
