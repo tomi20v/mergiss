@@ -1,1 +1,1 @@
-docker exec -ti mergiss_mergiss_1 ash
+docker exec -ti mergiss_mergiss ash

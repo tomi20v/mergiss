@@ -3,6 +3,7 @@ services:
   mergiss:
     build:
       context: .
+    container_name: mergiss_mergiss
     ports:
       - 5173:5173
     volumes:
