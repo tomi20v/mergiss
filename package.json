@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.4.0",
-  "description": "Piece can be rotated while dragging",
+  "version": "0.5.1",
+  "description": "static build",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
@@ -25,6 +25,7 @@
     "@smui/layout-grid": "^8.0.0-beta.3",
     "@smui/top-app-bar": "^8.0.0-beta.3",
     "@sveltejs/adapter-auto": "^3.0.0",
+    "@sveltejs/adapter-static": "^3.0.8",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@vitest/coverage-v8": "^2.1.9",
