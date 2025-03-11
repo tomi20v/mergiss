@@ -1,6 +1,12 @@
 <div class="countdown {countdownSpeedClass(ttl)}"
+     style="position: relative;"
      style:color="{color}"
-     style:background-color="{color == colors.black ? 'gray' : ''}" >
+     style:background-color="{color == colors.black ? 'gray' : ''}"
+     style:width="{width}px"
+     style:height="{width}px"
+     style:font-size="{width/2}px"
+     style:left="{left}"
+>
   { formatTtl(ttl) }
 </div>
 <script lang="ts">
@@ -9,10 +15,24 @@
   import { onMount, onDestroy } from "svelte";
   import colors from "$lib/game/colors";
   import {uiBus} from "$lib/util";
+  import store from "$lib/store.svelte";
 
   let {group, color}: {group: Group, color: string} = $props();
   let ttl = $state(0);
   let interval: number = 0;
+
+  // default size 50px, but with big board and small blocks it shrinks down to 40 (oversized, really helps)
+  let width = ($derived<number>).by(() => {
+    const cellWidth = store.mergeBoardCellWidth;
+    return Math.max(Math.min(50, cellWidth-1), 40);
+  })
+  // when oversized, flex centering doesn't work and countdown starts moving to the right. With this dynamic left
+  //  it is kept in center (vertically no need, that works fine)
+  let left = $derived.by(() => {
+    const w = width;
+    const cellWidth = store.mergeBoardCellWidth;
+    return cellWidth > w ? 'auto' : (Math.floor((cellWidth-w)/2) + 'px');
+  })
 
   onMount(() => {
     ttl = group.ttl;
@@ -73,11 +93,12 @@
     .countdown {
         background: black;
         color: white;
-        font-size: 22px;
         font-weight: bold;
         font-family: 'Courier New', Courier, monospace;
-        width: 50px;
-        height: 50px;
+        /** these are now in getters and dynamic */
+        /*font-size: 22px;*/
+        /*width: 50px;*/
+        /*height: 50px;*/
         border-radius: 50%;
         display: flex;
         align-items: center;
