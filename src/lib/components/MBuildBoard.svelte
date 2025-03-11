@@ -36,9 +36,12 @@
   // const sX = 3, sY = 3;
   const sX = 5, sY = 5;
   // const sX = 10, sY = 10;
-  // const sX = 30, sY = 20;
-  // const sX = 40, sY = 20;
   // const sX = 15, sY = 15;
+  // const sX = 30, sY = 20;
+  // const sX = 5, sY = 20;
+  // const sX = 5, sY = 30;
+  // const sX = 30, sY = 30;
+  // const sX = 40, sY = 20;
   // const sX = 42, sY = 42;
 
   let sizeX: number = $state(sX);
@@ -61,8 +64,8 @@
 
   onMount(() => {
     fields = Array.from(
-            {length: sizeX},
-            () => Array.from({length: sizeY}, emptyField)
+            {length: sizeY},
+            () => Array.from({length: sizeX}, emptyField)
     );
     uiBus.on('pieceDrop', onPieceDrop);
     uiBus.on('groupExpired', onGroupExpired);
