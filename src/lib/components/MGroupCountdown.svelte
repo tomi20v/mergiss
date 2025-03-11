@@ -1,6 +1,12 @@
 <div class="countdown {countdownSpeedClass(ttl)}"
+     style="position: relative;"
      style:color="{color}"
-     style:background-color="{color == colors.black ? 'gray' : ''}" >
+     style:background-color="{color == colors.black ? 'gray' : ''}"
+     style:width="{width}px"
+     style:height="{width}px"
+     style:font-size="{width/2}px"
+     style:left="{left}"
+>
   { formatTtl(ttl) }
 </div>
 <script lang="ts">
@@ -9,10 +15,24 @@
   import { onMount, onDestroy } from "svelte";
   import colors from "$lib/game/colors";
   import {uiBus} from "$lib/util";
+  import store from "$lib/store.svelte";
 
   let {group, color}: {group: Group, color: string} = $props();
   let ttl = $state(0);
   let interval: number = 0;
+
+  // default size 50px, but with big board and small blocks it shrinks down to 40 (oversize, really helps)
+  let width = ($derived<number>).by(() => {
+    const cellWidth = store.mergeBoardCellWidth;
+    return Math.max(Math.min(50, cellWidth-1), 40);
+  })
+  // when oversize, flex centering doesn't work and countdown starts moving to the right. With this dynamic left
+  //  it is kept in center (vertically no need, that works fine)
+  let left = $derived.by(() => {
+    const w = width;
+    const cellWidth = store.mergeBoardCellWidth;
+    return cellWidth > w ? 'auto' : (Math.floor((cellWidth-w)/2) + 'px');
+  })
 
   onMount(() => {
     ttl = group.ttl;
@@ -22,7 +42,7 @@
      * Using a common timer source would be efficient but then all timers would jump at the same time on the screen
      */
     interval = setInterval(() => {
-      // we round to one decimal to avoid ugly 0.099999997 etc values
+      // we round to one decimal to avoid ugly 0.099999997 etc. values
       ttl = Math.floor((ttl-0.1)*10) / 10;
       if (ttl <= 0) {
         ttl = 0;
@@ -44,7 +64,7 @@
     if (ttl <= 0) {
       return '0';
     }
-    // showing decimals towards the end of countdown seems a good idea but it doesn't look good
+    // showing decimals towards the end of countdown seems a good idea, but it doesn't look good
     //  with the scale animation
     // else if (ttl <= 1) {
     //   return ttl.toFixed(1).substring(1);
@@ -73,11 +93,12 @@
     .countdown {
         background: black;
         color: white;
-        font-size: 22px;
         font-weight: bold;
         font-family: 'Courier New', Courier, monospace;
-        width: 50px;
-        height: 50px;
+        /** these are now in getters and dynamic */
+        /*font-size: 22px;*/
+        /*width: 50px;*/
+        /*height: 50px;*/
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -104,21 +125,24 @@
 
     /* Glowing Pulse Effect */
     @keyframes pulse {
-        from {
-            box-shadow: 0 0 5px rgba(128, 0, 128, 0.6);
+        0% {
+            box-shadow: 0 0 25px rgba(175, 64, 100, 0.8);
         }
-        to {
-            box-shadow: 0 0 20px rgba(128, 0, 128, 1);
+        50% {
+            box-shadow: 0 0 25px rgba(100, 64, 225, 0.6);
+        }
+        100% {
+            box-shadow: 0 0 25px rgba(128, 250, 128, 1);
         }
     }
 
     @keyframes pulse2 {
         from {
-            box-shadow: 0 0 20px rgba(128, 0, 128, 1);
+            box-shadow: 0 0 25px rgba(128, 0, 128, 1);
             scale: 1;
         }
         to {
-            box-shadow: 0 0 5px rgba(128, 0, 128, 0.6);
+            box-shadow: 0 0 15px rgba(175, 64, 100, 0.6);
             scale: 0.4;
         }
     }

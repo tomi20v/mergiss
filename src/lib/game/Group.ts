@@ -6,7 +6,7 @@ export default class Group {
 
   readonly group: number;
   ttl: number = 0;
-  private interval: NodeJS.Timer | number = 0;
+  private interval: ReturnType<typeof setInterval> | number = 0;
 
   static fromPiece(position: Position, piece: Piece): Group {
     return new Group(

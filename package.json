@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.5.2",
-  "description": "netlify build",
+  "version": "0.5.3",
+  "description": "pieces get cleaned up properly, countdown is nicer and dynamic",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
