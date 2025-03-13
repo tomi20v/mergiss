@@ -11,7 +11,7 @@
                  transition:elasticTransition|global
                  onfocus={() => null}
                  role="none"
-                 onclick={() => onClick(iX, iY)}
+                 onmousedown={() => onMouseDown(iX, iY)}
             >
                 {#if (fields[iY][iX].color)}
                     {@const color = fields[iY][iX].color}
@@ -62,10 +62,10 @@
     return groups.find(each => (each.centerX == atX) && (each.centerY == atY));
   }
 
-  function onClick(atX: number, atY: number) {
+  function onMouseDown(atX: number, atY: number) {
     const field = fields[atY][atX];
     if (field.group) {
-      uiBus.emit('groupClicked', fields[atY][atX].group);
+      uiBus.emit('groupClickStart', fields[atY][atX].group);
     }
   }
 

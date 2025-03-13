@@ -1,4 +1,5 @@
-<div class="countdown {countdownSpeedClass(ttl)}"
+<svelte:document onmouseup={onMouseUp} />
+<div class="countdown {countdownSpeedClass(ttl)} {accelerating ? 'countdown-accelerating' : ''}"
      style="position: relative;"
      style:color="{color}"
      style:background-color="{color == colors.black ? 'gray' : ''}"
@@ -19,7 +20,11 @@
 
   let {group, color}: {group: Group, color: string} = $props();
   let ttl = $state(0);
-  let interval: number = 0;
+  let timerId: ReturnType<typeof setTimeout> | null = null;
+  let currentTimeout = 100; // Current timeout duration in ms (dynamically updated)
+  const minTimeout = 0.1;
+  const q = 0.985;
+  let accelerating = $state(false);
 
   // default size 50px, but with big board and small blocks it shrinks down to 40 (oversize, really helps)
   let width = ($derived<number>).by(() => {
@@ -36,32 +41,23 @@
 
   onMount(() => {
     ttl = group.ttl;
-    /**
-     * Not very efficient as we mostly/always display whole seconds only. However, there won't be many groups.
-     * We run a 0.1 timer to ensure no jumps in the countdown (with 1sec it jumps from initial 5 to 3)
-     * Using a common timer source would be efficient but then all timers would jump at the same time on the screen
-     */
-    interval = setInterval(() => {
-      // we round to one decimal to avoid ugly 0.099999997 etc. values
-      ttl = Math.floor((ttl-0.1)*10) / 10;
-      checkIfAlive();
-      group.ttl = ttl;
-    }, 100) as unknown as number;
-    uiBus.on('groupClicked', onGroupClicked)
+    startTimer();
+    uiBus.on('groupClickStart', onGroupClickStart)
+    uiBus.on('groupClickStop', onGroupClickStop)
   })
 
   onDestroy(() => {
-    if (interval) {
-      clearInterval(interval);
+    if (timerId) {
+      clearTimeout(timerId);
     }
-    uiBus.off('groupClicked', onGroupClicked);
+    uiBus.off('groupClickStart', onGroupClickStart);
   })
 
   function checkIfAlive() {
     if (ttl <= 0) {
       ttl = 0;
-      clearInterval(interval as unknown as number);
-      // defer this as it will erase group and group.ttl setting would result in error
+      clearTimeout(timerId as unknown as number);
+      // defer to let ongoing things run first (needed?)
       setTimeout(() => uiBus.emit('groupExpired', group));
     }
   }
@@ -93,11 +89,34 @@
     return ttl.toFixed(0);
   }
 
-  function onGroupClicked(g: number) {
+  function onGroupClickStart(g: number) {
     if (g == group.group) {
+      if (!accelerating) {
+        accelerating = true;
+      }
       ttl -= 1;
-      checkIfAlive();
     }
+  }
+
+  function startTimer() {
+    timerId = setTimeout(() => {
+      if (accelerating) {
+        currentTimeout = Math.max(currentTimeout * q, minTimeout);
+      }
+      ttl = Math.floor((ttl-currentTimeout/1000)*10) / 10;
+      checkIfAlive();
+      group.ttl = ttl;
+      startTimer();
+    }, currentTimeout);
+  }
+
+  function onGroupClickStop() {
+    accelerating = false;
+    currentTimeout = 100;
+  }
+
+  function onMouseUp() {
+    uiBus.emit('groupClickStop');
   }
 
 </script>
@@ -134,6 +153,23 @@
     }
     .countdown-fastest {
         animation: pulse2 0.175s infinite alternate !important;
+    }
+
+    .countdown-accelerating {
+        color: red;
+        animation: wowbump 0.25s infinite alternate;
+    }
+
+    @keyframes wowbump {
+        from {
+            color: red;
+        }
+        70% {
+            color: white;
+        }
+        to {
+            color: white;
+        }
     }
 
     /* Glowing Pulse Effect */
