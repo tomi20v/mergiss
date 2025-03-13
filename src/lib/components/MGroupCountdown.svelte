@@ -44,32 +44,26 @@
     interval = setInterval(() => {
       // we round to one decimal to avoid ugly 0.099999997 etc. values
       ttl = Math.floor((ttl-0.1)*10) / 10;
-      if (ttl <= 0) {
-        ttl = 0;
-        clearInterval(interval as unknown as number);
-        // defer this as it will erase group and group.ttl setting would result in error
-        setTimeout(() => uiBus.emit('groupExpired', group));
-      }
+      checkIfAlive();
       group.ttl = ttl;
     }, 100) as unknown as number;
+    uiBus.on('groupClicked', onGroupClicked)
   })
 
   onDestroy(() => {
     if (interval) {
       clearInterval(interval);
     }
+    uiBus.off('groupClicked', onGroupClicked);
   })
 
-  function formatTtl(ttl: number): string {
+  function checkIfAlive() {
     if (ttl <= 0) {
-      return '0';
+      ttl = 0;
+      clearInterval(interval as unknown as number);
+      // defer this as it will erase group and group.ttl setting would result in error
+      setTimeout(() => uiBus.emit('groupExpired', group));
     }
-    // showing decimals towards the end of countdown seems a good idea, but it doesn't look good
-    //  with the scale animation
-    // else if (ttl <= 1) {
-    //   return ttl.toFixed(1).substring(1);
-    // }
-    return ttl.toFixed(0);
   }
 
   function countdownSpeedClass(ttl: number) {
@@ -84,6 +78,25 @@
     }
     else if (ttl <= 10) {
       return 'countdown-fast';
+    }
+  }
+
+  function formatTtl(ttl: number): string {
+    if (ttl <= 0) {
+      return '0';
+    }
+    // showing decimals towards the end of countdown seems a good idea, but it doesn't look good
+    //  with the scale animation
+    // else if (ttl <= 1) {
+    //   return ttl.toFixed(1).substring(1);
+    // }
+    return ttl.toFixed(0);
+  }
+
+  function onGroupClicked(g: number) {
+    if (g == group.group) {
+      ttl -= 1;
+      checkIfAlive();
     }
   }
 
