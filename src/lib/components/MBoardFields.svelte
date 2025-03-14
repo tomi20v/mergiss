@@ -11,6 +11,7 @@
                  transition:elasticTransition|global
                  onfocus={() => null}
                  role="none"
+                 onmousedown={() => onMouseDown(iX, iY)}
             >
                 {#if (fields[iY][iX].color)}
                     {@const color = fields[iY][iX].color}
@@ -37,6 +38,7 @@
   import store from "$lib/store.svelte";
   import MGroupCountdown from "$lib/components/MGroupCountdown.svelte";
   import Group from "$lib/game/Group.js";
+  import {uiBus} from "$lib/util";
 
   let {
     fields,
@@ -58,6 +60,13 @@
 
   function groupCenterAt(atX: number, atY: number): Group | undefined {
     return groups.find(each => (each.centerX == atX) && (each.centerY == atY));
+  }
+
+  function onMouseDown(atX: number, atY: number) {
+    const field = fields[atY][atX];
+    if (field.group) {
+      uiBus.emit('groupClickStart', fields[atY][atX].group);
+    }
   }
 
 </script>

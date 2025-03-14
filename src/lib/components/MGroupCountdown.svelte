@@ -1,4 +1,5 @@
-<div class="countdown {countdownSpeedClass(ttl)}"
+<svelte:document onmouseup={onGroupClickStop} />
+<div class="countdown {countdownSpeedClass(ttl)} {accelerating ? 'countdown-accelerating' : ''}"
      style="position: relative;"
      style:color="{color}"
      style:background-color="{color == colors.black ? 'gray' : ''}"
@@ -19,7 +20,11 @@
 
   let {group, color}: {group: Group, color: string} = $props();
   let ttl = $state(0);
-  let interval: number = 0;
+  let timerId: ReturnType<typeof setTimeout> | null = null;
+  let currentTimeout = 100; // Current timeout duration in ms (dynamically updated)
+  const minTimeout = 0.1;
+  const q = 0.985;
+  let accelerating = $state(false);
 
   // default size 50px, but with big board and small blocks it shrinks down to 40 (oversize, really helps)
   let width = ($derived<number>).by(() => {
@@ -36,41 +41,16 @@
 
   onMount(() => {
     ttl = group.ttl;
-    /**
-     * Not very efficient as we mostly/always display whole seconds only. However, there won't be many groups.
-     * We run a 0.1 timer to ensure no jumps in the countdown (with 1sec it jumps from initial 5 to 3)
-     * Using a common timer source would be efficient but then all timers would jump at the same time on the screen
-     */
-    interval = setInterval(() => {
-      // we round to one decimal to avoid ugly 0.099999997 etc. values
-      ttl = Math.floor((ttl-0.1)*10) / 10;
-      if (ttl <= 0) {
-        ttl = 0;
-        clearInterval(interval as unknown as number);
-        // defer this as it will erase group and group.ttl setting would result in error
-        setTimeout(() => uiBus.emit('groupExpired', group));
-      }
-      group.ttl = ttl;
-    }, 100) as unknown as number;
+    startTimer();
+    uiBus.on('groupClickStart', onGroupClickStart)
   })
 
   onDestroy(() => {
-    if (interval) {
-      clearInterval(interval);
+    if (timerId) {
+      clearTimeout(timerId);
     }
+    uiBus.off('groupClickStart', onGroupClickStart);
   })
-
-  function formatTtl(ttl: number): string {
-    if (ttl <= 0) {
-      return '0';
-    }
-    // showing decimals towards the end of countdown seems a good idea, but it doesn't look good
-    //  with the scale animation
-    // else if (ttl <= 1) {
-    //   return ttl.toFixed(1).substring(1);
-    // }
-    return ttl.toFixed(0);
-  }
 
   function countdownSpeedClass(ttl: number) {
     if (ttl == 0) {
@@ -85,6 +65,50 @@
     else if (ttl <= 10) {
       return 'countdown-fast';
     }
+  }
+
+  function formatTtl(ttl: number): string {
+    if (ttl <= 0) {
+      return '0';
+    }
+    // showing decimals towards the end of countdown seems a good idea, but it doesn't look good
+    //  with the scale animation
+    // else if (ttl <= 1) {
+    //   return ttl.toFixed(1).substring(1);
+    // }
+    return ttl.toFixed(0);
+  }
+
+  function onGroupClickStart(g: number) {
+    if (g == group.group) {
+      if (!accelerating) {
+        accelerating = true;
+      }
+      ttl -= 1;
+    }
+  }
+
+  function startTimer() {
+    timerId = setTimeout(() => {
+      if (accelerating) {
+        currentTimeout = Math.max(currentTimeout * q, minTimeout);
+      }
+      ttl = Math.floor((ttl-currentTimeout/1000)*10) / 10;
+      if (ttl <= 0) {
+        ttl = 0;
+        clearTimeout(timerId as unknown as number);
+        uiBus.emit('groupExpired', group);
+      }
+      else {
+        group.ttl = ttl;
+        startTimer();
+      }
+    }, currentTimeout);
+  }
+
+  function onGroupClickStop() {
+    accelerating = false;
+    currentTimeout = 100;
   }
 
 </script>
@@ -121,6 +145,23 @@
     }
     .countdown-fastest {
         animation: pulse2 0.175s infinite alternate !important;
+    }
+
+    .countdown-accelerating {
+        color: red;
+        animation: wowbump 0.25s infinite alternate;
+    }
+
+    @keyframes wowbump {
+        from {
+            color: red;
+        }
+        70% {
+            color: white;
+        }
+        to {
+            color: white;
+        }
     }
 
     /* Glowing Pulse Effect */

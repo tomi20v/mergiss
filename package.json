@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.5.3",
-  "description": "pieces get cleaned up properly, countdown is nicer and dynamic",
+  "version": "0.5.4",
+  "description": "click/long click on groups reduces ttl",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
