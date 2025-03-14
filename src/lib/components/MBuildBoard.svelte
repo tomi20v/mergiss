@@ -114,16 +114,6 @@
     }
   }
 
-  function putOnBoard(piece: Piece, iterator: FlatteningIterator<number>) {
-    const group = Group.fromPiece(new Position(cursorAt!.atX, cursorAt!.atY), piece);
-    for (const i of iterator) {
-      if (i.value) {
-        fields[i.y][i.x] = coloredField(piece.color, group.group);
-      }
-    }
-    groups.push(group);
-  }
-
   function onPieceDrop({piece, dragAt}: {piece: Piece, dragAt: Position}) {
 
     if (!cursorAt) {
@@ -145,6 +135,16 @@
     cursorAt = null;
     uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
 
+  }
+
+  function putOnBoard(piece: Piece, iterator: FlatteningIterator<number>) {
+    const group = Group.fromPiece(new Position(cursorAt!.atX, cursorAt!.atY), piece);
+    for (const i of iterator) {
+      if (i.value) {
+        fields[i.y][i.x] = coloredField(piece.color, group.group);
+      }
+    }
+    groups.push(group);
   }
 
   function resizeAddColumn() {
