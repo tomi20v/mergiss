@@ -65,7 +65,7 @@
   function onMouseDown(atX: number, atY: number) {
     const field = fields[atY][atX];
     if (field.group) {
-      uiBus.emit('groupClickStart', fields[atY][atX].group);
+      uiBus.emit('accelerateGroup', fields[atY][atX].group);
     }
   }
 

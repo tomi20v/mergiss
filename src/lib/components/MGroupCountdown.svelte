@@ -1,4 +1,4 @@
-<svelte:document onmouseup={onGroupClickStop} />
+<svelte:document onmouseup={resetVelocity} />
 <div class="countdown {countdownSpeedClass(ttl)} {accelerating ? 'countdown-accelerating' : ''}"
      style="position: relative;"
      style:color="{color}"
@@ -42,15 +42,24 @@
   onMount(() => {
     ttl = group.ttl;
     startTimer();
-    uiBus.on('groupClickStart', onGroupClickStart)
+    uiBus.on('accelerateGroup', accelerate)
   })
 
   onDestroy(() => {
     if (timerId) {
       clearTimeout(timerId);
     }
-    uiBus.off('groupClickStart', onGroupClickStart);
+    uiBus.off('groupClickStart', accelerate);
   })
+
+  function accelerate(g: number) {
+    if (g == group.group) {
+      if (!accelerating) {
+        accelerating = true;
+      }
+      ttl -= 1;
+    }
+  }
 
   function countdownSpeedClass(ttl: number) {
     if (ttl == 0) {
@@ -79,13 +88,9 @@
     return ttl.toFixed(0);
   }
 
-  function onGroupClickStart(g: number) {
-    if (g == group.group) {
-      if (!accelerating) {
-        accelerating = true;
-      }
-      ttl -= 1;
-    }
+  function resetVelocity() {
+    accelerating = false;
+    currentTimeout = 100;
   }
 
   function startTimer() {
@@ -104,11 +109,6 @@
         startTimer();
       }
     }, currentTimeout);
-  }
-
-  function onGroupClickStop() {
-    accelerating = false;
-    currentTimeout = 100;
   }
 
 </script>
