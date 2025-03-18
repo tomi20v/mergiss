@@ -35,7 +35,7 @@
   import {blur} from "svelte/transition";
   import elasticTransition from "$lib/transitions/elasticTransition";
   import type {FieldType} from "$lib/game/FieldType";
-  import store from "$lib/store.svelte";
+  import playStore from "$lib/playStore.svelte.js";
   import MGroupCountdown from "$lib/components/MGroupCountdown.svelte";
   import Group from "$lib/game/Group.js";
   import {uiBus} from "$lib/util";
@@ -51,7 +51,7 @@
   } = $props();
 
   $effect(() => {
-    store.mergeBoardCellWidth = width;
+    playStore.mergeBoardCellWidth = width;
   })
 
   function backgroundImageOf(atX: number, atY: number): string {

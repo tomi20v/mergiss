@@ -16,7 +16,7 @@
   import { onMount, onDestroy } from "svelte";
   import colors from "$lib/game/colors";
   import {uiBus} from "$lib/util";
-  import store from "$lib/store.svelte";
+  import playStore from "$lib/playStore.svelte.js";
 
   let {group, color}: {group: Group, color: string} = $props();
   let ttl = $state(0);
@@ -28,14 +28,14 @@
 
   // default size 50px, but with big board and small blocks it shrinks down to 40 (oversize, really helps)
   let width = ($derived<number>).by(() => {
-    const cellWidth = store.mergeBoardCellWidth;
+    const cellWidth = playStore.mergeBoardCellWidth;
     return Math.max(Math.min(50, cellWidth-1), 40);
   })
   // when oversize, flex centering doesn't work and countdown starts moving to the right. With this dynamic left
   //  it is kept in center (vertically no need, that works fine)
   let left = $derived.by(() => {
     const w = width;
-    const cellWidth = store.mergeBoardCellWidth;
+    const cellWidth = playStore.mergeBoardCellWidth;
     return cellWidth > w ? 'auto' : (Math.floor((cellWidth-w)/2) + 'px');
   })
 

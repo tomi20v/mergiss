@@ -27,7 +27,7 @@
 </div>
 <script lang="ts">
 
-  import store from "$lib/store.svelte";
+  import playStore from "$lib/playStore.svelte.js";
   import PieceType from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util";
   import Position from "$lib/game/geometry/Position";
@@ -139,9 +139,9 @@
     dragImage.style.zIndex = '9999'; // Ensure the drag image is visible
     // dragImage.style.width = store.mergeBoardCellWidth + 'px'; // Ensure the drag image is visible
     // Ensure the drag image is same size as the board. Due to relative gaps we set the size of the whole
-    const draggedWidth = store.mergeBoardCellWidth * piece.sizeX();
+    const draggedWidth = playStore.mergeBoardCellWidth * piece.sizeX();
     dragImage.style.width = draggedWidth + 'px';
-    dragImage.style.transformOrigin = ((dragAtX + 0.5) * store.mergeBoardCellWidth) + 'px ' + ((dragAtY + 0.5) * store.mergeBoardCellWidth) + 'px';
+    dragImage.style.transformOrigin = ((dragAtX + 0.5) * playStore.mergeBoardCellWidth) + 'px ' + ((dragAtY + 0.5) * playStore.mergeBoardCellWidth) + 'px';
     dragImage.style.transition = "transform .3s cubic-bezier(0.64, 0.57, 0.67, 1.53)";
 
     document.body.appendChild(dragImage);
@@ -176,8 +176,8 @@
       return;
     }
     // @todo don't use mergeboardcellwidth here
-    dragImage.style.left = (event.clientX - (dragAtX + 0.5) * store.mergeBoardCellWidth ) + 'px';
-    dragImage.style.top = (event.clientY - (dragAtY + 0.5) * store.mergeBoardCellWidth ) + 'px';
+    dragImage.style.left = (event.clientX - (dragAtX + 0.5) * playStore.mergeBoardCellWidth ) + 'px';
+    dragImage.style.top = (event.clientY - (dragAtY + 0.5) * playStore.mergeBoardCellWidth ) + 'px';
     // console.log('mouseMove', event.clientX, event.clientY, dragAtX, dragAtY, store.mergeBoardCellWidth);
   }
 
