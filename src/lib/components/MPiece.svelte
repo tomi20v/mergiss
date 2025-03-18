@@ -33,7 +33,7 @@
   import Position from "$lib/game/geometry/Position";
   import {blur} from "svelte/transition";
   import {bounceOut} from "svelte/easing";
-  import Mouse from "$lib/Mouse";
+  import MouseButtons from "$lib/MouseButtons";
 
   const DragAtOptions = {
     topLeft: 0,
@@ -102,14 +102,14 @@
         return 0;
     }
   })
-  let dragButton = $state(Mouse.NOBUTTON);
-  let dragging = $derived(dragButton !== Mouse.NOBUTTON);
+  let dragButton = $state(MouseButtons.NOBUTTON);
+  let dragging = $derived(dragButton !== MouseButtons.NOBUTTON);
   let dragImage!: HTMLElement;
   let dragRotation = $state(0);
 
   function dragDrop() {
     // this eliminates flickering between mouseup and removing the piece (if it is to be removed)
-    setTimeout(() => dragButton = Mouse.NOBUTTON, 1);
+    setTimeout(() => dragButton = MouseButtons.NOBUTTON, 1);
     document.body.removeChild(dragImage);
     // putting in a setTimeout results in better sequence: mouseUp here, enter on other (board cell), onPieceDrop on other (board)
     setTimeout(() => uiBus.emit('pieceDrop', {piece, dragAt: new Position(dragAtX, dragAtY, dragRotation)}));

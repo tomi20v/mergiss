@@ -24,7 +24,7 @@
   import Piece from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util";
   import MBoardFields from "$lib/components/MBoardFields.svelte";
-  import {coloredField, emptyField, type FieldType} from "$lib/game/FieldType";
+  import {coloredField, emptyField, type FieldType} from "$lib/game/fields";
   import { FlatteningIterator, } from "@tomi20v/iterators";
   import {move, rotateCoords} from "@tomi20v/iterators";
   import Group from "$lib/game/Group";
@@ -144,6 +144,9 @@
       }
     }
     groups.push(group);
+    // checkGroupMerges();
+    // uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
+    // uiBus.emit('groupCreated', group);
   }
 
   function resizeAddColumn() {

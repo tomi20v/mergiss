@@ -34,7 +34,7 @@
 
   import {blur} from "svelte/transition";
   import elasticTransition from "$lib/transitions/elasticTransition";
-  import type {FieldType} from "$lib/game/FieldType";
+  import type {FieldType} from "$lib/game/fields";
   import playStore from "$lib/playStore.svelte.js";
   import MGroupCountdown from "$lib/components/MGroupCountdown.svelte";
   import Group from "$lib/game/Group.js";
