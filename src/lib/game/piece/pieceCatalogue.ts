@@ -1,6 +1,6 @@
-import type {IProtoMap} from "$lib/game/piece/IProtoMap";
+import type {PixelMapType} from "$lib/game/piece/PixelMapType";
 
-const pieceCatalogue: IProtoMap[] = [
+const pieceCatalogue: PixelMapType[] = [
   [
     [0,0,1,],
     [1,1,1,],

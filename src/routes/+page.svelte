@@ -11,6 +11,9 @@
       <IconButton class="material-icons">merge</IconButton>
       <Title>MERGISS</Title>
     </Section>
+    <Section align="end" >
+      <MGameScore />
+    </Section>
     <Section align="end" toolbar>
       <IconButton class="material-icons" onclick={onToggleFullScreen}>fullscreen</IconButton>
     </Section>
@@ -53,6 +56,7 @@
   import ColorSamples from "$lib/components/dev/ColorSamples.svelte";
   import {dev} from "$app/environment";
   import {onMount} from "svelte";
+  import MGameScore from "$lib/components/appbar/MGameScore.svelte";
 
   let isFullScreen = false;
   let boardHeight = $state(400);

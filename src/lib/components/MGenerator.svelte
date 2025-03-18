@@ -27,7 +27,7 @@
   import {pieceFactory} from "$lib/game/services";
   import MPiece from "$lib/components/MPiece.svelte";
   import {onDestroy, onMount} from "svelte";
-  import {uiBus} from "$lib/util";
+  import {uiBus} from "$lib/util/uiBus";
 
   let { disabled = false } = $props();
 

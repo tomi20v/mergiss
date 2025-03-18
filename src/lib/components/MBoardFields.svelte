@@ -34,11 +34,11 @@
 
   import {blur} from "svelte/transition";
   import elasticTransition from "$lib/transitions/elasticTransition";
-  import type {FieldType} from "$lib/game/FieldType";
-  import store from "$lib/store.svelte";
+  import type {FieldType} from "$lib/game/fields";
+  import playStore from "$lib/playStore.svelte.js";
   import MGroupCountdown from "$lib/components/MGroupCountdown.svelte";
   import Group from "$lib/game/Group.js";
-  import {uiBus} from "$lib/util";
+  import {uiBus} from "$lib/util/uiBus";
 
   let {
     fields,
@@ -51,7 +51,7 @@
   } = $props();
 
   $effect(() => {
-    store.mergeBoardCellWidth = width;
+    playStore.mergeBoardCellWidth = width;
   })
 
   function backgroundImageOf(atX: number, atY: number): string {
@@ -65,7 +65,7 @@
   function onMouseDown(atX: number, atY: number) {
     const field = fields[atY][atX];
     if (field.group) {
-      uiBus.emit('groupClickStart', fields[atY][atX].group);
+      uiBus.emit('accelerateGroup', fields[atY][atX].group);
     }
   }
 

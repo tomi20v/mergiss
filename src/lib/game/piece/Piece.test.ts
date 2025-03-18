@@ -1,7 +1,7 @@
 import { describe, expect, it, test } from "vitest";
 import Piece from "$lib/game/piece/Piece";
 import pieceCatalogue from "$lib/game/piece/pieceCatalogue";
-import type {IProtoMap} from "$lib/game/piece/IProtoMap";
+import type {PixelMapType} from "$lib/game/piece/PixelMapType";
 import { FlatteningIterator } from "@tomi20v/iterators";
 
 const anyProtoMap = [[1,0],[1,1]];
@@ -11,7 +11,7 @@ const anyUniqueId = '12487';
 
 describe('Piece.ts', () => {
 
-  describe.each(pieceCatalogue)('with each protomap', (...eachProtoMap: IProtoMap) => {
+  describe.each(pieceCatalogue)('with each protomap', (...eachProtoMap: PixelMapType) => {
 
     const p = new Piece(eachProtoMap, anyColor, anyShadowColor);
 

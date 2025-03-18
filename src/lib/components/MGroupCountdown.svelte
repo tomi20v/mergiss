@@ -1,4 +1,4 @@
-<svelte:document onmouseup={onGroupClickStop} />
+<svelte:document onmouseup={resetVelocity} />
 <div class="countdown {countdownSpeedClass(ttl)} {accelerating ? 'countdown-accelerating' : ''}"
      style="position: relative;"
      style:color="{color}"
@@ -15,8 +15,8 @@
   import Group from "$lib/game/Group.js";
   import { onMount, onDestroy } from "svelte";
   import colors from "$lib/game/colors";
-  import {uiBus} from "$lib/util";
-  import store from "$lib/store.svelte";
+  import {uiBus} from "$lib/util/uiBus";
+  import playStore from "$lib/playStore.svelte.js";
 
   let {group, color}: {group: Group, color: string} = $props();
   let ttl = $state(0);
@@ -28,29 +28,38 @@
 
   // default size 50px, but with big board and small blocks it shrinks down to 40 (oversize, really helps)
   let width = ($derived<number>).by(() => {
-    const cellWidth = store.mergeBoardCellWidth;
+    const cellWidth = playStore.mergeBoardCellWidth;
     return Math.max(Math.min(50, cellWidth-1), 40);
   })
   // when oversize, flex centering doesn't work and countdown starts moving to the right. With this dynamic left
   //  it is kept in center (vertically no need, that works fine)
   let left = $derived.by(() => {
     const w = width;
-    const cellWidth = store.mergeBoardCellWidth;
+    const cellWidth = playStore.mergeBoardCellWidth;
     return cellWidth > w ? 'auto' : (Math.floor((cellWidth-w)/2) + 'px');
   })
 
   onMount(() => {
     ttl = group.ttl;
     startTimer();
-    uiBus.on('groupClickStart', onGroupClickStart)
+    uiBus.on('accelerateGroup', accelerate)
   })
 
   onDestroy(() => {
     if (timerId) {
       clearTimeout(timerId);
     }
-    uiBus.off('groupClickStart', onGroupClickStart);
+    uiBus.off('groupClickStart', accelerate);
   })
+
+  function accelerate(g: number) {
+    if (g == group.group) {
+      if (!accelerating) {
+        accelerating = true;
+      }
+      ttl -= 1;
+    }
+  }
 
   function countdownSpeedClass(ttl: number) {
     if (ttl == 0) {
@@ -79,13 +88,9 @@
     return ttl.toFixed(0);
   }
 
-  function onGroupClickStart(g: number) {
-    if (g == group.group) {
-      if (!accelerating) {
-        accelerating = true;
-      }
-      ttl -= 1;
-    }
+  function resetVelocity() {
+    accelerating = false;
+    currentTimeout = 100;
   }
 
   function startTimer() {
@@ -104,11 +109,6 @@
         startTimer();
       }
     }, currentTimeout);
-  }
-
-  function onGroupClickStop() {
-    accelerating = false;
-    currentTimeout = 100;
   }
 
 </script>

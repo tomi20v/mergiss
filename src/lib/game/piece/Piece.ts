@@ -1,10 +1,10 @@
-import type {IProtoMap} from "$lib/game/piece/IProtoMap";
+import type {PixelMapType} from "$lib/game/piece/PixelMapType";
 import {uniqueId} from "lui-g";
 import { FlatteningIterator } from "@tomi20v/iterators";
 
 export default class Piece {
 
-  readonly pixelMap: IProtoMap;
+  readonly pixelMap: PixelMapType;
   readonly color: string;
   readonly shadowColor: string;
   // when re-constructed from JSON, this originalTs will hold original value
@@ -18,7 +18,7 @@ export default class Piece {
   }
 
   constructor(
-    pixelMap: IProtoMap,
+    pixelMap: PixelMapType,
     color: string,
     shadowColor: string,
     originalUniqueId: string = ''
