@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.5.4",
-  "description": "click/long click on groups reduces ttl",
+  "version": "0.5.5",
+  "description": "I can see the score",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
@@ -41,7 +41,7 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.0.0",
-    "vite": "^5.4.11",
+    "vite": "^5.4.14",
     "vitest": "^2.0.4"
   },
   "dependencies": {
