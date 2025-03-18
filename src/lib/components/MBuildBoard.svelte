@@ -1,6 +1,4 @@
-<svelte:window
-        onmousemove={onMouseMove}
-/>
+<svelte:window onmousemove={onMouseMove} />
 <div bind:this={elem} class="flex flex-grow flex-col gap-0 p-2 text-white justify-center align-middle relative">
   {#if (dev)}
     <div class="flex flex-col gap-1 absolute top-0 right-0 bg-red-600 justify-center align-middle" >
@@ -13,6 +11,7 @@
         <button onclick={resizeAddColumn}>add</button>
       </div>
       <div>{JSON.stringify(cursorAt)}</div>
+      <div><button onclick="{testScore}">score!</button></div>
     </div>
   {/if}
   <MBoardFields fields={fields} groups={groups} width={width} />
@@ -177,5 +176,10 @@
     fields.pop();
   }
 
-</script>
+  function testScore() {
+    if (import.meta.env.MODE === 'development') {
+      uiBus.emit('dev.points', Math.floor(1000*Math.random()));
+    }
+  }
 
+</script>
