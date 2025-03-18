@@ -29,7 +29,7 @@
 
   import playStore from "$lib/playStore.svelte.js";
   import PieceType from "$lib/game/piece/Piece";
-  import {uiBus} from "$lib/util";
+  import {uiBus} from "$lib/util/uiBus";
   import Position from "$lib/game/geometry/Position";
   import {blur} from "svelte/transition";
   import {bounceOut} from "svelte/easing";

@@ -15,7 +15,7 @@
   import Group from "$lib/game/Group.js";
   import { onMount, onDestroy } from "svelte";
   import colors from "$lib/game/colors";
-  import {uiBus} from "$lib/util";
+  import {uiBus} from "$lib/util/uiBus";
   import playStore from "$lib/playStore.svelte.js";
 
   let {group, color}: {group: Group, color: string} = $props();

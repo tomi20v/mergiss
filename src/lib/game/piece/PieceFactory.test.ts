@@ -1,7 +1,7 @@
 import {afterEach, beforeEach, describe, expect, test, vi, type Mock } from "vitest";
 import PieceFactory from "$lib/game/piece/PieceFactory";
 import pieceCatalogue from "$lib/game/piece/pieceCatalogue";
-import {randomArrayItem} from "$lib/util";
+import {randomArrayItem} from "$lib/util/randomArrayItem";
 
 const anyColor = 'anyColor', anyOtherColor = 'anyOtherColor';
 vi.mock('$lib/game/colors', () => ({

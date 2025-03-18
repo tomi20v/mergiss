@@ -38,7 +38,7 @@
   import playStore from "$lib/playStore.svelte.js";
   import MGroupCountdown from "$lib/components/MGroupCountdown.svelte";
   import Group from "$lib/game/Group.js";
-  import {uiBus} from "$lib/util";
+  import {uiBus} from "$lib/util/uiBus";
 
   let {
     fields,
