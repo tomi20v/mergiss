@@ -1,4 +1,5 @@
-<Button>
+<Button style="background: linear-gradient(135deg, #E27D5F, #C75C8F) !important;
+               box-shadow: 0px 0px 6px 1px rgba(199, 92, 143, 0.4) !important;">
   <Icon class="material-icons" style="transform: scale(1.3);">{icons.score}</Icon>
   <Label>{playStore.score.toLocaleString()}</Label>
 </Button>
