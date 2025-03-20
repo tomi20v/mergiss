@@ -7,7 +7,7 @@
                         background-size: 100%;
                         background-image: url({backgroundImageOf(iX, iY)});
                         "
-                 style:width="{width}px"
+                 style:width="{cellWidth}px"
                  transition:elasticTransition|global
                  onfocus={() => null}
                  role="none"
@@ -35,7 +35,6 @@
   import {blur} from "svelte/transition";
   import elasticTransition from "$lib/transitions/elasticTransition";
   import type {FieldType} from "$lib/game/fields";
-  import playStore from "$lib/playStore.svelte.js";
   import MGroupCountdown from "$lib/components/MGroupCountdown.svelte";
   import Group from "$lib/game/Group.js";
   import {uiBus} from "$lib/util/uiBus";
@@ -43,16 +42,12 @@
   let {
     fields,
     groups,
-    width,
+    cellWidth,
   }: {
-    width: number,
+    cellWidth: number,
     groups: Group[],
     fields: FieldType[][],
   } = $props();
-
-  $effect(() => {
-    playStore.mergeBoardCellWidth = width;
-  })
 
   function backgroundImageOf(atX: number, atY: number): string {
     return `grid/${String.fromCharCode(atY%6 + 65)}${atX%6+1}.png`;

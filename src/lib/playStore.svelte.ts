@@ -7,8 +7,8 @@ class PlayStore {
   score: number = $state(0);
 }
 
-// uiBus.on("play.start", (play: PlayConfigType) => {
-uiBus.on("play.start", () => {
+// uiBus.on("playStart", (play: PlayConfigType) => {
+uiBus.on("playStart", () => {
   playStore.score = 0;
 })
 
