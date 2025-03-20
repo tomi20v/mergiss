@@ -1,13 +1,16 @@
 const icons = {
+  achievement: "emoji_events",
+  mastery: "star",
+  score: "token",
   // achievement: "leaderboard",
-  achievement: "military_tech",
-  // mastery: "seal",
-  mastery: "emoji_events",
-  // score: "star",
-  // score: "emoji_events",
-  // score: "star",
+  // achievement: "military_tech",
+  // mastery: "emoji_events",
+  // mastery: "military_tech",
+  // score: "flash_on",
+  // score: "dashboard",
+  // score: "view_in_ar",
+  // score: "attach_money",
   // score: "paid",
-  score: "flash_on",
 }
 
 export default icons;
