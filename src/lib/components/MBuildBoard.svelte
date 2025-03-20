@@ -14,7 +14,7 @@
       <div><button onclick="{testScore}">score!</button></div>
     </div>
   {/if}
-  <MBoardFields fields={fields} groups={groups} width={width} />
+  <MBoardFields fields={fields} groups={groups} cellWidth={cellWidth} />
 </div>
 <script lang="ts">
 
@@ -28,6 +28,7 @@
   import { FlatteningIterator, } from "@tomi20v/iterators";
   import {move, rotateCoords} from "@tomi20v/iterators";
   import Group from "$lib/game/Group";
+  import playStore from "$lib/playStore.svelte";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -50,7 +51,7 @@
 
   let cursorAt: Position|null = $state(null);
 
-  let width: number = $derived.by(() => {
+  let cellWidth: number = $derived.by(() => {
     // this makes sure we update the width when the table size changes
     // const s = serial;
     const extraWidth = sizeX >= 5 ? 2.2 : 1.8;
@@ -59,6 +60,10 @@
     const perHeight = Math.floor(boardHeight / (sizeY+extraHeight));
     const ret = Math.min(perWidth, perHeight);
     return ret;
+  })
+  // keep it updated in the store too
+  $effect(() => {
+    playStore.mergeBoardCellWidth = cellWidth;
   })
 
   onMount(() => {
@@ -95,7 +100,7 @@
   function onMouseMove(event: MouseEvent) {
     const field = elem.querySelector('.m-board-field');
     const p = field?.getBoundingClientRect();
-    const w = width;
+    const w = cellWidth;
     if (!p || event.clientX < p.left || event.clientY < p.top) {
       cursorAt = null;
       return;
