@@ -11,8 +11,8 @@
   import {uiBus} from "$lib/util/uiBus";
 
   if (import.meta.env.MODE === 'development') {
-    // this if removes the code from production builds
-    uiBus.on("dev.points", (points: number) => {
+    // this surrounding "if" removes the code from production builds
+    uiBus.on("dev.score", (points: number) => {
       playStore.score += points;
     })
   }

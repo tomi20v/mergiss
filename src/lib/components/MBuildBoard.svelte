@@ -181,7 +181,7 @@
 
   function testScore() {
     if (import.meta.env.MODE === 'development') {
-      uiBus.emit('dev.points', Math.floor(1000*Math.random()));
+      uiBus.emit('dev.score', Math.floor(1000*Math.random()));
     }
   }
 
