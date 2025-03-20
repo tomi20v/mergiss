@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.5.5",
-  "description": "I can see the score",
+  "version": "0.5.6",
+  "description": "currency/score/mastery/achievement types/icons",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
