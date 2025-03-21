@@ -3,13 +3,13 @@ import PieceFactory from "$lib/game/piece/PieceFactory";
 import pieceCatalogue from "$lib/game/piece/pieceCatalogue";
 import {randomArrayItem} from "$lib/util/randomArrayItem";
 
+
 const anyColor = 'anyColor', anyOtherColor = 'anyOtherColor';
 vi.mock('$lib/game/colors', () => ({
   randomColorPair: vi.fn(() => ({color: anyColor, otherColor: anyOtherColor}))
 }));
-vi.mock('$lib/util', () => ({
+vi.mock('$lib/util/randomArrayItem', () => ({
   randomArrayItem: vi.fn(),
-  // getUniqueId: vi.fn()
 }));
 
 describe('PieceFactory.ts', () => {

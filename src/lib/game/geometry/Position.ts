@@ -36,6 +36,10 @@ export default class Position {
     );
   }
 
+  scale(factor: number): Position {
+    return new Position(this.atX * factor, this.atY * factor);
+  }
+
   sub(other: Position): Position {
     return new Position(this.atX - other.atX, this.atY - other.atY, this.rotXY - other.rotXY);
   }
