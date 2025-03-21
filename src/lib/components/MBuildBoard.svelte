@@ -146,14 +146,60 @@
   }
 
   function putOnBoard(piece: Piece, iterator: FlatteningIterator<number>) {
-    const group = Group.fromPiece(new Position(cursorAt!.atX, cursorAt!.atY), piece);
+    // first just create a new grooup. We'll merge it with connecting groups later
+    const newGroup = Group.fromPiece(new Position(cursorAt!.atX, cursorAt!.atY), piece);
+    const groupsToMerge: Group[] = [];
     for (const i of iterator) {
       if (i.value) {
-        fields[i.y][i.x] = coloredField(piece.color, group.group);
+        fields[i.y][i.x] = coloredField(piece.color, newGroup.group);
+        const position = new Position(i.x, i.y);
+        boardPositionsAround(position)
+          .forEach(otherPosition => {
+            const otherField: FieldType = fields[otherPosition.atY][otherPosition.atX];
+            if ((otherField.color !== null) && (otherField.group !== newGroup.group)) {
+              const otherGroup = groups.find(each => each.group == otherField.group);
+              // there will always be an otherGroup in practice, butkeep compiler happy
+              if (otherGroup && !groupsToMerge.includes(otherGroup)) {
+                groupsToMerge.push(otherGroup);
+              }
+              // I will need this to get extra points for stiching. OR maybe could just
+              //  emit count of stiches with the (final) group created?
+              // uiBus.emit('pieceStitch', {group, otherGroup, position, otherPosition})
+            }
+          })
       }
     }
-    groups.push(group);
-    // checkGroupMerges();
+    if (groupsToMerge.length > 0) {
+      groupsToMerge.push(newGroup);
+      const newCenter = groupsToMerge.reduce((prev, curr) => {
+        const w = prev.weight + curr.weight;
+        return {
+          x: (prev.x*prev.weight + curr.weight*curr.centerX) / w,
+          y: (prev.y*prev.weight + curr.weight*curr.centerY) / w,
+          weight: prev.weight + curr.weight,
+          ttl: (prev.ttl*prev.weight + curr.ttl*curr.weight) / w * Math.pow(groupsToMerge.length-1, 1/2),
+        }
+      }, {x: 0, y: 0, weight: 0, ttl: 0});
+      const megedGroup = new Group(newCenter.x, newCenter.y, newCenter.weight, newCenter.ttl);
+      const groupIdsToMerge = groupsToMerge.map(each => each.group);
+      fields.forEach(eachRow => {
+        eachRow.forEach(eachField => {
+          if (groupIdsToMerge.includes(eachField.group)) {
+            eachField.group = megedGroup.group;
+          }
+        })
+      })
+      console.log('groupsToMerge', groupsToMerge, newCenter, megedGroup);
+      // @todo update group numbers in fields[][] here
+      groupsToMerge.forEach(each => {
+        groups.splice(groups.indexOf(each), 1);
+      });
+      groups.push(megedGroup);
+      console.log('GROUPS!', [...groups]);
+    }
+    else {
+      groups.push(newGroup);
+    }
     // uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
     // uiBus.emit('groupCreated', group);
   }
@@ -192,6 +238,16 @@
     if (import.meta.env.MODE === 'development') {
       uiBus.emit('dev.score', Math.floor(1000*Math.random()));
     }
+  }
+
+  function boardPositionsAround(p: Position): Position[] {
+    return [
+      new Position(p.atX, p.atY-1),
+      new Position(p.atX+1, p.atY),
+      new Position(p.atX, p.atY+1),
+      new Position(p.atX-1, p.atY),
+    ]
+      .filter(each => areValidCoordinates(each.atX, each.atY));
   }
 
 </script>
