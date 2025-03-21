@@ -169,19 +169,24 @@
           })
       }
     }
+
     if (groupsToMerge.length > 0) {
+      // we'll merge this new group immediately (as groups are immutable)
       groupsToMerge.push(newGroup);
+      // calculate new center and new TTL
       const newCenter = groupsToMerge.reduce((prev, curr) => {
         const w = prev.weight + curr.weight;
         return {
-          x: (prev.x*prev.weight + curr.weight*curr.centerX) / w,
-          y: (prev.y*prev.weight + curr.weight*curr.centerY) / w,
-          weight: prev.weight + curr.weight,
+          x: (prev.x*prev.weight + curr.centerX*curr.weight) / w,
+          y: (prev.y*prev.weight + curr.centerY*curr.weight) / w,
+          weight: w,
           ttl: (prev.ttl*prev.weight + curr.ttl*curr.weight) / w * Math.pow(groupsToMerge.length-1, 1/2),
         }
       }, {x: 0, y: 0, weight: 0, ttl: 0});
       const megedGroup = new Group(newCenter.x, newCenter.y, newCenter.weight, newCenter.ttl);
       const groupIdsToMerge = groupsToMerge.map(each => each.group);
+
+      // update group ID in fields which belong to a merged group
       fields.forEach(eachRow => {
         eachRow.forEach(eachField => {
           if (groupIdsToMerge.includes(eachField.group)) {
@@ -189,19 +194,17 @@
           }
         })
       })
-      console.log('groupsToMerge', groupsToMerge, newCenter, megedGroup);
-      // @todo update group numbers in fields[][] here
+
+      // remove merged ones, and add the new one
       groupsToMerge.forEach(each => {
         groups.splice(groups.indexOf(each), 1);
       });
       groups.push(megedGroup);
-      console.log('GROUPS!', [...groups]);
     }
     else {
       groups.push(newGroup);
     }
     // uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
-    // uiBus.emit('groupCreated', group);
   }
 
   function resizeAddColumn() {
