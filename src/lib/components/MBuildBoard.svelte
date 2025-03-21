@@ -151,9 +151,9 @@
     const groupsToMerge: Group[] = [];
     for (const i of iterator) {
       if (i.value) {
-        fields[i.y][i.x] = coloredField(piece.color, newGroup.group);
         const position = new Position(i.x, i.y);
         boardPositionsAround(position)
+          .concat(position)
           .forEach(otherPosition => {
             const otherField: FieldType = fields[otherPosition.atY][otherPosition.atX];
             if ((otherField.color !== null) && (otherField.group !== newGroup.group)) {
@@ -167,6 +167,8 @@
               // uiBus.emit('pieceStitch', {group, otherGroup, position, otherPosition})
             }
           })
+        // update last, so I can detect the group under this before
+        fields[i.y][i.x] = coloredField(piece.color, newGroup.group);
       }
     }
 
