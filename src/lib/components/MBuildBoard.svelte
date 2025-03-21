@@ -75,9 +75,13 @@
     uiBus.on('groupExpired', onGroupExpired);
   })
 
+  function areValidCoordinates(x: number, y: number): boolean {
+    return (x >= 0 && x < sizeX && y >= 0 && y < sizeY);
+  }
+
   function fitsOnBoard(iterator: FlatteningIterator<number>): boolean {
     for (const i of iterator) {
-      if (i.value && (i.x < 0 || i.x >= sizeX || i.y < 0 || i.y >= sizeY)) {
+      if (i.value && !areValidCoordinates(i.x, i.y)) {
         return false;
       }
     }
