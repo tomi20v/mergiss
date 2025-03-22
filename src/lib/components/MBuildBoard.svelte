@@ -178,17 +178,27 @@
       // we'll merge this new group immediately (as groups are immutable)
       groupsToMerge.push(newGroup);
       // calculate new center and new TTL
-      const newCenter = groupsToMerge.reduce((prev, curr) => {
+      function mergeMapper(prev, curr) {
         const w = prev.weight + curr.weight;
+        // sum of TTLs multiplied by a factor which is higher when joining multiple groups or having
+        //  more stitches - just slightly, and even like this it will have to be limited so that
+        //  when big pieces touch it won't result in huge TTLs
+        // const q = Math.pow(1+(groupsToMerge.length-1)/10+stitchCount/10, 1/4);
+        const q = Math.pow(1+(groupsToMerge.length-1)/10 + Math.min(stitchCount, 9)/20, 1/4);
+        const ttl = Math.min(
+          (prev.ttl*2 + curr.ttl),
+          (prev.ttl + curr.ttl*2),
+          (prev.ttl * 1.05 + curr.ttl * 1.4 + 1),
+          (prev.ttl + curr.ttl) * q
+        );
         return {
           x: (prev.x*prev.weight + curr.centerX*curr.weight) / w,
           y: (prev.y*prev.weight + curr.centerY*curr.weight) / w,
           weight: w,
-          // ttl: (prev.ttl*prev.weight + curr.ttl*curr.weight) / w * Math.pow(groupsToMerge.length-1, 1/2),
-          // ttl: (prev.ttl*prev.weight + curr.ttl*curr.weight) / w * Math.pow(1+(groupsToMerge.length-1)/10+stitchCount/10, 1),
-          ttl: (prev.ttl + curr.ttl) * Math.pow(1+(groupsToMerge.length-1)/10+stitchCount/10, 1/2),
+          ttl,
         }
-      }, {x: 0, y: 0, weight: 0, ttl: 0});
+      }
+      const newCenter = groupsToMerge.reduce(mergeMapper, {x: 0, y: 0, weight: 0, ttl: 0});
       const mergedGroup = new Group(newCenter.x, newCenter.y, newCenter.weight, newCenter.ttl);
       const groupIdsToMerge = groupsToMerge.map(each => each.group);
 
@@ -201,9 +211,15 @@
         })
       })
 
+      console.log('before', groupsToMerge, [...groups]);
+
       // remove merged ones, and add the new one
       groupsToMerge.forEach(each => {
-        groups.splice(groups.indexOf(each), 1);
+        // groupsToMerge contains the newGroup but groups does not. This results in an index
+        //  of -1 which, when used with splice, results in funny stuff
+        if (groups.indexOf(each) !== -1) {
+          groups.splice(groups.indexOf(each), 1);
+        }
       });
       // I need a slight timeout so that MBoardFields can pick up the change even when the center hasn't changed
       setTimeout(() => groups.push(mergedGroup), 1);
