@@ -189,14 +189,14 @@
           ttl: (prev.ttl + curr.ttl) * Math.pow(1+(groupsToMerge.length-1)/10+stitchCount/10, 1/2),
         }
       }, {x: 0, y: 0, weight: 0, ttl: 0});
-      const megedGroup = new Group(newCenter.x, newCenter.y, newCenter.weight, newCenter.ttl);
+      const mergedGroup = new Group(newCenter.x, newCenter.y, newCenter.weight, newCenter.ttl);
       const groupIdsToMerge = groupsToMerge.map(each => each.group);
 
       // update group ID in fields which belong to a merged group
       fields.forEach(eachRow => {
         eachRow.forEach(eachField => {
           if (groupIdsToMerge.includes(eachField.group)) {
-            eachField.group = megedGroup.group;
+            eachField.group = mergedGroup.group;
           }
         })
       })
@@ -206,7 +206,7 @@
         groups.splice(groups.indexOf(each), 1);
       });
       // I need a slight timeout so that MBoardFields can pick up the change even when the center hasn't changed
-      setTimeout(() => groups.push(megedGroup), 1);
+      setTimeout(() => groups.push(mergedGroup), 1);
     }
     else {
       groups.push(newGroup);
