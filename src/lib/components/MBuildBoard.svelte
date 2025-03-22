@@ -149,6 +149,7 @@
     // first just create a new grooup. We'll merge it with connecting groups later
     const newGroup = Group.fromPiece(new Position(cursorAt!.atX, cursorAt!.atY), piece);
     const groupsToMerge: Group[] = [];
+    let stitchCount = 0;
     for (const i of iterator) {
       if (i.value) {
         const position = new Position(i.x, i.y);
@@ -165,6 +166,7 @@
               // I will need this to get extra points for stiching. OR maybe could just
               //  emit count of stiches with the (final) group created?
               // uiBus.emit('pieceStitch', {group, otherGroup, position, otherPosition})
+              stitchCount++;
             }
           })
         // update last, so I can detect the group under this before
@@ -182,7 +184,9 @@
           x: (prev.x*prev.weight + curr.centerX*curr.weight) / w,
           y: (prev.y*prev.weight + curr.centerY*curr.weight) / w,
           weight: w,
-          ttl: (prev.ttl*prev.weight + curr.ttl*curr.weight) / w * Math.pow(groupsToMerge.length-1, 1/2),
+          // ttl: (prev.ttl*prev.weight + curr.ttl*curr.weight) / w * Math.pow(groupsToMerge.length-1, 1/2),
+          // ttl: (prev.ttl*prev.weight + curr.ttl*curr.weight) / w * Math.pow(1+(groupsToMerge.length-1)/10+stitchCount/10, 1),
+          ttl: (prev.ttl + curr.ttl) * Math.pow(1+(groupsToMerge.length-1)/10+stitchCount/10, 1/2),
         }
       }, {x: 0, y: 0, weight: 0, ttl: 0});
       const megedGroup = new Group(newCenter.x, newCenter.y, newCenter.weight, newCenter.ttl);
@@ -201,7 +205,8 @@
       groupsToMerge.forEach(each => {
         groups.splice(groups.indexOf(each), 1);
       });
-      groups.push(megedGroup);
+      // I need a slight timeout so that MBoardFields can pick up the change even when the center hasn't changed
+      setTimeout(() => groups.push(megedGroup), 1);
     }
     else {
       groups.push(newGroup);
