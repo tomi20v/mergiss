@@ -25,6 +25,11 @@
                         <MGroupCountdown group={groupCenterAt(iX, iY) as Group} color={color} />
                         {/if}
                     </div>
+                {:else if (groupCenterAt(iX, iY))}
+                  <div class="flex grow m-0.5 items-center justify-center">
+                      <!-- @todo place in the center -->
+                    <MGroupCountdown group={groupCenterAt(iX, iY) as Group} color={''} />
+                  </div>
                 {/if}
             </div>
         {/each}
@@ -54,7 +59,10 @@
   }
 
   function groupCenterAt(atX: number, atY: number): Group | undefined {
-    return groups.find(each => (each.centerX == atX) && (each.centerY == atY));
+    // I have to take the floor() to match with group centers like 1.5, 4.8 etc. These could be offset later
+    // return groups.find(each => (Math.floor(each.centerX) == atX) && (Math.floor(each.centerY) == atY));
+    // return groups.find(each => (Math.ceil(each.centerX) == atX) && (Math.ceil(each.centerY) == atY));
+    return groups.find(each => (Math.round(each.centerX) == atX) && (Math.round(each.centerY) == atY));
   }
 
   function onMouseDown(atX: number, atY: number) {
