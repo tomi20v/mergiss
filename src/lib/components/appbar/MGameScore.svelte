@@ -1,5 +1,6 @@
 <!-- I can't use classes on components, but I can use styles :/ -->
-<Button style="background: linear-gradient(135deg, #E27D5F, #C75C8F) !important;
+<Button id="game-score"
+        style="background: linear-gradient(135deg, #E27D5F, #C75C8F) !important;
                box-shadow: 0px 0px 6px 1px rgba(199, 92, 143, 0.4) !important;
                transform: scale({scale.current});
                ">

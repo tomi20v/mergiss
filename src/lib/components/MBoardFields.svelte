@@ -23,7 +23,6 @@
                style:left="{stitchLeft(stitch)}px"
                style:top="{stitchTop(stitch)}px"
                in:blur={{duration: 100}}
-               out:blur={{duration: 600}}
           />
         {/each}
 
@@ -103,6 +102,39 @@
     }
   }
 
+  function flyToScore(stitch: PositionPair) {
+
+    const stitchEl = document.getElementById('stitch-' + stitch.cnt);
+    if (!stitchEl) return;
+    const scoreEl = document.getElementById('game-score');
+    if (!scoreEl) return;
+
+    const rect = stitchEl.getBoundingClientRect();
+    const clone = stitchEl.cloneNode(true) as HTMLElement;
+    document.body.appendChild(clone);
+    Object.assign(clone.style, {
+      position: 'absolute',
+      top: rect.top + 'px',
+      left: rect.left + 'px',
+      width: rect.width + 'px',
+      height: rect.height + 'px',
+      zIndex: 99,
+      margin: 0,
+      opacity: 1,
+    })
+    clone.getBoundingClientRect();
+
+    const deltaX = scoreEl.getBoundingClientRect().left - rect.left;
+    const deltaY = scoreEl.getBoundingClientRect().top - rect.top;
+    clone.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.1)`;
+    clone.style.transition = `transform 0.3s ease, opacity 0.5s ease`;
+    clone.addEventListener('transitionend', () => {
+      // @todo emit score event only here
+      clone.remove();
+    });
+
+  }
+
   function onStitch(stitch: PositionPair) {
     const newStitch: PositionPair = {...stitch, cnt: numericId()}
     stitches.push(newStitch);
@@ -113,6 +145,7 @@
     //  one piece's stitches are visible at once so keep the effect fast than a player could put a
     //  piece on the board (OR make the PositionPair have an ID but then it has to be a class as well)
     setTimeout(() => {
+      flyToScore(newStitch);
       const s = stitches.find(each => each.cnt == newStitch.cnt);
       if (s) {
         stitches.splice(stitches.indexOf(s), 1);
