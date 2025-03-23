@@ -210,7 +210,7 @@
       setTimeout(() => groups.push(mergedGroup), 1);
 
       stitches.forEach(each => {
-        uiBus.emit('stitch', {...each, cnt: stitches.length});
+        uiBus.emit('groupStitch', {...each, cnt: stitches.length});
       })
 
     }

@@ -17,6 +17,7 @@
   import { Spring, Tween, } from "svelte/motion";
   import { expoOut } from "svelte/easing";
   import type Group from "$lib/game/Group";
+  import type {PositionPair} from "$lib/game/geometry/positionPair";
 
   // these together (and with addScore) make a nice "pop" when score is increased
   let scale = new Spring(1, { stiffness: 0.8, damping: 1 });
@@ -31,6 +32,7 @@
 
   onMount(() => {
     uiBus.on("groupExpired", (group: Group) => addScore(group.weight))
+    uiBus.on("groupStitch", onGroupStitch)
   })
 
   onDestroy(() => {
@@ -41,6 +43,12 @@
     playStore.score += score;
     scale.set(1.18);
     setTimeout(() => scale.set(1), 150);
+  }
+
+  function onGroupStitch(p: PositionPair) {
+    // using sqrt will keep the earned points more linear (as the event is
+    //  emitted as many times as many stitches)
+    addScore(Math.sqrt(p.cnt||0));
   }
 
 </script>
