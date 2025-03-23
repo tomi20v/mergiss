@@ -59,7 +59,6 @@
   import Group from "$lib/game/Group.js";
   import {uiBus} from "$lib/util/uiBus";
   import type {PositionPair} from "$lib/game/geometry/positionPair";
-  import {numericId} from "$lib/util/numericId";
   import {flyToScore} from "$lib/util/flyToScore";
 
   let {
@@ -104,14 +103,10 @@
   }
 
   function onStitch(stitch: PositionPair) {
-    // we create a new stitch with unique id. we could always create the stitches with a unique id!
-    const newStitch: PositionPair = {...stitch, id: numericId()}
-    stitches.push(newStitch);
-
+    stitches.push(stitch);
     setTimeout(() => {
-
-      flyToScore('stitch-' + newStitch.id, () => uiBus.emit('stitchExpired', stitch));
-      const s = stitches.find(each => each.id == newStitch.id);
+      flyToScore('stitch-' + stitch.id, () => uiBus.emit('stitchExpired', stitch));
+      const s = stitches.find(each => each.id == stitch.id);
       if (s) {
         stitches.splice(stitches.indexOf(s), 1);
       }
