@@ -1,6 +1,6 @@
-import { uniqueId } from "lui-g";
 import type Position from "$lib/game/geometry/Position";
 import type Piece from "$lib/game/piece/Piece";
+import {numericId} from "$lib/util/numericId";
 
 export default class Group {
 
@@ -24,7 +24,7 @@ export default class Group {
     readonly weight: number,
     ttl = 4
   ) {
-    this.group = parseInt(uniqueId(''));
+    this.group = numericId();
     this.ttl = ttl;
   }
 
