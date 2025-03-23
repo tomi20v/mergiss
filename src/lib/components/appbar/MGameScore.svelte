@@ -32,11 +32,12 @@
 
   onMount(() => {
     uiBus.on("groupExpired", (group: Group) => addScore(group.weight))
-    uiBus.on("groupStitch", onGroupStitch)
+    uiBus.on("stitch", onStitch)
   })
 
   onDestroy(() => {
     uiBus.off("groupExpired");
+    uiBus.off("stitch");
   })
 
   function addScore(score: number) {
@@ -45,7 +46,7 @@
     setTimeout(() => scale.set(1), 150);
   }
 
-  function onGroupStitch(p: PositionPair) {
+  function onStitch(p: PositionPair) {
     // using sqrt will keep the earned points more linear (as the event is
     //  emitted as many times as many stitches)
     addScore(Math.sqrt(p.cnt||0));

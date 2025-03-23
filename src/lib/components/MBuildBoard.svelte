@@ -35,6 +35,7 @@
   let elem: HTMLElement;
   // @todo these shall go into some game state ("save") management
   // const sX = 3, sY = 3;
+  // const sX = 3, sY = 3;
   const sX = 5, sY = 5;
   // const sX = 10, sY = 10;
   // const sX = 15, sY = 15;
@@ -210,7 +211,7 @@
       setTimeout(() => groups.push(mergedGroup), 1);
 
       stitches.forEach(each => {
-        uiBus.emit('groupStitch', {...each, cnt: stitches.length});
+        uiBus.emit('stitch', {...each, cnt: stitches.length});
       })
 
     }
