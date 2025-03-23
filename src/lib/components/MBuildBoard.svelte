@@ -79,6 +79,16 @@
     return (x >= 0 && x < sizeX && y >= 0 && y < sizeY);
   }
 
+  function boardPositionsAround(atX: number, atY: number): Position[] {
+    return [
+      new Position(atX, atY-1),
+      new Position(atX+1, atY),
+      new Position(atX, atY+1),
+      new Position(atX-1, atY),
+    ]
+      .filter(each => areValidCoordinates(each.atX, each.atY));
+  }
+
   function fitsOnBoard(iterator: FlatteningIterator<number>): boolean {
     for (const i of iterator) {
       if (i.value && !areValidCoordinates(i.x, i.y)) {
@@ -148,78 +158,50 @@
   function putOnBoard(piece: Piece, iterator: FlatteningIterator<number>) {
     // first just create a new grooup. We'll merge it with connecting groups later
     const newGroup = Group.fromPiece(new Position(cursorAt!.atX, cursorAt!.atY), piece);
-    const groupsToMerge: Group[] = [];
+    const groupIdsToMerge: Set<number> = new Set();
     let stitchCount = 0;
+
     for (const i of iterator) {
-      if (i.value) {
-        const position = new Position(i.x, i.y);
-        boardPositionsAround(position)
-          .concat(position)
-          .forEach(otherPosition => {
-            const otherField: FieldType = fields[otherPosition.atY][otherPosition.atX];
-            if ((otherField.color !== null) && (otherField.group !== newGroup.group)) {
-              const otherGroup = groups.find(each => each.group == otherField.group);
-              // there will always be an otherGroup in practice, butkeep compiler happy
-              if (otherGroup && !groupsToMerge.includes(otherGroup)) {
-                groupsToMerge.push(otherGroup);
-              }
-              // I will need this to get extra points for stiching. OR maybe could just
-              //  emit count of stiches with the (final) group created?
-              // uiBus.emit('pieceStitch', {group, otherGroup, position, otherPosition})
-              stitchCount++;
-            }
-          })
-        // update last, so I can detect the group under this before
-        fields[i.y][i.x] = coloredField(piece.color, newGroup.group);
+      if (!i.value) continue;
+      let groupUnder = fields[i.y][i.x].group;
+      if (groupUnder) {
+        groupIdsToMerge.add(groupUnder);
       }
+      fields[i.y][i.x] = coloredField(piece.color, newGroup.group);
     }
 
-    if (groupsToMerge.length > 0) {
-      // we'll merge this new group immediately (as groups are immutable)
-      groupsToMerge.push(newGroup);
-      // calculate new center and new TTL
-      function mergeMapper(prev, curr) {
-        const w = prev.weight + curr.weight;
-        // sum of TTLs multiplied by a factor which is higher when joining multiple groups or having
-        //  more stitches - just slightly, and even like this it will have to be limited so that
-        //  when big pieces touch it won't result in huge TTLs
-        // const q = Math.pow(1+(groupsToMerge.length-1)/10+stitchCount/10, 1/4);
-        const q = Math.pow(1+(groupsToMerge.length-1)/10 + Math.min(stitchCount, 9)/20, 1/4);
-        const ttl = Math.min(
-          (prev.ttl*2 + curr.ttl),
-          (prev.ttl + curr.ttl*2),
-          (prev.ttl * 1.05 + curr.ttl * 1.4 + 1),
-          (prev.ttl + curr.ttl) * q
-        );
-        return {
-          x: (prev.x*prev.weight + curr.centerX*curr.weight) / w,
-          y: (prev.y*prev.weight + curr.centerY*curr.weight) / w,
-          weight: w,
-          ttl,
-        }
-      }
-      const newCenter = groupsToMerge.reduce(mergeMapper, {x: 0, y: 0, weight: 0, ttl: 0});
-      const mergedGroup = new Group(newCenter.x, newCenter.y, newCenter.weight, newCenter.ttl);
-      const groupIdsToMerge = groupsToMerge.map(each => each.group);
+    for (const i of iterator) {
+      if (!i.value) continue;
+      boardPositionsAround(i.x, i.y)
+        .forEach(otherPosition => {
+          const otherGroupId = fields[otherPosition.atY][otherPosition.atX].group;
+          if (!otherGroupId) return;
+          // this will pick up newGroup.id as well, so it will be merged too
+          groupIdsToMerge.add(otherGroupId);
+          if (otherGroupId != newGroup.group) {
+            stitchCount++;
+          }
+        })
+    }
+
+    if (groupIdsToMerge.size > 0) {
+
+      const groupsToMerge: Group[] = groups.filter(each => groupIdsToMerge.has(each.group));
+
+      const mergedGroup = groupsToMerge.reduce(mergeMapper(groupsToMerge.length, stitchCount), newGroup);
 
       // update group ID in fields which belong to a merged group
       fields.forEach(eachRow => {
         eachRow.forEach(eachField => {
-          if (groupIdsToMerge.includes(eachField.group)) {
+          if (groupIdsToMerge.has(eachField.group)) {
             eachField.group = mergedGroup.group;
           }
         })
       })
 
-      console.log('before', groupsToMerge, [...groups]);
-
       // remove merged ones, and add the new one
       groupsToMerge.forEach(each => {
-        // groupsToMerge contains the newGroup but groups does not. This results in an index
-        //  of -1 which, when used with splice, results in funny stuff
-        if (groups.indexOf(each) !== -1) {
-          groups.splice(groups.indexOf(each), 1);
-        }
+        groups.splice(groups.indexOf(each), 1);
       });
       // I need a slight timeout so that MBoardFields can pick up the change even when the center hasn't changed
       setTimeout(() => groups.push(mergedGroup), 1);
@@ -228,6 +210,31 @@
       groups.push(newGroup);
     }
     // uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
+  }
+
+  // curry this to get a (Group, Group) => Group merger function
+  function mergeMapper(groupCount: number, stitchCount: number) {
+    // calculate new center and new TTL
+    return (prev: Group, curr: Group): Group => {
+      const w = prev.weight + curr.weight;
+      // sum of TTLs multiplied by a factor which is higher when joining multiple groups or having
+      //  more stitches - just slightly, and even like this it will have to be limited so that
+      //  when big pieces touch it won't result in huge TTLs
+      // const q = Math.pow(1+(groupsToMerge.length-1)/10+stitchCount/10, 1/4);
+      const q = Math.pow(1+(groupCount-1)/10 + Math.min(stitchCount, 9)/20, 1/4);
+      const ttl = Math.min(
+        (prev.ttl*2 + curr.ttl),
+        (prev.ttl + curr.ttl*2),
+        (prev.ttl * 1.05 + curr.ttl * 1.4 + 1),
+        (prev.ttl + curr.ttl) * q
+      );
+      return new Group(
+        (prev.centerX*prev.weight + curr.centerX*curr.weight) / w,
+        (prev.centerY*prev.weight + curr.centerY*curr.weight) / w,
+        w,
+        ttl,
+      );
+    }
   }
 
   function resizeAddColumn() {
@@ -264,16 +271,6 @@
     if (import.meta.env.MODE === 'development') {
       uiBus.emit('dev.score', Math.floor(1000*Math.random()));
     }
-  }
-
-  function boardPositionsAround(p: Position): Position[] {
-    return [
-      new Position(p.atX, p.atY-1),
-      new Position(p.atX+1, p.atY),
-      new Position(p.atX, p.atY+1),
-      new Position(p.atX-1, p.atY),
-    ]
-      .filter(each => areValidCoordinates(each.atX, each.atY));
   }
 
 </script>
