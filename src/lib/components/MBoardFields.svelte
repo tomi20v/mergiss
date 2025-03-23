@@ -16,7 +16,7 @@
       >
 
         {#each (stitchesAt(iX, iY)) as stitch}
-          <img src="stitch.png" id="stitch-{stitch.cnt}" alt=""
+          <img src="stitch.png" id="stitch-{stitch.id}" alt=""
                style="display: block; position: relative; margin-right: -{imgX}px; z-index: 99"
                style:width="{imgX}px"
                style:height="{imgY}px"
@@ -60,6 +60,7 @@
   import {uiBus} from "$lib/util/uiBus";
   import type {PositionPair} from "$lib/game/geometry/positionPair";
   import {numericId} from "$lib/util/numericId";
+  import {flyToScore} from "$lib/util/flyToScore";
 
   let {
     fields,
@@ -102,51 +103,15 @@
     }
   }
 
-  function flyToScore(stitch: PositionPair) {
-
-    const stitchEl = document.getElementById('stitch-' + stitch.cnt);
-    if (!stitchEl) return;
-    const scoreEl = document.getElementById('game-score');
-    if (!scoreEl) return;
-
-    const rect = stitchEl.getBoundingClientRect();
-    const clone = stitchEl.cloneNode(true) as HTMLElement;
-    document.body.appendChild(clone);
-    Object.assign(clone.style, {
-      position: 'absolute',
-      top: rect.top + 'px',
-      left: rect.left + 'px',
-      width: rect.width + 'px',
-      height: rect.height + 'px',
-      zIndex: 99,
-      margin: 0,
-      opacity: 1,
-    })
-    clone.getBoundingClientRect();
-
-    const deltaX = scoreEl.getBoundingClientRect().left - rect.left;
-    const deltaY = scoreEl.getBoundingClientRect().top - rect.top;
-    clone.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.1)`;
-    clone.style.transition = `transform 0.3s ease, opacity 0.5s ease`;
-    clone.addEventListener('transitionend', () => {
-      // @todo emit score event only here
-      clone.remove();
-    });
-
-  }
-
   function onStitch(stitch: PositionPair) {
-    const newStitch: PositionPair = {...stitch, cnt: numericId()}
+    // we create a new stitch with unique id. we could always create the stitches with a unique id!
+    const newStitch: PositionPair = {...stitch, id: numericId()}
     stitches.push(newStitch);
-    // stitches.push(stitch);
-    // not very good as it just takes the last stitch out
-    //  however, that's fine, it'll work like a stack and all stitches will expire virtually at once
-    //  so it will just take out the last ones. However it must disappear fast enough so that only
-    //  one piece's stitches are visible at once so keep the effect fast than a player could put a
-    //  piece on the board (OR make the PositionPair have an ID but then it has to be a class as well)
+
     setTimeout(() => {
-      flyToScore(newStitch);
-      const s = stitches.find(each => each.cnt == newStitch.cnt);
+
+      flyToScore('stitch-' + newStitch.id, () => uiBus.emit('stitchExpired', stitch));
+      const s = stitches.find(each => each.id == newStitch.id);
       if (s) {
         stitches.splice(stitches.indexOf(s), 1);
       }

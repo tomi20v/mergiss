@@ -33,12 +33,12 @@
 
   onMount(() => {
     uiBus.on("groupExpired", (group: Group) => addScore(group.weight))
-    uiBus.on("stitch", onStitch)
+    uiBus.on("stitchExpired", onStitch)
   })
 
   onDestroy(() => {
     uiBus.off("groupExpired");
-    uiBus.off("stitch");
+    uiBus.off("stitchExpired");
   })
 
   function addScore(score: number) {
