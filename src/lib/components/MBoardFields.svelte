@@ -15,14 +15,15 @@
            onmousedown={() => onMouseDown(iX, iY)}
       >
 
-
         {#each (stitchesAt(iX, iY)) as stitch}
-          <img src="stitch.png" alt=""
-               style="display: block; position: relative; width: {imgX}px; height: {imgY}px; margin-right: -{imgX}px; z-index: 99"
-               style:left={stitchLeft(stitch)}
-               style:top={stitchTop(stitch)}
+          <img src="stitch.png" id="stitch-{stitch.cnt}" alt=""
+               style="display: block; position: relative; margin-right: -{imgX}px; z-index: 99"
+               style:width="{imgX}px"
+               style:height="{imgY}px"
+               style:left="{stitchLeft(stitch)}px"
+               style:top="{stitchTop(stitch)}px"
                in:blur={{duration: 100}}
-               out:blur={{duration: 400}}
+               out:blur={{duration: 600}}
           />
         {/each}
 
@@ -59,6 +60,7 @@
   import Group from "$lib/game/Group.js";
   import {uiBus} from "$lib/util/uiBus";
   import type {PositionPair} from "$lib/game/geometry/positionPair";
+  import {numericId} from "$lib/util/numericId";
 
   let {
     fields,
@@ -102,25 +104,32 @@
   }
 
   function onStitch(stitch: PositionPair) {
-    stitches.push(stitch);
+    const newStitch: PositionPair = {...stitch, cnt: numericId()}
+    stitches.push(newStitch);
+    // stitches.push(stitch);
     // not very good as it just takes the last stitch out
     //  however, that's fine, it'll work like a stack and all stitches will expire virtually at once
     //  so it will just take out the last ones. However it must disappear fast enough so that only
     //  one piece's stitches are visible at once so keep the effect fast than a player could put a
     //  piece on the board (OR make the PositionPair have an ID but then it has to be a class as well)
-    setTimeout(() => stitches.splice(-1, 1), 500);
+    setTimeout(() => {
+      const s = stitches.find(each => each.cnt == newStitch.cnt);
+      if (s) {
+        stitches.splice(stitches.indexOf(s), 1);
+      }
+    }, 300);
   }
 
   function stitchesAt(atX: number, atY: number): PositionPair[] {
     return stitches.filter(each => (each.p1.atX == atX) && (each.p1.atY == atY))
   }
 
-  function stitchLeft(stitch: PositionPair): string {
-    return (stitch.p1.atX == stitch.p2.atX ? cellWidth/2 : cellWidth) - imgX/2 + 'px';
+  function stitchLeft(stitch: PositionPair): number {
+    return (stitch.p1.atX == stitch.p2.atX ? cellWidth/2 : cellWidth) - imgX/2;
   }
 
-  function stitchTop(stitch: PositionPair): string {
-    return (stitch.p1.atY == stitch.p2.atY ? cellWidth/2 : cellWidth) - imgY/2 + 'px';
+  function stitchTop(stitch: PositionPair): number {
+    return (stitch.p1.atY == stitch.p2.atY ? cellWidth/2 : cellWidth) - imgY/2;
   }
 
 
