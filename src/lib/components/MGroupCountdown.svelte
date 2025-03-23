@@ -56,6 +56,8 @@
     if (g == group.group) {
       if (!accelerating) {
         accelerating = true;
+        // increase initial speed
+        currentTimeout/= 2;
       }
       ttl -= 1;
     }
