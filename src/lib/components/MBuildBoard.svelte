@@ -29,6 +29,7 @@
   import {move, rotateCoords} from "@tomi20v/iterators";
   import Group from "$lib/game/Group";
   import playStore from "$lib/playStore.svelte";
+  import {type PositionPair, sortedPositionPair} from "$lib/game/geometry/positionPair";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -79,12 +80,12 @@
     return (x >= 0 && x < sizeX && y >= 0 && y < sizeY);
   }
 
-  function boardPositionsAround(atX: number, atY: number): Position[] {
+  function boardPositionsAround(p: Position): Position[] {
     return [
-      new Position(atX, atY-1),
-      new Position(atX+1, atY),
-      new Position(atX, atY+1),
-      new Position(atX-1, atY),
+      new Position(p.atX, p.atY-1),
+      new Position(p.atX+1, p.atY),
+      new Position(p.atX, p.atY+1),
+      new Position(p.atX-1, p.atY),
     ]
       .filter(each => areValidCoordinates(each.atX, each.atY));
   }
@@ -159,7 +160,7 @@
     // first just create a new grooup. We'll merge it with connecting groups later
     const newGroup = Group.fromPiece(new Position(cursorAt!.atX, cursorAt!.atY), piece);
     const groupIdsToMerge: Set<number> = new Set();
-    let stitchCount = 0;
+    const stitches: PositionPair[] = [];
 
     for (const i of iterator) {
       if (!i.value) continue;
@@ -172,23 +173,25 @@
 
     for (const i of iterator) {
       if (!i.value) continue;
-      boardPositionsAround(i.x, i.y)
+      const position = new Position(i.x, i.y);
+      boardPositionsAround(position)
         .forEach(otherPosition => {
           const otherGroupId = fields[otherPosition.atY][otherPosition.atX].group;
           if (!otherGroupId) return;
           // this will pick up newGroup.id as well, so it will be merged too
           groupIdsToMerge.add(otherGroupId);
           if (otherGroupId != newGroup.group) {
-            stitchCount++;
+            stitches.push(sortedPositionPair(position, otherPosition));
           }
         })
     }
 
     if (groupIdsToMerge.size > 0) {
 
-      const groupsToMerge: Group[] = groups.filter(each => groupIdsToMerge.has(each.group));
-
-      const mergedGroup = groupsToMerge.reduce(mergeMapper(groupsToMerge.length, stitchCount), newGroup);
+      const groupsToMerge: Group[] = groups
+        .filter(each => groupIdsToMerge.has(each.group));
+      const mergedGroup = groupsToMerge
+        .reduce(mergeMapper(groupsToMerge.length, stitches.length), newGroup);
 
       // update group ID in fields which belong to a merged group
       fields.forEach(eachRow => {
@@ -205,6 +208,11 @@
       });
       // I need a slight timeout so that MBoardFields can pick up the change even when the center hasn't changed
       setTimeout(() => groups.push(mergedGroup), 1);
+
+      stitches.forEach(each => {
+        uiBus.emit('stitch', {...each, cnt: stitches.length});
+      })
+
     }
     else {
       groups.push(newGroup);
