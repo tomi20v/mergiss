@@ -1,5 +1,5 @@
 // numericId.test.ts
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, type Mock } from 'vitest';
 import { numericId } from './numericId';
 import * as luiG from 'lui-g';
 
@@ -9,7 +9,7 @@ vi.mock('lui-g', () => ({
 
 describe('numericId', () => {
   it('should convert uniqueId string to number', () => {
-    (luiG.uniqueId as unknown as vi.Mock).mockReturnValue('12345');
+    (luiG.uniqueId as unknown as Mock).mockReturnValue('12345');
 
     const result = numericId();
 
@@ -17,7 +17,7 @@ describe('numericId', () => {
   });
 
   it('should return NaN if uniqueId returns non-numeric string', () => {
-    (luiG.uniqueId as unknown as vi.Mock).mockReturnValue('abc');
+    (luiG.uniqueId as unknown as Mock).mockReturnValue('abc');
 
     const result = numericId();
 

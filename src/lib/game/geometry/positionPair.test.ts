@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, type Mock, beforeEach } from 'vitest'
 import { sortedPositionPair } from './positionPair'
 import Position from './Position'
 import * as numericIdModule from '$lib/util/numericId'
@@ -9,7 +9,8 @@ vi.mock('$lib/util/numericId', () => ({
 
 describe('sortedPositionPair', () => {
   beforeEach(() => {
-    (numericIdModule.numericId as vi.Mock).mockReturnValue(42)
+    // (numericIdModule.numericId as vi.Mock).mockReturnValue(42)
+    (numericIdModule.numericId as Mock).mockReturnValue(42)
   })
 
   it('returns pair in original order if p1 is above p2', () => {
