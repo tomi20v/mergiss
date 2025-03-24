@@ -100,7 +100,7 @@
     return true;
   }
 
-  function onGroupExpired(group: Group) {
+  function onGroupExpired({group}: {group: Group}) {
     const index = groups.indexOf(group);
     for (const row of fields) {
       for (const field of row) {

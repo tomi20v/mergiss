@@ -59,7 +59,6 @@
   import Group from "$lib/game/Group.js";
   import {uiBus} from "$lib/util/uiBus";
   import type {PositionPair} from "$lib/game/geometry/positionPair";
-  import {flyToScore} from "$lib/util/flyToScore";
 
   let {
     fields,
@@ -71,9 +70,10 @@
     fields: FieldType[][],
   } = $props();
 
-  // image size: 115*96
-  const imgX = $derived(cellWidth/136 * 58);
-  const imgY = $derived(cellWidth/136 * 48);
+  // image size: 115*96, 272 is a very big cell (3*3 on some very high resolution), so
+  //  scaling will practically always be downscaling, that's good
+  const imgX = $derived(cellWidth/272 * 115);
+  const imgY = $derived(cellWidth/272 * 96);
   const stitches: PositionPair[] = $state([]);
 
   onMount(() => {
@@ -105,10 +105,10 @@
   function onStitch(stitch: PositionPair) {
     stitches.push(stitch);
     setTimeout(() => {
-      flyToScore('stitch-' + stitch.id, () => uiBus.emit('stitchExpired', stitch));
       const s = stitches.find(each => each.id == stitch.id);
       if (s) {
         stitches.splice(stitches.indexOf(s), 1);
+        uiBus.emit('stitchExpired', {stitch: s, htmlId: 'stitch-' + stitch.id});
       }
     }, 300);
   }
