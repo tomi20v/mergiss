@@ -29,10 +29,12 @@
   import {move, rotateCoords} from "@tomi20v/iterators";
   import Group from "$lib/game/Group";
   import playStore from "$lib/playStore.svelte";
+  import {type PositionPair, sortedPositionPair} from "$lib/game/geometry/positionPair";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
   // @todo these shall go into some game state ("save") management
+  // const sX = 3, sY = 3;
   // const sX = 3, sY = 3;
   const sX = 5, sY = 5;
   // const sX = 10, sY = 10;
@@ -75,16 +77,30 @@
     uiBus.on('groupExpired', onGroupExpired);
   })
 
+  function areValidCoordinates(x: number, y: number): boolean {
+    return (x >= 0 && x < sizeX && y >= 0 && y < sizeY);
+  }
+
+  function boardPositionsAround(p: Position): Position[] {
+    return [
+      new Position(p.atX, p.atY-1),
+      new Position(p.atX+1, p.atY),
+      new Position(p.atX, p.atY+1),
+      new Position(p.atX-1, p.atY),
+    ]
+      .filter(each => areValidCoordinates(each.atX, each.atY));
+  }
+
   function fitsOnBoard(iterator: FlatteningIterator<number>): boolean {
     for (const i of iterator) {
-      if (i.value && (i.x < 0 || i.x >= sizeX || i.y < 0 || i.y >= sizeY)) {
+      if (i.value && !areValidCoordinates(i.x, i.y)) {
         return false;
       }
     }
     return true;
   }
 
-  function onGroupExpired(group: Group) {
+  function onGroupExpired({group}: {group: Group}) {
     const index = groups.indexOf(group);
     for (const row of fields) {
       for (const field of row) {
@@ -142,16 +158,92 @@
   }
 
   function putOnBoard(piece: Piece, iterator: FlatteningIterator<number>) {
-    const group = Group.fromPiece(new Position(cursorAt!.atX, cursorAt!.atY), piece);
+    // first just create a new grooup. We'll merge it with connecting groups later
+    const newGroup = Group.fromPiece(new Position(cursorAt!.atX, cursorAt!.atY), piece);
+    const groupIdsToMerge: Set<number> = new Set();
+    const stitches: PositionPair[] = [];
+
     for (const i of iterator) {
-      if (i.value) {
-        fields[i.y][i.x] = coloredField(piece.color, group.group);
+      if (!i.value) continue;
+      let groupUnder = fields[i.y][i.x].group;
+      if (groupUnder) {
+        groupIdsToMerge.add(groupUnder);
       }
+      fields[i.y][i.x] = coloredField(piece.color, newGroup.group);
     }
-    groups.push(group);
-    // checkGroupMerges();
+
+    for (const i of iterator) {
+      if (!i.value) continue;
+      const position = new Position(i.x, i.y);
+      boardPositionsAround(position)
+        .forEach(otherPosition => {
+          const otherGroupId = fields[otherPosition.atY][otherPosition.atX].group;
+          if (!otherGroupId) return;
+          // this will pick up newGroup.id as well, so it will be merged too
+          groupIdsToMerge.add(otherGroupId);
+          if (otherGroupId != newGroup.group) {
+            stitches.push(sortedPositionPair(position, otherPosition));
+          }
+        })
+    }
+
+    if (groupIdsToMerge.size > 0) {
+
+      const groupsToMerge: Group[] = groups
+        .filter(each => groupIdsToMerge.has(each.group));
+      const mergedGroup = groupsToMerge
+        .reduce(mergeMapper(groupsToMerge.length, stitches.length), newGroup);
+
+      // update group ID in fields which belong to a merged group
+      fields.forEach(eachRow => {
+        eachRow.forEach(eachField => {
+          if (groupIdsToMerge.has(eachField.group)) {
+            eachField.group = mergedGroup.group;
+          }
+        })
+      })
+
+      // remove merged ones, and add the new one
+      groupsToMerge.forEach(each => {
+        groups.splice(groups.indexOf(each), 1);
+      });
+      // I need a slight timeout so that MBoardFields can pick up the change even when the center hasn't changed
+      setTimeout(() => groups.push(mergedGroup), 1);
+
+      stitches.forEach(each => {
+        uiBus.emit('stitch', {...each, cnt: stitches.length});
+      })
+
+    }
+    else {
+      groups.push(newGroup);
+    }
     // uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
-    // uiBus.emit('groupCreated', group);
+  }
+
+  // curry this to get a (Group, Group) => Group merger function
+  function mergeMapper(groupCount: number, stitchCount: number) {
+    // calculate new center and new TTL
+    return (prev: Group, curr: Group): Group => {
+      const w = prev.weight + curr.weight;
+      // sum of TTLs multiplied by a factor which is higher when joining multiple groups or having
+      //  more stitches - just slightly, and even like this it will have to be limited so that
+      //  when big pieces touch it won't result in huge TTLs
+      // const q = Math.pow(1+(groupsToMerge.length-1)/10+stitchCount/10, 1/4);
+      const q = Math.pow(1+(groupCount-1)/10 + Math.min(stitchCount, 9)/20, 1/4);
+      const ttl = Math.min(
+        (prev.ttl*2 + curr.ttl),
+        (prev.ttl + curr.ttl*2),
+        (prev.ttl * 1.05 + curr.ttl * 1.4 + 1),
+        (prev.ttl + curr.ttl) * q
+      );
+      return new Group(
+        (prev.centerX*prev.weight + curr.centerX*curr.weight) / w,
+        (prev.centerY*prev.weight + curr.centerY*curr.weight) / w,
+        w,
+        ttl,
+      );
+    }
   }
 
   function resizeAddColumn() {

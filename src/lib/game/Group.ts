@@ -1,12 +1,11 @@
-import { uniqueId } from "lui-g";
 import type Position from "$lib/game/geometry/Position";
 import type Piece from "$lib/game/piece/Piece";
+import {numericId} from "$lib/util/numericId";
 
 export default class Group {
 
   readonly group: number;
   ttl: number = 0;
-  private interval: ReturnType<typeof setInterval> | number = 0;
 
   static fromPiece(position: Position, piece: Piece): Group {
     return new Group(
@@ -25,7 +24,7 @@ export default class Group {
     readonly weight: number,
     ttl = 4
   ) {
-    this.group = parseInt(uniqueId(''));
+    this.group = numericId();
     this.ttl = ttl;
   }
 

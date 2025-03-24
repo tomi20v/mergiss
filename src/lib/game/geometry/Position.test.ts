@@ -89,6 +89,25 @@ describe('Position XY+rot', () => {
     expect(p.rotXY).to.equal(q.rotXY);
   })
 
+  it('should scale coordinates correctly', () => {
+    const position = new Position(2, 3);
+
+    // Scale by 2
+    const scaledPosition = position.scale(2);
+    expect(scaledPosition.atX).toBe(4);
+    expect(scaledPosition.atY).toBe(6);
+
+    // Scale by 0.5
+    const scaledPositionHalf = position.scale(0.5);
+    expect(scaledPositionHalf.atX).toBe(1);
+    expect(scaledPositionHalf.atY).toBe(1.5);
+
+    // Scale by -1 (negative scaling)
+    const scaledPositionNegative = position.scale(-1);
+    expect(scaledPositionNegative.atX).toBe(-2);
+    expect(scaledPositionNegative.atY).toBe(-3);
+  });
+
   const equalMap = [
     [anyX, anyY, anyRotXY, anyX, anyY, anyRotXY, 1],
     [anyX, anyY, anyRotXY, anyX+1, anyY, anyRotXY, 0],
