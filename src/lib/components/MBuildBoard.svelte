@@ -91,9 +91,17 @@
       .filter(each => areValidCoordinates(each.atX, each.atY));
   }
 
-  function fitsOnBoard(iterator: FlatteningIterator<number>): boolean {
+  function fitsOnBoard(iterator: FlatteningIterator<number>, color: string): boolean {
     for (const i of iterator) {
-      if (i.value && !areValidCoordinates(i.x, i.y)) {
+      // skip empty fields in piece
+      if (!i.value) continue;
+      // doesn't fit if any piece is outside the board
+      if (!areValidCoordinates(i.x, i.y)) {
+        return false;
+      }
+      // can put only on empty board field or same color
+      const field = fields[i.y][i.x];
+      if (field.color && field.color != color) {
         return false;
       }
     }
@@ -147,7 +155,7 @@
         move({x: cursorAt.atX, y: cursorAt.atY})
       );
 
-    if (!fitsOnBoard(iterator)) {
+    if (!fitsOnBoard(iterator, piece.color)) {
       return;
     }
 

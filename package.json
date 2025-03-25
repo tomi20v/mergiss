@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.5.7",
-  "description": "I get score when a group expires",
+  "version": "0.5.8",
+  "description": "Only same color can overlap",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
