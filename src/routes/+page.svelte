@@ -35,8 +35,10 @@
       <MGenerator disabled />
     </div>
   </div>
-  <div class="flex flex-grow align-middle justify-center items-center pl-10 pr-10" >
-    <MGissBoard boardWidth={boardWidth} boardHeight={boardHeight} />
+  <div class="flex flex-grow flex-row align-middle justify-center items-center pl-2 pr-2  gap-2">
+<!--    <div id="left-tab" class="flex flex-col flex-1" style="border: 1px solid green; height: 100%; min-width: 200px; max-width: 25%;">asd</div>-->
+    <MBuildBoard boardWidth={boardWidth} boardHeight={boardHeight} />
+<!--    <div id="right-tab" class="flex flex-col flex-1" style="border: 1px solid green; height: 100%; min-width: 200px; max-width: 25%;">asd</div>-->
   </div>
   <div id="bottom-container" class="p-2 border" >
     {#if (dev)}
@@ -51,7 +53,7 @@
 
   import IconButton from '@smui/icon-button';
   import TopAppBar, {Row, Section, Title} from '@smui/top-app-bar';
-  import MGissBoard from "$lib/components/MBuildBoard.svelte";
+  import MBuildBoard from "$lib/components/MBuildBoard.svelte";
   import MGenerator from "$lib/components/MGenerator.svelte";
   import ColorSamples from "$lib/components/dev/ColorSamples.svelte";
   import {dev} from "$app/environment";
