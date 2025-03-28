@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.5.9",
-  "description": "Generators generate periodically",
+  "version": "0.5.10",
+  "description": "Generators speed up on clicking",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {

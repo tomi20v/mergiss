@@ -10,9 +10,7 @@
       {#if piece}
         <MPiece {piece} />
       {:else}
-        <CircularProgress style="width: 75%; height: 75%;" {progress}
-                          ontransitionend={onTransitionEnd}
-        />
+        <CircularProgress style="width: 75%; height: 75%;" {progress} ontransitionend={onProgressComplete} />
       {/if}
     </div>
   {:else}
@@ -40,13 +38,19 @@
   let piece: Piece|null = $state(null);
   let margin = $derived(8);
   let marginX = $derived(piece ? margin - (piece as Piece).sizeX()+1 : margin);
+
   let progress = $state(0);
   let timer: ReturnType<typeof setTimeout>|number = 0;
   const interval: number = 0.1; // Update every 100ms - provides smooth animation with built-in easing
-  let intervalStep: number = $derived(interval/playStore.generatorTime);
+  const easingTime = 0.4;
+  let progressEndAt: number = 0;
+  let inEasing = false;
 
   onMount(() => {
     uiBus.on('pieceDropped', onPieceDropped);
+    if (!disabled) {
+      startProgress();
+    }
     timer = setInterval(update, 100);
   })
 
@@ -57,29 +61,48 @@
 
   function generatePiece() {
     piece = null;
-    setTimeout(() => piece = pieceFactory.randomPiece(), 1);
+    setTimeout(() => piece = pieceFactory.randomPiece());
   }
 
   function onClick() {
-    if (!disabled) {
-      // @todo accelerating etc
+    if (!disabled && !piece) {
+      // when still in progress, skip 1 second, and increase current value accordingly
+      if (progress < 1) {
+        progressEndAt = Math.max((new Date()).getTime()/1000, progressEndAt - 1);
+        progress = Math.min(1, progress + 1/playStore.generatorTime);
+      }
+      // if we're already in easing, we can just skip to generating the piece
+      else if (inEasing && (progress == 1)) {
+        generatePiece();
+        inEasing = false;
+      }
     }
   }
 
   function onPieceDropped(eventData: {origin: string, piece: Piece}) {
     if (piece?.equals(eventData.piece)) {
       piece = null;
+      startProgress();
     }
   }
 
-  function onTransitionEnd() {
+  function onProgressComplete() {
     progress = 0;
     generatePiece();
+    inEasing = false;
+  }
+
+  function startProgress() {
+    progressEndAt = (new Date()).getTime()/1000 + playStore.generatorTime - easingTime;
   }
 
   function update() {
     if (!disabled && !piece && progress < 1) {
-      progress = Math.min(1, progress + intervalStep);
+      const remainingDuration = Math.max(0, progressEndAt - (new Date()).getTime()/1000);
+      progress = Math.min(1, progress + interval/remainingDuration);
+      if (progress == 1) {
+        inEasing = true;
+      }
     }
   }
 
