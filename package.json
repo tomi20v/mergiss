@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.5.8",
-  "description": "Only same color can overlap",
+  "version": "0.5.9",
+  "description": "Generators generate periodically",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
