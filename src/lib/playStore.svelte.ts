@@ -5,14 +5,13 @@ import {uiBus} from "$lib/util/uiBus";
 class PlayStore {
   mergeBoardCellWidth: number = $state(0);
   score: number = $state(0);
-  generatorTime: number = $state(0.1);
+  generatorTime: number = $state(0.5);
 }
 
 // uiBus.on("playStart", (play: PlayConfigType) => {
 uiBus.on("playStart", () => {
   playStore.score = 0;
-  // NOTE: ~0.3sec easing due to CirculaProgress' easing
-  playStore.generatorTime = 0.1;
+  playStore.generatorTime = 0.5;
 })
 
 const playStore: PlayStore = new PlayStore();
