@@ -29,6 +29,7 @@
   import Group from "$lib/game/Group";
   import playStore from "$lib/playStore.svelte";
   import {type PositionPair, sortedPositionPair} from "$lib/game/geometry/positionPair";
+  import {EDirection} from "$lib/game/geometry/EDirection";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -209,6 +210,36 @@
       groups.push(newGroup);
     }
 
+    const rowCounts: number[] = fields.map(
+      eachRow => eachRow.filter(eachField => eachField.color != null).length
+    );
+    const columnCounts: number[] = fields.reduce(
+      (acc: number[], row) => row.map((field, x) => acc[x] + (field.color == null ? 0 : 1)),
+      Array(fields[0].length).fill(0)
+    )
+
+    const oSizeX = sizeX;
+    const oSizeY = sizeY;
+
+    // unshifting effs up the current board content internally, results in "cannot read properties of undefined reading 'group' at MGroupCountDown 57:19 accelerate
+    // it could be solved by recalculating group center after shifts
+    // however, animation is also hindered in this case (shows in: animation for last row/column, not first one)
+    // @todo re-count and/or adjust (when unshifting) group centers
+    if (rowCounts[0] == oSizeX) {
+      resizeAddRow(EDirection.up);
+    }
+    if (rowCounts[rowCounts.length-1] == oSizeX) {
+      resizeAddRow(EDirection.down);
+    }
+    if (columnCounts[0] == oSizeY) {
+      resizeAddColumn(EDirection.left);
+    }
+    if (columnCounts[columnCounts.length-1] == oSizeY) {
+      resizeAddColumn(EDirection.right);
+    }
+    // @todo remove groups without fields after cleanup
+
+    // uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
   }
 
   function mergeGroups(groupIdsToMerge: Set<number>, stitchCount: number, newGroup: Group) {
@@ -259,13 +290,26 @@
     }
   }
 
-  function resizeAddColumn() {
+  function resizeAddColumn(direction: EDirection) {
     sizeX++;
-    fields.forEach(each => each.push(emptyField()));
+    fields.forEach(each => direction == EDirection.left ? each.unshift(emptyField()) : each.push(emptyField()));
     // fields.forEach(each => setTimeout(() => each.push(emptyField()), 400*Math.random()));
   }
+  function resizeAddRow(direction: EDirection) {
+    sizeY++;
+    const row: FieldType[] = [];
+    for (let x=0; x<sizeX; x++) {
+      row.push(emptyField());
+    }
+    if (direction == EDirection.up) {
+      fields.unshift(row);
+    }
+    else {
+      fields.push(row);
+    }
+  }
   function resizeRemoveColumn() {
-    if (sizeX <= 5) {
+    if (sizeX <= 3) {
       return;
     }
     sizeX--;
@@ -273,16 +317,8 @@
     // funky effect :D
     // fields.forEach(each => setTimeout(() => each.pop(), 400*Math.random()));
   }
-  function resizeAddRow() {
-    sizeY++;
-    const row: FieldType[] = [];
-    for (let x=0; x<sizeX; x++) {
-      row.push(emptyField());
-    }
-    fields.push(row);
-  }
   function resizeRemoveRow() {
-    if (sizeY <= 5) {
+    if (sizeY <= 3) {
       return;
     }
     sizeY--;
