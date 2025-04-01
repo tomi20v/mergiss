@@ -25,8 +25,7 @@
   import {uiBus} from "$lib/util/uiBus";
   import MBoardFields from "$lib/components/MBoardFields.svelte";
   import {coloredField, emptyField, type FieldType} from "$lib/game/fields";
-  import { FlatteningIterator, } from "@tomi20v/iterators";
-  import {move, rotateCoords} from "@tomi20v/iterators";
+  import {FlatteningIterator, move, rotateCoords,} from "@tomi20v/iterators";
   import Group from "$lib/game/Group";
   import playStore from "$lib/playStore.svelte";
   import {type PositionPair, sortedPositionPair} from "$lib/game/geometry/positionPair";
@@ -171,6 +170,7 @@
     const groupIdsToMerge: Set<number> = new Set();
     const stitches: PositionPair[] = [];
 
+    // set fields to contain new color and group, gather groups with which the new piece overlaps
     for (const i of iterator) {
       if (!i.value) continue;
       let groupUnder = fields[i.y][i.x].group;
@@ -180,6 +180,7 @@
       fields[i.y][i.x] = coloredField(piece.color, newGroup.group);
     }
 
+    // look around each field and check touching groups
     for (const i of iterator) {
       if (!i.value) continue;
       const position = new Position(i.x, i.y);
@@ -197,26 +198,7 @@
 
     if (groupIdsToMerge.size > 0) {
 
-      const groupsToMerge: Group[] = groups
-        .filter(each => groupIdsToMerge.has(each.group));
-      const mergedGroup = groupsToMerge
-        .reduce(mergeMapper(groupsToMerge.length, stitches.length), newGroup);
-
-      // update group ID in fields which belong to a merged group
-      fields.forEach(eachRow => {
-        eachRow.forEach(eachField => {
-          if (groupIdsToMerge.has(eachField.group)) {
-            eachField.group = mergedGroup.group;
-          }
-        })
-      })
-
-      // remove merged ones, and add the new one
-      groupsToMerge.forEach(each => {
-        groups.splice(groups.indexOf(each), 1);
-      });
-      // I need a slight timeout so that MBoardFields can pick up the change even when the center hasn't changed
-      setTimeout(() => groups.push(mergedGroup), 1);
+      mergeGroups(groupIdsToMerge, stitches.length, newGroup);
 
       stitches.forEach(each => {
         uiBus.emit('stitch', {...each, cnt: stitches.length});
@@ -226,7 +208,30 @@
     else {
       groups.push(newGroup);
     }
-    // uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
+
+  }
+
+  function mergeGroups(groupIdsToMerge: Set<number>, stitchCount: number, newGroup: Group) {
+    const groupsToMerge: Group[] = groups
+      .filter(each => groupIdsToMerge.has(each.group));
+    const mergedGroup = groupsToMerge
+      .reduce(mergeMapper(groupsToMerge.length, stitchCount), newGroup);
+
+    // update group ID in fields which belong to a merged group
+    fields.forEach(eachRow => {
+      eachRow.forEach(eachField => {
+        if (groupIdsToMerge.has(eachField.group)) {
+          eachField.group = mergedGroup.group;
+        }
+      })
+    })
+
+    // remove merged ones, and add the new one
+    groupsToMerge.forEach(each => {
+      groups.splice(groups.indexOf(each), 1);
+    });
+    // I need a slight timeout so that MBoardFields can pick up the change even when the center hasn't changed
+    setTimeout(() => groups.push(mergedGroup), 1);
   }
 
   // curry this to get a (Group, Group) => Group merger function
