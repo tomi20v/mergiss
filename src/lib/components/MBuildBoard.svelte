@@ -219,6 +219,36 @@
       groups.push(newGroup);
     }
 
+    // delaying helps so that initially we show the piece in place, so that
+    //  the stitches don't appeair in the middle of nothing
+    setTimeout(() => {
+      extendBoard();
+      expireEmptyGroup();
+    }, 300);
+
+  }
+
+  function clearRow(row: number) {
+    for (let i=0; i<sizeX; i++) {
+      fields[row][i] = emptyField();
+    }
+  }
+  function clearColumn(column: number) {
+    for (let i=0; i<sizeY; i++) {
+      fields[i][column] = emptyField();
+    }
+  }
+
+  function expireEmptyGroup() {
+    // no need to check all groups, only the last group can be empty
+    // for (const group of groups) {
+    const group: Group = groups.slice(-1).pop() as Group;
+    if (!fields.flat().find(each => each.group == group.group)) {
+      group.ttl = 0;
+    }
+  }
+
+  function extendBoard() {
     const rowCounts: number[] = fields.map(
       eachRow => eachRow.filter(eachField => eachField.color != null).length
     );
@@ -230,10 +260,7 @@
     const oSizeX = sizeX;
     const oSizeY = sizeY;
 
-    // unshifting effs up the current board content internally, results in "cannot read properties of undefined reading 'group' at MGroupCountDown 57:19 accelerate
-    // it could be solved by recalculating group center after shifts
-    // however, animation is also hindered in this case (shows in: animation for last row/column, not first one)
-    // @todo re-count and/or adjust (when unshifting) group centers
+    // @todo re-count and/or adjust group center
     if (rowCounts[0] == oSizeX) {
       clearRow(0);
       resizeAddRow(EDirection.up);
@@ -249,20 +276,6 @@
     if (columnCounts[columnCounts.length-1] == oSizeY) {
       clearColumn(columnCounts.length-1);
       resizeAddColumn(EDirection.right);
-    }
-    // @todo remove groups without fields after cleanup
-
-    // uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
-  }
-
-  function clearRow(row: number) {
-    for (let i=0; i<sizeX; i++) {
-      fields[row][i] = emptyField();
-    }
-  }
-  function clearColumn(column: number) {
-    for (let i=0; i<sizeY; i++) {
-      fields[i][column] = emptyField();
     }
   }
 
@@ -285,8 +298,8 @@
     groupsToMerge.forEach(each => {
       groups.splice(groups.indexOf(each), 1);
     });
-    // I need a slight timeout so that MBoardFields can pick up the change even when the center hasn't changed
-    setTimeout(() => groups.push(mergedGroup), 1);
+    // note: we shall not use a timeout here as it causes more problems than it solves
+    groups.push(mergedGroup);
   }
 
   // curry this to get a (Group, Group) => Group merger function
