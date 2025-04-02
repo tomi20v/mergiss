@@ -19,7 +19,7 @@
 <script lang="ts">
 
   import {dev} from "$app/environment";
-  import {onMount} from "svelte";
+  import {onMount, onDestroy} from "svelte";
   import Position from "$lib/game/geometry/Position";
   import Piece from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util/uiBus";
@@ -36,7 +36,8 @@
   // @todo these shall go into some game state ("save") management
   // const sX = 3, sY = 3;
   // const sX = 3, sY = 3;
-  const sX = 5, sY = 5;
+  const sX = 3, sY = 3;
+  // const sX = 5, sY = 5;
   // const sX = 10, sY = 10;
   // const sX = 15, sY = 15;
   // const sX = 30, sY = 20;
@@ -79,6 +80,11 @@
     uiBus.on('pieceDrop', onPieceDrop);
     uiBus.on('groupExpired', onGroupExpired);
   })
+
+  onDestroy(() => {
+    uiBus.off('pieceDrop', onPieceDrop);
+    uiBus.off('groupExpired', onGroupExpired);
+  });
 
   function areValidCoordinates(x: number, y: number): boolean {
     return (x >= 0 && x < sizeX && y >= 0 && y < sizeY);
