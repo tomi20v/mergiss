@@ -32,7 +32,7 @@
 
         {#if (fields[iY][iX].color)}
           {@const color = fields[iY][iX].color}
-          <div
+          <div id="{field.id}"
               class="flex grow m-0.5 m-board-field-inner items-center justify-center"
               style="border-radius: 15%; background-color: {color}; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray;"
               in:blur={{duration: 200}}
@@ -44,7 +44,6 @@
           </div>
         {:else if (groupCenterAt(iX, iY))}
           <div class="flex grow m-0.5 items-center justify-center">
-              <!-- @todo place in the center -->
             <MGroupCountdown group={groupCenterAt(iX, iY) as Group} color={''} />
           </div>
         {/if}
