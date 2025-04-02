@@ -6,37 +6,38 @@
         <button onclick={resizeRemoveColumn}>dec</button>
         <div class="flex flex-col gap-1 position=relative">
           <button onclick={resizeRemoveRow}>dec</button>
-          <button onclick={resizeAddRow}>add</button>
+          <button onclick={() => resizeAddRow(EDirection.down)}>add</button>
         </div>
-        <button onclick={resizeAddColumn}>add</button>
+        <button onclick={() => resizeAddColumn(EDirection.right)}>add</button>
       </div>
       <div>{JSON.stringify(cursorAt)}</div>
       <div><button onclick="{testScore}">score!</button></div>
     </div>
   {/if}
-  <MBoardFields fields={fields} groups={groups} cellWidth={cellWidth} />
+  <MBoardFields fields={fields} groups={groups} cellWidth={cellWidth} startX={startX} startY={startY} />
 </div>
 <script lang="ts">
 
   import {dev} from "$app/environment";
-  import {onMount} from "svelte";
+  import {onMount, onDestroy} from "svelte";
   import Position from "$lib/game/geometry/Position";
   import Piece from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util/uiBus";
   import MBoardFields from "$lib/components/MBoardFields.svelte";
   import {coloredField, emptyField, type FieldType} from "$lib/game/fields";
-  import { FlatteningIterator, } from "@tomi20v/iterators";
-  import {move, rotateCoords} from "@tomi20v/iterators";
+  import {FlatteningIterator, move, rotateCoords,} from "@tomi20v/iterators";
   import Group from "$lib/game/Group";
   import playStore from "$lib/playStore.svelte";
   import {type PositionPair, sortedPositionPair} from "$lib/game/geometry/positionPair";
+  import {EDirection} from "$lib/game/geometry/EDirection";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
   // @todo these shall go into some game state ("save") management
   // const sX = 3, sY = 3;
   // const sX = 3, sY = 3;
-  const sX = 5, sY = 5;
+  const sX = 3, sY = 3;
+  // const sX = 5, sY = 5;
   // const sX = 10, sY = 10;
   // const sX = 15, sY = 15;
   // const sX = 30, sY = 20;
@@ -48,6 +49,9 @@
 
   let sizeX: number = $state(sX);
   let sizeY: number = $state(sY);
+  // we'll need these so that [0;0] keeps the same ID when unshifting (when unshifting, we'll sub 1 from these)
+  let startX: number = $state(0);
+  let startY: number = $state(0);
   let fields: FieldType[][] = $state([]);
   const groups: Group[] = $state([]);
 
@@ -76,6 +80,11 @@
     uiBus.on('pieceDrop', onPieceDrop);
     uiBus.on('groupExpired', onGroupExpired);
   })
+
+  onDestroy(() => {
+    uiBus.off('pieceDrop', onPieceDrop);
+    uiBus.off('groupExpired', onGroupExpired);
+  });
 
   function areValidCoordinates(x: number, y: number): boolean {
     return (x >= 0 && x < sizeX && y >= 0 && y < sizeY);
@@ -110,14 +119,12 @@
 
   function onGroupExpired({group}: {group: Group}) {
     const index = groups.indexOf(group);
-    for (const row of fields) {
-      for (const field of row) {
-        if (field.group == group.group) {
-          field.color = null;
-          field.group = 0;
-        }
+    fields.flat().forEach(field => {
+      if (field.group == group.group) {
+        field.color = null;
+        field.group = 0;
       }
-    }
+    })
     groups.splice(index, 1);
   }
 
@@ -171,6 +178,7 @@
     const groupIdsToMerge: Set<number> = new Set();
     const stitches: PositionPair[] = [];
 
+    // set fields to contain new color and group, gather groups with which the new piece overlaps
     for (const i of iterator) {
       if (!i.value) continue;
       let groupUnder = fields[i.y][i.x].group;
@@ -180,6 +188,7 @@
       fields[i.y][i.x] = coloredField(piece.color, newGroup.group);
     }
 
+    // look around each field and check touching groups
     for (const i of iterator) {
       if (!i.value) continue;
       const position = new Position(i.x, i.y);
@@ -197,26 +206,7 @@
 
     if (groupIdsToMerge.size > 0) {
 
-      const groupsToMerge: Group[] = groups
-        .filter(each => groupIdsToMerge.has(each.group));
-      const mergedGroup = groupsToMerge
-        .reduce(mergeMapper(groupsToMerge.length, stitches.length), newGroup);
-
-      // update group ID in fields which belong to a merged group
-      fields.forEach(eachRow => {
-        eachRow.forEach(eachField => {
-          if (groupIdsToMerge.has(eachField.group)) {
-            eachField.group = mergedGroup.group;
-          }
-        })
-      })
-
-      // remove merged ones, and add the new one
-      groupsToMerge.forEach(each => {
-        groups.splice(groups.indexOf(each), 1);
-      });
-      // I need a slight timeout so that MBoardFields can pick up the change even when the center hasn't changed
-      setTimeout(() => groups.push(mergedGroup), 1);
+      mergeGroups(groupIdsToMerge, stitches.length, newGroup);
 
       stitches.forEach(each => {
         uiBus.emit('stitch', {...each, cnt: stitches.length});
@@ -226,7 +216,85 @@
     else {
       groups.push(newGroup);
     }
-    // uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
+
+    // delaying helps so that initially we show the piece in place, so that
+    //  the stitches don't appeair in the middle of nothing
+    setTimeout(() => {
+      extendBoard();
+      expireEmptyGroup();
+    }, 300);
+
+  }
+
+  function clearRow(row: number) {
+    for (let i=0; i<sizeX; i++) {
+      fields[row][i] = emptyField();
+    }
+  }
+  function clearColumn(column: number) {
+    for (let i=0; i<sizeY; i++) {
+      fields[i][column] = emptyField();
+    }
+  }
+
+  function expireEmptyGroup() {
+    // no need to check all groups, only the last group can be empty
+    // for (const group of groups) {
+    const group: Group = groups.slice(-1).pop() as Group;
+    if (!fields.flat().find(each => each.group == group.group)) {
+      group.ttl = 0;
+    }
+  }
+
+  function extendBoard() {
+    const rowCounts: number[] = fields.map(
+      eachRow => eachRow.filter(eachField => eachField.color != null).length
+    );
+    const columnCounts: number[] = fields.reduce(
+      (acc: number[], row) => row.map((field, x) => acc[x] + (field.color == null ? 0 : 1)),
+      Array(fields[0].length).fill(0)
+    )
+
+    const oSizeX = sizeX;
+    const oSizeY = sizeY;
+
+    // @todo re-count and/or adjust group center
+    if (rowCounts[0] == oSizeX) {
+      clearRow(0);
+      resizeAddRow(EDirection.up);
+    }
+    if (rowCounts[rowCounts.length-1] == oSizeX) {
+      clearRow(rowCounts.length-1);
+      resizeAddRow(EDirection.down);
+    }
+    if (columnCounts[0] == oSizeY) {
+      clearColumn(0);
+      resizeAddColumn(EDirection.left);
+    }
+    if (columnCounts[columnCounts.length-1] == oSizeY) {
+      clearColumn(columnCounts.length-1);
+      resizeAddColumn(EDirection.right);
+    }
+  }
+
+  function mergeGroups(groupIdsToMerge: Set<number>, stitchCount: number, newGroup: Group) {
+    const groupsToMerge: Group[] = groups
+      .filter(each => groupIdsToMerge.has(each.group));
+    const mergedGroup = groupsToMerge
+      .reduce(mergeMapper(groupsToMerge.length, stitchCount), newGroup);
+
+    // update group ID in fields which belong to a merged group
+    fields.flat().forEach(eachField => {
+      if (groupIdsToMerge.has(eachField.group)) {
+        eachField.group = mergedGroup.group;
+      }
+    })
+    // remove merged ones, and add the new one
+    groupsToMerge.forEach(each => {
+      groups.splice(groups.indexOf(each), 1);
+    });
+    // note: we shall not use a timeout here as it causes more problems than it solves
+    groups.push(mergedGroup);
   }
 
   // curry this to get a (Group, Group) => Group merger function
@@ -254,13 +322,27 @@
     }
   }
 
-  function resizeAddColumn() {
+  function resizeAddColumn(direction: EDirection) {
     sizeX++;
-    fields.forEach(each => each.push(emptyField()));
+    if (direction == EDirection.left) {
+      startX--;
+    }
+    fields.forEach(each => direction == EDirection.left ? each.unshift(emptyField()) : each.push(emptyField()));
     // fields.forEach(each => setTimeout(() => each.push(emptyField()), 400*Math.random()));
   }
+  function resizeAddRow(direction: EDirection) {
+    sizeY++;
+    const row: FieldType[] = Array.from({length: sizeX}, emptyField);
+    if (direction == EDirection.up) {
+      fields.unshift(row);
+      startY--;
+    }
+    else {
+      fields.push(row);
+    }
+  }
   function resizeRemoveColumn() {
-    if (sizeX <= 5) {
+    if (sizeX <= 3) {
       return;
     }
     sizeX--;
@@ -268,16 +350,8 @@
     // funky effect :D
     // fields.forEach(each => setTimeout(() => each.pop(), 400*Math.random()));
   }
-  function resizeAddRow() {
-    sizeY++;
-    const row: FieldType[] = [];
-    for (let x=0; x<sizeX; x++) {
-      row.push(emptyField());
-    }
-    fields.push(row);
-  }
   function resizeRemoveRow() {
-    if (sizeY <= 5) {
+    if (sizeY <= 3) {
       return;
     }
     sizeY--;

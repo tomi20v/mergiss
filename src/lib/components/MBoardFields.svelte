@@ -1,7 +1,11 @@
 {#each fields as row, iY}
-  <div class="flex gap-0 justify-center m-board-row">
-    {#each row as _, iX}
-      <div id="board-field-{iX}-{iY}"
+  <div id="board-row-{iY+startY}"
+       class="flex gap-0 justify-center m-board-row"
+       in:blur={{duration: 200}}
+  >
+    <!--{#each row as field, iX (field.id)}-->
+    {#each row as field, iX (iX + startX + '-' + iY + '-' + field.id)}
+      <div id="board-field-{iX+startX}-{iY+startY}"
            class="flex m-board-field"
            style="color: white;
                   aspect-ratio: 1;
@@ -9,7 +13,7 @@
                   background-image: url({backgroundImageOf(iX, iY)});
                   "
            style:width="{cellWidth}px"
-           transition:elasticTransition|global
+           in:elasticTransition|global
            onfocus={() => null}
            role="none"
            onmousedown={() => onMouseDown(iX, iY)}
@@ -28,11 +32,11 @@
 
         {#if (fields[iY][iX].color)}
           {@const color = fields[iY][iX].color}
-          <div
+          <div id="{field.id}"
               class="flex grow m-0.5 m-board-field-inner items-center justify-center"
               style="border-radius: 15%; background-color: {color}; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray;"
               in:blur={{duration: 200}}
-              out:blur={{duration: 200}}
+              out:blur={{duration: 400}}
           >
               {#if (groupCenterAt(iX, iY))}
                 <MGroupCountdown group={groupCenterAt(iX, iY) as Group} color={color} />
@@ -40,7 +44,6 @@
           </div>
         {:else if (groupCenterAt(iX, iY))}
           <div class="flex grow m-0.5 items-center justify-center">
-              <!-- @todo place in the center -->
             <MGroupCountdown group={groupCenterAt(iX, iY) as Group} color={''} />
           </div>
         {/if}
@@ -64,10 +67,14 @@
     fields,
     groups,
     cellWidth,
+    startX,
+    startY,
   }: {
     cellWidth: number,
     groups: Group[],
     fields: FieldType[][],
+    startX: number,
+    startY: number,
   } = $props();
 
   // image size: 115*96, 272 is a very big cell (3*3 on some very high resolution), so
