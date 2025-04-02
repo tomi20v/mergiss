@@ -11,7 +11,11 @@
         <button onclick={() => resizeAddColumn(EDirection.right)}>add</button>
       </div>
       <div>{JSON.stringify(cursorAt)}</div>
-      <div><button onclick="{testScore}">score!</button></div>
+      <div>
+        <button onclick="{testScore}">score!</button>
+        <button onclick={() => playStore.paused=true}>||</button>
+        <button onclick={() => playStore.paused=false}>&nbsp;&gt;&nbsp;</button>
+      </div>
     </div>
   {/if}
   <MBoardFields fields={fields} groups={groups} cellWidth={cellWidth} startX={startX} startY={startY} />
