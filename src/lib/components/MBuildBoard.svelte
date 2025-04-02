@@ -229,20 +229,35 @@
     // however, animation is also hindered in this case (shows in: animation for last row/column, not first one)
     // @todo re-count and/or adjust (when unshifting) group centers
     if (rowCounts[0] == oSizeX) {
+      clearRow(0);
       resizeAddRow(EDirection.up);
     }
     if (rowCounts[rowCounts.length-1] == oSizeX) {
+      clearRow(rowCounts.length-1);
       resizeAddRow(EDirection.down);
     }
     if (columnCounts[0] == oSizeY) {
+      clearColumn(0);
       resizeAddColumn(EDirection.left);
     }
     if (columnCounts[columnCounts.length-1] == oSizeY) {
+      clearColumn(columnCounts.length-1);
       resizeAddColumn(EDirection.right);
     }
     // @todo remove groups without fields after cleanup
 
     // uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
+  }
+
+  function clearRow(row: number) {
+    for (let i=0; i<sizeX; i++) {
+      fields[row][i] = emptyField();
+    }
+  }
+  function clearColumn(column: number) {
+    for (let i=0; i<sizeY; i++) {
+      fields[i][column] = emptyField();
+    }
   }
 
   function mergeGroups(groupIdsToMerge: Set<number>, stitchCount: number, newGroup: Group) {
