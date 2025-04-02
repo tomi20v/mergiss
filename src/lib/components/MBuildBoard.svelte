@@ -119,14 +119,12 @@
 
   function onGroupExpired({group}: {group: Group}) {
     const index = groups.indexOf(group);
-    for (const row of fields) {
-      for (const field of row) {
-        if (field.group == group.group) {
-          field.color = null;
-          field.group = 0;
-        }
+    fields.flat().forEach(field => {
+      if (field.group == group.group) {
+        field.color = null;
+        field.group = 0;
       }
-    }
+    })
     groups.splice(index, 1);
   }
 
@@ -286,14 +284,11 @@
       .reduce(mergeMapper(groupsToMerge.length, stitchCount), newGroup);
 
     // update group ID in fields which belong to a merged group
-    fields.forEach(eachRow => {
-      eachRow.forEach(eachField => {
-        if (groupIdsToMerge.has(eachField.group)) {
-          eachField.group = mergedGroup.group;
-        }
-      })
+    fields.flat().forEach(eachField => {
+      if (groupIdsToMerge.has(eachField.group)) {
+        eachField.group = mergedGroup.group;
+      }
     })
-
     // remove merged ones, and add the new one
     groupsToMerge.forEach(each => {
       groups.splice(groups.indexOf(each), 1);
