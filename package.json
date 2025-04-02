@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.5.10",
-  "description": "Generators speed up on clicking",
+  "version": "0.6.0",
+  "description": "I can extend the board",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
