@@ -9,6 +9,8 @@
      style:font-size="{width/2}px"
      style:left="{left}"
 >
+  <!-- leaving here for debugging only -->
+<!--  <span style="font-size: 15px">{ formatTtl(ttl) }<br/><span style="font-size: 12px">#{group.group}</span></span>-->
   { formatTtl(ttl) }
 </div>
 <script lang="ts">
@@ -40,8 +42,12 @@
     return cellWidth > w ? 'auto' : (Math.floor((cellWidth-w)/2) + 'px');
   })
 
-  onMount(() => {
+  // keep ttl updated, as it is not explicitly reactive
+  $effect(() => {
     ttl = group.ttl;
+  })
+
+  onMount(() => {
     startTimer();
     uiBus.on('accelerateGroup', accelerate)
   })
