@@ -6,9 +6,9 @@
         <button onclick={resizeRemoveColumn}>dec</button>
         <div class="flex flex-col gap-1 position=relative">
           <button onclick={resizeRemoveRow}>dec</button>
-          <button onclick={resizeAddRow}>add</button>
+          <button onclick={() => resizeAddRow(EDirection.down)}>add</button>
         </div>
-        <button onclick={resizeAddColumn}>add</button>
+        <button onclick={() => resizeAddColumn(EDirection.right)}>add</button>
       </div>
       <div>{JSON.stringify(cursorAt)}</div>
       <div><button onclick="{testScore}">score!</button></div>
