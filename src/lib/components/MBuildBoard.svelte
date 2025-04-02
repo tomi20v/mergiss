@@ -14,7 +14,7 @@
       <div><button onclick="{testScore}">score!</button></div>
     </div>
   {/if}
-  <MBoardFields fields={fields} groups={groups} cellWidth={cellWidth} />
+  <MBoardFields fields={fields} groups={groups} cellWidth={cellWidth} startX={startX} startY={startY} />
 </div>
 <script lang="ts">
 
@@ -48,6 +48,9 @@
 
   let sizeX: number = $state(sX);
   let sizeY: number = $state(sY);
+  // we'll need these so that [0;0] keeps the same ID when unshifting (when unshifting, we'll sub 1 from these)
+  let startX: number = $state(0);
+  let startY: number = $state(0);
   let fields: FieldType[][] = $state([]);
   const groups: Group[] = $state([]);
 
@@ -292,17 +295,18 @@
 
   function resizeAddColumn(direction: EDirection) {
     sizeX++;
+    if (direction == EDirection.left) {
+      startX--;
+    }
     fields.forEach(each => direction == EDirection.left ? each.unshift(emptyField()) : each.push(emptyField()));
     // fields.forEach(each => setTimeout(() => each.push(emptyField()), 400*Math.random()));
   }
   function resizeAddRow(direction: EDirection) {
     sizeY++;
-    const row: FieldType[] = [];
-    for (let x=0; x<sizeX; x++) {
-      row.push(emptyField());
-    }
+    const row: FieldType[] = Array.from({length: sizeX}, emptyField);
     if (direction == EDirection.up) {
       fields.unshift(row);
+      startY--;
     }
     else {
       fields.push(row);
