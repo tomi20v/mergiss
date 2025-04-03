@@ -1,4 +1,4 @@
-<svelte:window onmousemove={onMouseMove} />
+<svelte:window onmousemove={throttledOnMouseMove} />
 <div bind:this={elem} class="flex flex-grow flex-col gap-0 p-2 text-white justify-center align-middle relative">
   {#if (dev)}
     <div class="flex flex-col gap-1 absolute top-0 right-0 bg-red-600 justify-center align-middle" >

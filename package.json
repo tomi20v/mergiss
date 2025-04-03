@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.6.0",
-  "description": "I can extend the board",
+  "version": "0.6.1",
+  "description": "dev can pause the game",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
@@ -46,7 +46,9 @@
   },
   "dependencies": {
     "@tomi20v/iterators": "^0.14.0",
+    "@types/lodash.throttle": "^4.1.9",
     "eventemitter3": "^5.0.1",
+    "lodash.throttle": "^4.1.1",
     "lui-g": "^1.0.2",
     "svelte-material-ui": "^8.0.0-beta.3"
   }
