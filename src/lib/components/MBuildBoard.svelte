@@ -13,8 +13,11 @@
       <div>{JSON.stringify(cursorAt)}</div>
       <div>
         <button onclick="{testScore}">score!</button>
-        <button onclick={() => playStore.paused=true}>||</button>
+        {#if (playStore.paused)}
         <button onclick={() => playStore.paused=false}>&nbsp;&gt;&nbsp;</button>
+        {:else}
+        <button onclick={() => playStore.paused=true}>||</button>
+        {/if}
       </div>
     </div>
   {/if}
@@ -137,6 +140,7 @@
   const throttledOnMouseMove = throttle(onMouseMove, 10);
 
   function onMouseMove(event: MouseEvent) {
+    // NOTE these can't easily be precached as it just causes problems
     const field = elem.querySelector('.m-board-field');
     const p = field?.getBoundingClientRect();
     const w = cellWidth;
@@ -306,6 +310,7 @@
   }
 
   // curry this to get a (Group, Group) => Group merger function
+  // @todo add bonus for overlapping pieces? (MGS-66)
   function mergeMapper(groupCount: number, stitchCount: number) {
     // calculate new center and new TTL
     return (prev: Group, curr: Group): Group => {
