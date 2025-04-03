@@ -104,6 +104,10 @@
 
   function startTimer() {
     timerId = setTimeout(() => {
+      if (playStore.paused) {
+        startTimer();
+        return;
+      }
       if (accelerating) {
         currentTimeout = Math.max(currentTimeout * q, minTimeout);
       }

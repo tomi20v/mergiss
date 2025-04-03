@@ -24,6 +24,7 @@
 </div>
 <script lang="ts">
 
+  import {dev} from "$app/environment";
   import {Image} from "@smui/image-list";
   import Piece from "$lib/game/piece/Piece";
   import {pieceFactory} from "$lib/game/services";
@@ -65,6 +66,11 @@
   }
 
   function onClick() {
+    // If in dev mode and a piece exists, generate a new one
+    if (!disabled && piece && dev) {
+      generatePiece();
+      return;
+    }
     if (!disabled && !piece) {
       // when still in progress, skip 1 second, and increase current value accordingly
       if (progress < 1) {

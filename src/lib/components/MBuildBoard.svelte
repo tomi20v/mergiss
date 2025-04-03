@@ -1,4 +1,4 @@
-<svelte:window onmousemove={onMouseMove} />
+<svelte:window onmousemove={throttledOnMouseMove} />
 <div bind:this={elem} class="flex flex-grow flex-col gap-0 p-2 text-white justify-center align-middle relative">
   {#if (dev)}
     <div class="flex flex-col gap-1 absolute top-0 right-0 bg-red-600 justify-center align-middle" >
@@ -11,7 +11,14 @@
         <button onclick={() => resizeAddColumn(EDirection.right)}>add</button>
       </div>
       <div>{JSON.stringify(cursorAt)}</div>
-      <div><button onclick="{testScore}">score!</button></div>
+      <div>
+        <button onclick="{testScore}">score!</button>
+        {#if (playStore.paused)}
+        <button onclick={() => playStore.paused=false}>&nbsp;&gt;&nbsp;</button>
+        {:else}
+        <button onclick={() => playStore.paused=true}>||</button>
+        {/if}
+      </div>
     </div>
   {/if}
   <MBoardFields fields={fields} groups={groups} cellWidth={cellWidth} startX={startX} startY={startY} />
@@ -30,6 +37,7 @@
   import playStore from "$lib/playStore.svelte";
   import {type PositionPair, sortedPositionPair} from "$lib/game/geometry/positionPair";
   import {EDirection} from "$lib/game/geometry/EDirection";
+  import throttle from 'lodash.throttle';
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -128,7 +136,11 @@
     groups.splice(index, 1);
   }
 
+  // throttling this probably helps with performance
+  const throttledOnMouseMove = throttle(onMouseMove, 10);
+
   function onMouseMove(event: MouseEvent) {
+    // NOTE these can't easily be precached as it just causes problems
     const field = elem.querySelector('.m-board-field');
     const p = field?.getBoundingClientRect();
     const w = cellWidth;
@@ -298,6 +310,7 @@
   }
 
   // curry this to get a (Group, Group) => Group merger function
+  // @todo add bonus for overlapping pieces? (MGS-66)
   function mergeMapper(groupCount: number, stitchCount: number) {
     // calculate new center and new TTL
     return (prev: Group, curr: Group): Group => {
