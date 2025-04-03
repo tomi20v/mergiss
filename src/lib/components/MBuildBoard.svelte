@@ -34,6 +34,7 @@
   import playStore from "$lib/playStore.svelte";
   import {type PositionPair, sortedPositionPair} from "$lib/game/geometry/positionPair";
   import {EDirection} from "$lib/game/geometry/EDirection";
+  import throttle from 'lodash.throttle';
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -131,6 +132,9 @@
     })
     groups.splice(index, 1);
   }
+
+  // throttling this probably helps with performance
+  const throttledOnMouseMove = throttle(onMouseMove, 10);
 
   function onMouseMove(event: MouseEvent) {
     const field = elem.querySelector('.m-board-field');
