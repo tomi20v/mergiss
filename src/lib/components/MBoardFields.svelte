@@ -57,7 +57,7 @@
   import {onMount, onDestroy} from "svelte";
   import {blur} from "svelte/transition";
   import elasticTransition from "$lib/transitions/elasticTransition";
-  import type {FieldType} from "$lib/game/fields";
+  import type {FieldType} from "$lib/game/fields.svelte";
   import MGroupCountdown from "$lib/components/MGroupCountdown.svelte";
   import Group from "$lib/game/Group.js";
   import {uiBus} from "$lib/util/uiBus";

@@ -31,7 +31,7 @@
   import Piece from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util/uiBus";
   import MBoardFields from "$lib/components/MBoardFields.svelte";
-  import {coloredField, emptyField, type FieldType} from "$lib/game/fields";
+  import {emptyField, type FieldType} from "$lib/game/fields.svelte";
   import {FlatteningIterator, move, rotateCoords,} from "@tomi20v/iterators";
   import Group from "$lib/game/Group";
   import playStore from "$lib/playStore.svelte";
@@ -197,7 +197,8 @@
       if (groupUnder) {
         groupIdsToMerge.add(groupUnder);
       }
-      fields[i.y][i.x] = coloredField(piece.color, newGroup.group);
+      fields[i.y][i.x].color = piece.color;
+      fields[i.y][i.x].group = newGroup.group;
     }
 
     // look around each field and check touching groups
@@ -240,12 +241,14 @@
 
   function clearRow(row: number) {
     for (let i=0; i<sizeX; i++) {
-      fields[row][i] = emptyField();
+      fields[row][i].group = 0;
+      fields[row][i].color = null;
     }
   }
   function clearColumn(column: number) {
     for (let i=0; i<sizeY; i++) {
-      fields[i][column] = emptyField();
+      fields[i][column].group = 0;
+      fields[i][column].color = null;
     }
   }
 
