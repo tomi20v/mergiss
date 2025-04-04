@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.6.1",
-  "description": "dev can pause the game",
+  "version": "0.6.2",
+  "description": "fix field object reactivity",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
