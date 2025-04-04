@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.6.2",
-  "description": "fix field object reactivity",
+  "version": "0.7.0",
+  "description": "add analytics",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {

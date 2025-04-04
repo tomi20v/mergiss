@@ -47,6 +47,8 @@
   </div>
 </div>
 
+<Analytics />
+
 <script lang="ts">
 
   import "../app.css";
@@ -59,6 +61,7 @@
   import {dev} from "$app/environment";
   import {onMount} from "svelte";
   import MGameScore from "$lib/components/appbar/MGameScore.svelte";
+  import Analytics from "$lib/components/Analytics.svelte";
 
   let isFullScreen = false;
   let boardHeight = $state(400);
