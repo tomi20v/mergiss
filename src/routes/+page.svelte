@@ -47,12 +47,13 @@
   </div>
 </div>
 
-<Analytics />
+<CookieConsent>
+  <Analytics />
+</CookieConsent>
 
 <script lang="ts">
 
   import "../app.css";
-
   import IconButton from '@smui/icon-button';
   import TopAppBar, {Row, Section, Title} from '@smui/top-app-bar';
   import MBuildBoard from "$lib/components/MBuildBoard.svelte";
@@ -62,6 +63,7 @@
   import {onMount} from "svelte";
   import MGameScore from "$lib/components/appbar/MGameScore.svelte";
   import Analytics from "$lib/components/Analytics.svelte";
+  import CookieConsent from "$lib/components/CookieConsent.svelte";
 
   let isFullScreen = false;
   let boardHeight = $state(400);

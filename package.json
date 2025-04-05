@@ -50,6 +50,7 @@
     "eventemitter3": "^5.0.1",
     "lodash.throttle": "^4.1.1",
     "lui-g": "^1.0.2",
-    "svelte-material-ui": "^8.0.0-beta.3"
+    "svelte-material-ui": "^8.0.0-beta.3",
+    "vanilla-cookieconsent": "^3.1.0"
   }
 }
