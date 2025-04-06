@@ -1,12 +1,13 @@
 <svelte:head>
   <!-- Google Analytics Script -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-124C2JKYVW"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id={measurementId}"></script>
 </svelte:head>
 <script lang="ts">
 
   import {dev} from "$app/environment";
   import {onMount} from "svelte";
 
+  let { measurementId } : { measurementId: string } = $props();
   let initialized = false;
 
   onMount(() => {
@@ -22,7 +23,7 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(...args: any[]){window.dataLayer.push(args);}
     gtag('js', new Date());
-    gtag('config', 'G-124C2JKYVW');
+    gtag('config', measurementId);
 
     initialized = true;
 

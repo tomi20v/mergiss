@@ -48,7 +48,7 @@
 </div>
 
 <CookieConsent>
-  <Analytics />
+  <Analytics measurementId="G-124C2JKYVW" />
 </CookieConsent>
 
 <script lang="ts">
