@@ -1,8 +1,8 @@
 {#if (!consented)}
   <div id="cc-banner-back"></div>
-{:else}
-  <slot></slot>
 {/if}
+<slot></slot>
+
 <script lang="ts">
 
   import {onMount} from "svelte";
@@ -10,32 +10,30 @@
   import 'vanilla-cookieconsent/dist/cookieconsent.css';
   import {cookieConsentConfig} from "$lib/cookieConsentConfig"
 
-  let consented = false;
+  let consentedCategories: string[] = $state([]);
+  let consented = $derived(consentedCategories.includes('necessary') && consentedCategories.includes('analytics'));
 
   onMount(() => {
+    setConsentedCategories();
     CookieConsent.run({
       ...cookieConsentConfig,
 
-      onFirstConsent: ({cookie}) => {
-        // implement google consent mode here
-        console.log('onFirstConsent fired', cookie);
-      },
-
-      onConsent: () => showIfNotConsented(),
-      onChange: () => showIfNotConsented(),
-      onModalHide: () => showIfNotConsented(),
+      // we don't really need this
+      // onFirstConsent: () => {},
+      onConsent: showIfNotConsented,
+      onChange: showIfNotConsented,
+      onModalHide: showIfNotConsented,
 
     });
   })
 
+  function setConsentedCategories() {
+    consentedCategories = CookieConsent.getUserPreferences().acceptedCategories;
+  }
+
   function showIfNotConsented() {
-    const categories: string[] = CookieConsent.getUserPreferences().acceptedCategories;
-    if (categories.includes('necessary') && categories.includes('analytics')) {
-      consented = true;
-    }
-    else {
-      setTimeout(CookieConsent.showPreferences, 500);
-    }
+    setConsentedCategories()
+    setTimeout(() => consented || CookieConsent.showPreferences(), 500);
   }
 
 </script>

@@ -80,8 +80,8 @@ const cookieConsentConfig: CookieConsent.CookieConsentConfig = {
         preferencesModal: {
           title: 'Manage cookie preferences',
           acceptAllBtn: 'Accept all',
-          // acceptNecessaryBtn: 'Reject all',
-          // savePreferencesBtn: 'Accept current selection',
+          acceptNecessaryBtn: 'Reject all',
+          savePreferencesBtn: 'Accept current selection',
           closeIconLabel: 'Close modal',
           // serviceCounterLabel: 'Service|Services',
           sections: [
