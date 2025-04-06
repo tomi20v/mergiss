@@ -5,7 +5,6 @@
 {/if}
 <script lang="ts">
 
-  import {dev} from "$app/environment";
   import {onMount} from "svelte";
   import * as CookieConsent from 'vanilla-cookieconsent';
   import 'vanilla-cookieconsent/dist/cookieconsent.css';
@@ -18,31 +17,26 @@
       ...cookieConsentConfig,
 
       onFirstConsent: ({cookie}) => {
+        // implement google consent mode here
         console.log('onFirstConsent fired', cookie);
       },
 
-      onConsent: ({cookie}) => {
-        console.log('onConsent fired!', cookie, CookieConsent.getUserPreferences());
-      },
-
-      onChange: ({changedCategories, changedServices }) => {
-        console.log('onChange fired!', changedCategories, changedServices);
-      },
-
-      onModalReady: ({ modalName }) => {
-        console.log('ready:', modalName);
-      },
-
-      onModalShow: ({ modalName }) => {
-        console.log('visible:', modalName);
-      },
-
-      onModalHide: ({ modalName }) => {
-        console.log('hidden:', modalName);
-      },
+      onConsent: () => showIfNotConsented(),
+      onChange: () => showIfNotConsented(),
+      onModalHide: () => showIfNotConsented(),
 
     });
   })
+
+  function showIfNotConsented() {
+    const categories: string[] = CookieConsent.getUserPreferences().acceptedCategories;
+    if (categories.includes('necessary') && categories.includes('analytics')) {
+      consented = true;
+    }
+    else {
+      setTimeout(CookieConsent.showPreferences, 500);
+    }
+  }
 
 </script>
 
