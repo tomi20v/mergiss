@@ -14,18 +14,22 @@
     initAnalytics();
   })
 
+  function gtag(...args: any[]) {
+    window.dataLayer = window.dataLayer || [];
+    // function gtag(...args: any[]){window.dataLayer.push(args);}
+    window.dataLayer.push(args);
+  }
+
+
   function initAnalytics() {
 
     if (dev) return;
-    if (initialized) return;
 
-    // Ensure gtag is available
-    window.dataLayer = window.dataLayer || [];
-    function gtag(...args: any[]){window.dataLayer.push(args);}
     gtag('js', new Date());
     gtag('config', measurementId);
+    gtag('consent', 'default', currentCategories);
 
-    initialized = true;
+  }
 
     console.log("analytics initialized");
 
