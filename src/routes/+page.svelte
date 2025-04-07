@@ -47,9 +47,8 @@
   </div>
 </div>
 
-<CookieConsent>
-  <Analytics measurementId="G-124C2JKYVW" />
-</CookieConsent>
+<!-- this could be put in +layout.svelte -->
+<Analytics measurementId="G-124C2JKYVW" consentCategories={["analytics_storage"]} />
 
 <script lang="ts">
 
@@ -63,7 +62,6 @@
   import {onMount} from "svelte";
   import MGameScore from "$lib/components/appbar/MGameScore.svelte";
   import Analytics from "$lib/components/Analytics.svelte";
-  import CookieConsent from "$lib/components/CookieConsent.svelte";
 
   let isFullScreen = false;
   let boardHeight = $state(400);

@@ -6,7 +6,7 @@ const cookieConsentConfig: CookieConsent.CookieConsentConfig = {
       enabled: true,
       readOnly: true
     },
-    analytics: {
+    analytics_storage: {
       autoClear: {
         cookies: [
           {
@@ -48,7 +48,6 @@ const cookieConsentConfig: CookieConsent.CookieConsentConfig = {
   guiOptions: {
     consentModal: {
       layout: 'box inline',
-      // layout: 'cloud',
       position: 'bottom left',
       equalWeightButtons: true,
       flipButtons: false
@@ -101,7 +100,7 @@ const cookieConsentConfig: CookieConsent.CookieConsentConfig = {
               title: 'Performance and Analytics',
               description:
                 'These cookies collect information about how you use our website. All of the data is anonymized and cannot be used to identify you.',
-              linkedCategory: 'analytics',
+              linkedCategory: 'analytics_storage',
             },
             // {
             //   title: 'More information',

@@ -1,7 +1,6 @@
 {#if (!consented)}
   <div id="cc-banner-back"></div>
 {/if}
-<slot></slot>
 
 <script lang="ts">
 
@@ -10,11 +9,26 @@
   import 'vanilla-cookieconsent/dist/cookieconsent.css';
   import {cookieConsentConfig} from "$lib/cookieConsentConfig"
 
+  let {
+    // default config could be used even when not all categories are to be shown (eg. only analytics is required)
+    consentCategories = [],
+    onConsent
+  }: {
+    consentCategories: string[],
+    onConsent: (categories: string[]) => void,
+  } = $props();
+
   let consentedCategories: string[] = $state([]);
-  let consented = $derived(consentedCategories.includes('necessary') && consentedCategories.includes('analytics'));
+  let consented = $derived(consentedCategories.includes('necessary') && consentedCategories.includes('analytics_storage'));
 
   onMount(() => {
     setConsentedCategories();
+    if (consentCategories.length > 0) {
+      cookieConsentConfig.categories = Object.fromEntries(
+        Object.entries(cookieConsentConfig.categories)
+          .filter(([key]) => consentCategories.concat(["necessary"]).includes(key))
+      );
+    }
     CookieConsent.run({
       ...cookieConsentConfig,
 
@@ -29,6 +43,9 @@
 
   function setConsentedCategories() {
     consentedCategories = CookieConsent.getUserPreferences().acceptedCategories;
+    if (consented) {
+      onConsent(consentedCategories);
+    }
   }
 
   function showIfNotConsented() {
