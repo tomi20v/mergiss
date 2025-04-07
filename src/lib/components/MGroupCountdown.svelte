@@ -1,5 +1,5 @@
 <svelte:document onmouseup={resetVelocity} />
-<div id="countdown-{group.group}"
+  <div id="group-countdown-{group.group}"
      class="countdown {countdownSpeedClass(ttl)} {accelerating ? 'countdown-accelerating' : ''}"
      style="position: relative;"
      style:color="{color}"

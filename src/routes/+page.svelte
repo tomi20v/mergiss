@@ -47,12 +47,12 @@
   </div>
 </div>
 
-<Analytics />
+<!-- this could be put in +layout.svelte -->
+<Analytics measurementId="G-124C2JKYVW" consentCategories={["analytics_storage"]} />
 
 <script lang="ts">
 
   import "../app.css";
-
   import IconButton from '@smui/icon-button';
   import TopAppBar, {Row, Section, Title} from '@smui/top-app-bar';
   import MBuildBoard from "$lib/components/MBuildBoard.svelte";
