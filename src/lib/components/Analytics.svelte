@@ -24,6 +24,7 @@
   let currentCategories: object = {
     'analytics_storage': 'denied',
     'ad_storage': 'denied',
+    'wait_for_update': 500,
   }
 
   onMount(() => {
@@ -53,6 +54,7 @@
       .reduce((prev, cur) => Object.assign(prev, {[cur]: 'granted'}), {});
     gtag('consent', 'update', categoryMap);
     gtag('event', 'consented', categoryMap);
+    gtag({'event': 'consented2', 'consentedCategories': consentedCategories});
   }
 
 

@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.7.0",
-  "description": "add analytics",
+  "version": "0.7.2",
+  "description": "consent banner",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
