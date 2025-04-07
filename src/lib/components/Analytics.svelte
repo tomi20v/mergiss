@@ -55,6 +55,5 @@
     gtag('event', 'consented', categoryMap);
   }
 
-  }
 
 </script>
