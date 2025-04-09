@@ -1,11 +1,20 @@
 <svelte:head>
   <!-- Google Analytics Script -->
-  {#if (!dev && measurementId)}
-  <script async src="https://www.googletagmanager.com/gtag/js?id={measurementId}"></script>
-  {/if}
+  <!--{#if (!dev && measurementId)}-->
+  <!--<script async src="https://www.googletagmanager.com/gtag/js?id={measurementId}"></script>-->
+  <!--{/if}-->
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-EQDFD52XPM"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-EQDFD52XPM');
+  </script>
 </svelte:head>
 
-<CookieConsent consentCategories={consentCategories} onConsent={onAnalyticsConsent} />
+<!--<CookieConsent consentCategories={consentCategories} onConsent={onAnalyticsConsent} />-->
 
 <script lang="ts">
 
@@ -13,6 +22,7 @@
   import {uiBus} from "$lib/util/uiBus";
   import {onMount} from "svelte";
   import CookieConsent from "$lib/components/CookieConsent.svelte";
+  import type Group from "$lib/game/Group";
 
   let {
     measurementId,
@@ -28,10 +38,16 @@
   }
 
   onMount(() => {
-    initAnalytics();
+    // initAnalytics();
+    for (const [eventName, handler] of Object.entries({
+      // onGroupExpire,
+      onFullScreen,
+    })) {
+      uiBus.on(eventName, handler);
+    }
   })
 
-  function gtag(...args: any[]) {
+  function ____gtag(...args: any[]) {
     window.dataLayer = window.dataLayer || [];
     // function gtag(...args: any[]){window.dataLayer.push(args);}
     window.dataLayer.push(args);
@@ -42,9 +58,9 @@
 
     if (dev) return;
 
-    gtag('js', new Date());
-    gtag('config', measurementId);
-    gtag('consent', 'default', currentCategories);
+    ____gtag('js', new Date());
+    ____gtag('config', measurementId);
+    ____gtag('consent', 'default', currentCategories);
 
   }
 
@@ -52,10 +68,17 @@
     const categoryMap = consentCategories
       .filter(each => consentedCategories.includes(each))
       .reduce((prev, cur) => Object.assign(prev, {[cur]: 'granted'}), {});
-    gtag('consent', 'update', categoryMap);
-    gtag('event', 'consented', categoryMap);
-    gtag({'event': 'consented2', 'consentedCategories': consentedCategories});
+    ____gtag('consent', 'update', categoryMap);
+    ____gtag('event', 'consented', categoryMap);
+    // gtag({'event': 'consented2', 'consentedCategories': consentedCategories});
   }
 
+  function onFullScreen(fullscreen: boolean) {
+    gtag('event', 'fullscreen', {fullscreen});
+  }
+
+  function onGroupExpire(group: Group) {
+    ____gtag('event', 'groupExpired', group);
+  }
 
 </script>
