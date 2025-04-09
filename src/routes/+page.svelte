@@ -2,17 +2,6 @@
         onresize={onResize}
         oncontextmenu={event => event.preventDefault()}
 />
-<svelte:head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-EQDFD52XPM"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-EQDFD52XPM');
-  </script>
-</svelte:head>
 <TopAppBar
   variant="standard"
   dense
@@ -59,7 +48,7 @@
 </div>
 
 <!-- this could be put in +layout.svelte -->
-<!--<Analytics measurementId="G-124C2JKYVW" consentCategories={["analytics_storage"]} />-->
+<Analytics measurementId="G-EQDFD52XPM" consentCategories={["analytics_storage"]} />
 
 <script lang="ts">
 
@@ -73,6 +62,7 @@
   import {onMount} from "svelte";
   import MGameScore from "$lib/components/appbar/MGameScore.svelte";
   import Analytics from "$lib/components/Analytics.svelte";
+  import {uiBus} from "$lib/util/uiBus";
 
   let isFullScreen = false;
   let boardHeight = $state(400);
@@ -105,9 +95,11 @@
 
   function onToggleFullScreen() {
     if (isFullScreen) {
-      closeFullscreen()
+      closeFullscreen();
+      uiBus.emit("onFullScreen", false);
     } else {
       openFullscreen();
+      uiBus.emit("onFullScreen", true);
     }
   }
 
