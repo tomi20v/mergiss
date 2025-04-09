@@ -1,7 +1,7 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.7.4",
+  "version": "0.7.5",
   "description": "new measure code",
   "type": "module",
   "prepare": "svelte-kit sync",
@@ -45,7 +45,6 @@
     "vitest": "^2.0.4"
   },
   "dependencies": {
-    "@beyonk/svelte-google-analytics": "^2.6.4",
     "@tomi20v/iterators": "^0.14.0",
     "@types/lodash.throttle": "^4.1.9",
     "eventemitter3": "^5.0.1",
