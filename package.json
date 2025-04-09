@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.7.2",
-  "description": "consent banner",
+  "version": "0.7.3",
+  "description": "new measure code",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
