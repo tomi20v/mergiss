@@ -2,7 +2,7 @@
   "name": "mergiss",
   "private": true,
   "version": "0.7.9",
-  "description": "put back consent banner",
+  "description": "consent banner",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
