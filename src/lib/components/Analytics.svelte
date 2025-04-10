@@ -72,19 +72,19 @@
 
     gtag('js', new Date());
     gtag('config', measurementId, {app_version: version});
-    // gtag('consent', 'default', currentCategories);
+    gtag('consent', 'default', currentCategories);
 
   }
 
   function onAnalyticsConsent(consentedCategories: string[]) {
-    // const categoryMap = consentCategories
-    //   .filter(each => consentedCategories.includes(each))
-    //   .reduce((prev, cur) => Object.assign(prev, {[cur]: 'granted'}), {});
-    // // ____gtag('consent', 'update', categoryMap);
-    // // ____gtag('event', 'consented', categoryMap);
-    // // ____gtag({'event': 'consented2', 'consentedCategories': consentedCategories});
-    // gtag('consent', 'update', categoryMap);
-    // gtag('event', 'consented', categoryMap);
+    const categoryMap = consentCategories
+      .filter(each => consentedCategories.includes(each))
+      .reduce((prev, cur) => Object.assign(prev, {[cur]: 'granted'}), {});
+    // ____gtag('consent', 'update', categoryMap);
+    // ____gtag('event', 'consented', categoryMap);
+    // ____gtag({'event': 'consented2', 'consentedCategories': consentedCategories});
+    gtag('consent', 'update', categoryMap);
+    gtag('event', 'consented', categoryMap);
   }
 
   function onFullScreen(fullscreen: boolean) {
