@@ -9,7 +9,9 @@ declare global {
 		// interface Platform {}
 	}
   interface Window {
-    dataLayer: any[];
+    dataLayer: (array|object)[];
+    gtag: () => void;
   }
+  function gtag(): void;
 }
 export {};
