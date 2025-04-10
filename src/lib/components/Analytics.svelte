@@ -1,10 +1,6 @@
 <svelte:head>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id={measurementId}"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-  </script>
 </svelte:head>
 
 <CookieConsent consentCategories={consentCategories} onConsent={onAnalyticsConsent} />
@@ -14,7 +10,7 @@
   import {uiBus} from "$lib/util/uiBus";
   import {onMount} from "svelte";
   import CookieConsent from "$lib/components/CookieConsent.svelte";
-  import { version } from '$app/environment';
+  import { dev, version } from '$app/environment';
 
   let {
     measurementId,
@@ -32,26 +28,38 @@
   onMount(() => {
 
     initAnalytics();
+
     for (const [eventName, handler] of Object.entries({
       // onGroupExpire,
       onFullScreen,
     })) {
       uiBus.on(eventName, handler);
     }
+
   })
 
-  // function ____gtag(...args: any[]) {
-  //   window.dataLayer = window.dataLayer || [];
-  //   // function gtag(...args: any[]){window.dataLayer.push(args);}
-  //   window.dataLayer.push(args);
-  // }
+  function gtag(..._: any[]) {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(arguments);
+  }
 
   function initAnalytics() {
 
-    // if (dev) return;
+    const config: {
+      debug_mode?: boolean,
+      v: string,
+    } = {
+      v: version,
+    };
+
+    if (dev) {
+      config.debug_mode = true;
+      window.gtag = gtag;
+    }
+
 
     gtag('js', new Date());
-    gtag('config', measurementId, {v: version});
+    gtag('config', measurementId, config);
     gtag('consent', 'default', currentCategories);
 
   }
@@ -61,7 +69,6 @@
       .filter(each => consentedCategories.includes(each))
       .reduce((prev, cur) => Object.assign(prev, {[cur]: 'granted'}), {});
     gtag('consent', 'update', categoryMap);
-    // gtag('event', 'consented', categoryMap);
   }
 
   function onFullScreen(fullscreen: boolean) {
@@ -69,7 +76,7 @@
   }
 
   // function onGroupExpire(group: Group) {
-  //   ____gtag('event', 'groupExpired', {group, v: version});
+  //   gtag('event', 'groupExpired', {group, v: version});
   // }
 
 </script>
