@@ -6,6 +6,7 @@ import Piece from "$lib/game/piece/Piece";
 const anyCenter = {x: 0, y: 0};
 const anyWeight = 42;
 const anyTtl = 21;
+const anyShape = 'anyShape';
 
 describe('Goup', () => {
 
@@ -19,7 +20,7 @@ describe('Goup', () => {
   });
 
   it('should create from piece', () => {
-    const piece = new Piece([], 'anyColor', 'anyShadowColor');
+    const piece = new Piece(anyShape, [], 'anyColor', 'anyShadowColor');
     const group = Group.fromPiece(new Position(anyCenter.x, anyCenter.y), piece);
     expect(group).toBeInstanceOf(Group);
     expect(group.centerX).toEqual(anyCenter.x);

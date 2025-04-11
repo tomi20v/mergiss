@@ -4,6 +4,7 @@ import { FlatteningIterator } from "@tomi20v/iterators";
 
 export default class Piece {
 
+  readonly shape: string;
   readonly pixelMap: PixelMapType;
   readonly color: string;
   readonly shadowColor: string;
@@ -14,15 +15,17 @@ export default class Piece {
 
   static fromJSON(json: string): Piece {
     const data = JSON.parse(json);
-    return new Piece(data.pixelMap, data.color, data.shadowColor, data.uniqueId);
+    return new Piece(data.shape, data.pixelMap, data.color, data.shadowColor, data.uniqueId);
   }
 
   constructor(
+    shape: string,
     pixelMap: PixelMapType,
     color: string,
     shadowColor: string,
     originalUniqueId: string = ''
   ) {
+    this.shape = shape;
     this.pixelMap = pixelMap;
     this.color = color;
     this.shadowColor = shadowColor;
