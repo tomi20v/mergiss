@@ -13,6 +13,7 @@
   import { dev, version } from '$app/environment';
   import type Piece from "$lib/game/piece/Piece";
   import playStore from "$lib/playStore.svelte";
+  import type Group from "$lib/game/Group";
 
   let {
     measurementId,
@@ -32,6 +33,7 @@
     initAnalytics();
 
     for (const [eventName, handler] of Object.entries({
+      groupCreated: onGroupCreated,
       // onGroupExpire,
       onFullScreen,
       pieceDropped: onPieceDropped,
@@ -99,6 +101,26 @@
         v: version,
       })
     }
+  }
+
+  function onGroupCreated(event: {
+    group: Group,
+    mergedGroupCount: number,
+    overlaps: number,
+    stitchCount: number,
+    boardSize: {sizeX: number, sizeY: number}
+  }) {
+    gtag('event', 'groupCreated', {
+      ttl: event.group.ttl,
+      score: event.group.score,
+      weight: event.group.weight,
+      mergedGroupCount: event.mergedGroupCount,
+      overlaps: event.overlaps,
+      stitchCount: event.stitchCount,
+      availableColorCount: playStore.availableColors.length,
+      boardSize: event.boardSize.sizeX + event.boardSize.sizeY,
+      v: version,
+    });
   }
 
 </script>

@@ -204,13 +204,16 @@
     // first just create a new grooup. We'll merge it with connecting groups later
     const newGroup = Group.fromPiece(new Position(cursorAt!.atX, cursorAt!.atY), piece);
     const groupIdsToMerge: Set<number> = new Set();
+    let overlaps = 0;
     const stitches: PositionPair[] = [];
+    let mergedGroup!: Group;
 
     // set fields to contain new color and group, gather groups with which the new piece overlaps
     for (const i of iterator) {
       if (!i.value) continue;
       let groupUnder = fields[i.y][i.x].group;
       if (groupUnder) {
+        overlaps++;
         groupIdsToMerge.add(groupUnder);
       }
       fields[i.y][i.x].color = piece.color;
@@ -235,7 +238,7 @@
 
     if (groupIdsToMerge.size > 0) {
 
-      mergeGroups(groupIdsToMerge, stitches.length, newGroup);
+      mergedGroup = mergeGroups(groupIdsToMerge, stitches.length, newGroup);
 
       stitches.forEach(each => {
         uiBus.emit('stitch', {...each, cnt: stitches.length});
@@ -245,6 +248,14 @@
     else {
       groups.push(newGroup);
     }
+
+    uiBus.emit('groupCreated', {
+      group: mergedGroup ?? newGroup,
+      mergedGroupCount: groupIdsToMerge.size,
+      overlaps: overlaps,
+      stitchCount: stitches.length,
+      boardSize: {sizeX, sizeY},
+    })
 
     // delaying helps so that initially we show the piece in place, so that
     //  the stitches don't appeair in the middle of nothing
@@ -308,7 +319,7 @@
     }
   }
 
-  function mergeGroups(groupIdsToMerge: Set<number>, stitchCount: number, newGroup: Group) {
+  function mergeGroups(groupIdsToMerge: Set<number>, stitchCount: number, newGroup: Group): Group {
     const groupsToMerge: Group[] = groups
       .filter(each => groupIdsToMerge.has(each.group));
     const mergedGroup = groupsToMerge
@@ -326,6 +337,7 @@
     });
     // note: we shall not use a timeout here as it causes more problems than it solves
     groups.push(mergedGroup);
+    return mergedGroup;
   }
 
   // curry this to get a (Group, Group) => Group merger function

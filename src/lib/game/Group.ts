@@ -6,6 +6,9 @@ export default class Group {
 
   readonly group: number;
   ttl: number = 0;
+  get score(): number {
+    return this.weight;
+  }
 
   static fromPiece(position: Position, piece: Piece): Group {
     return new Group(
