@@ -161,7 +161,17 @@
     }
   }
 
-  function onPieceDrop({piece, dragAt}: {piece: Piece, dragAt: Position}) {
+  function onPieceDrop({
+    piece,
+    dragAt,
+    dragTime,
+    rotationCount,
+  }: {
+    piece: Piece,
+    dragAt: Position,
+    dragTime: number,
+    rotationCount: number,
+  }) {
 
     if (!cursorAt) {
       return;
@@ -180,7 +190,13 @@
 
     putOnBoard(piece, iterator);
     cursorAt = null;
-    uiBus.emit('pieceDropped', {origin: 'mergeBoard', piece: piece});
+    uiBus.emit('pieceDropped', {
+      origin: 'mergeBoard',
+      piece: piece,
+      dragTime,
+      rotationCount,
+      boardSize: {sizeX, sizeY},
+    });
 
   }
 

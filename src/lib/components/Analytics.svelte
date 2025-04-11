@@ -11,6 +11,8 @@
   import {onMount} from "svelte";
   import CookieConsent from "$lib/components/CookieConsent.svelte";
   import { dev, version } from '$app/environment';
+  import type Piece from "$lib/game/piece/Piece";
+  import playStore from "$lib/playStore.svelte";
 
   let {
     measurementId,
@@ -32,6 +34,7 @@
     for (const [eventName, handler] of Object.entries({
       // onGroupExpire,
       onFullScreen,
+      pieceDropped: onPieceDropped,
     })) {
       uiBus.on(eventName, handler);
     }
@@ -78,5 +81,24 @@
   // function onGroupExpire(group: Group) {
   //   gtag('event', 'groupExpired', {group, v: version});
   // }
+
+  function onPieceDropped(event: {
+    origin: string,
+    piece: Piece,
+    dragTime: number,
+    rotationCount: number,
+    boardSize: {sizeX: number, sizeY: number}
+  }) {
+    if (event.origin == 'mergeBoard') {
+      gtag('event', 'pieceToBoard', {
+        dragTime: event.dragTime,
+        rotationCount: event.rotationCount,
+        shape: event.piece.shape,
+        availableColorCount: playStore.availableColors.length,
+        boardSize: event.boardSize.sizeX + event.boardSize.sizeY,
+        v: version,
+      })
+    }
+  }
 
 </script>

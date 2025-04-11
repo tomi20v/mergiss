@@ -4,15 +4,20 @@ import {uiBus} from "$lib/util/uiBus";
 //  for high scores and permanent achievements we'll probably need another store
 class PlayStore {
   paused: boolean = $state(false);
-  mergeBoardCellWidth: number = $state(0);
-  score: number = $state(0);
+  // generator
+  availableColors: string[] = $state([]);
   generatorTime: number = $state(0.5);
+  // board
+  mergeBoardCellWidth: number = $state(0);
+  // scores
+  score: number = $state(0);
 }
 
 // uiBus.on("playStart", (play: PlayConfigType) => {
 uiBus.on("playStart", () => {
-  playStore.score = 0;
+  playStore.paused = false;
   playStore.generatorTime = 0.5;
+  playStore.score = 0;
 })
 
 const playStore: PlayStore = new PlayStore();
