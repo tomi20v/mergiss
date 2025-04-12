@@ -322,12 +322,14 @@
       resizeAddColumn(EDirection.right);
       expansions.push(EDirection.right);
     }
-    uiBus.emit('boardExpanded', {
-      origin: 'mergeBoard',
-      boardSize: {sizeX, sizeY},
-      boardSizeBefore: {sizeX: oSizeX, sizeY: oSizeY},
-      expansions,
-    })
+    if (expansions.length > 0) {
+      uiBus.emit('boardExpanded', {
+        origin: 'mergeBoard',
+        boardSize: {sizeX, sizeY},
+        boardSizeBefore: {sizeX: oSizeX, sizeY: oSizeY},
+        expansions,
+      })
+    }
   }
 
   function mergeGroups(groupIdsToMerge: Set<number>, stitchCount: number, newGroup: Group): Group {

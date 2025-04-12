@@ -1,15 +1,15 @@
 <svelte:document onmouseup={resetVelocity} />
-  <div id="group-countdown-{group.group}"
-     class="countdown {countdownSpeedClass(ttl)} {accelerating ? 'countdown-accelerating' : ''}"
-     style="position: relative;"
-     style:color="{color}"
-     style:background-color="{color == colors.black ? 'gray' : ''}"
-     style:width="{width}px"
-     style:height="{width}px"
-     style:font-size="{width/2}px"
-     style:left="{left}"
+<div id="group-countdown-{group.group}"
+   class="countdown {countdownSpeedClass(ttl)} {accelerating ? 'countdown-accelerating' : ''}"
+   style="position: relative;"
+   style:color="{color}"
+   style:background-color="{color == colors.black ? 'gray' : ''}"
+   style:width="{width}px"
+   style:height="{width}px"
+   style:font-size="{width/2}px"
+   style:left="{left}"
 >
-  <!-- leaving here for debugging only -->
+<!-- leaving here for debugging only -->
 <!--  <span style="font-size: 15px">{ formatTtl(ttl) }<br/><span style="font-size: 12px">#{group.group}</span></span>-->
   { formatTtl(ttl) }
 </div>
@@ -118,7 +118,7 @@
         clearTimeout(timerId as unknown as number);
         // defer so the scale animation class will be removed before cloning
         setTimeout(() => {
-          uiBus.emit('groupExpired', {group, htmlId: "countdown-" + group.group});
+          uiBus.emit('groupExpired', {group, htmlId: "group-countdown-" + group.group});
         })
       }
       else {
