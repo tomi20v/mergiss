@@ -33,6 +33,7 @@
     initAnalytics();
 
     for (const [eventName, handler] of Object.entries({
+      boardExpanded: onBoardExpanded,
       groupCreated: onGroupCreated,
       // onGroupExpire,
       onFullScreen,
@@ -74,6 +75,21 @@
       .filter(each => consentedCategories.includes(each))
       .reduce((prev, cur) => Object.assign(prev, {[cur]: 'granted'}), {});
     gtag('consent', 'update', categoryMap);
+  }
+
+  function onBoardExpanded(event: {
+    origin: string,
+    boardSize: {sizeX: number, sizeY: number},
+    boardSizeBefore: {sizeX: number, sizeY: number},
+    expansions: number,
+  }) {
+    gtag('event', 'boardExpanded', {
+      boardSize: event.boardSize.sizeX + event.boardSize.sizeY,
+      boardSizeBefore: event.boardSizeBefore.sizeX + event.boardSizeBefore.sizeY,
+      dimensions: event.boardSize,
+      expansions: event.expansions,
+      v: version,
+    });
   }
 
   function onFullScreen(fullscreen: boolean) {

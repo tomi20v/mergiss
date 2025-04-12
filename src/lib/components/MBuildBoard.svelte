@@ -260,7 +260,7 @@
     // delaying helps so that initially we show the piece in place, so that
     //  the stitches don't appeair in the middle of nothing
     setTimeout(() => {
-      extendBoard();
+      expandBoard();
       expireEmptyGroup();
     }, 300);
 
@@ -288,7 +288,7 @@
     }
   }
 
-  function extendBoard() {
+  function expandBoard() {
     const rowCounts: number[] = fields.map(
       eachRow => eachRow.filter(eachField => eachField.color != null).length
     );
@@ -296,6 +296,7 @@
       (acc: number[], row) => row.map((field, x) => acc[x] + (field.color == null ? 0 : 1)),
       Array(fields[0].length).fill(0)
     )
+    const expansions: number[] = [];
 
     const oSizeX = sizeX;
     const oSizeY = sizeY;
@@ -304,19 +305,29 @@
     if (rowCounts[0] == oSizeX) {
       clearRow(0);
       resizeAddRow(EDirection.up);
+      expansions.push(EDirection.up);
     }
     if (rowCounts[rowCounts.length-1] == oSizeX) {
       clearRow(rowCounts.length-1);
       resizeAddRow(EDirection.down);
+      expansions.push(EDirection.down);
     }
     if (columnCounts[0] == oSizeY) {
       clearColumn(0);
       resizeAddColumn(EDirection.left);
+      expansions.push(EDirection.left);
     }
     if (columnCounts[columnCounts.length-1] == oSizeY) {
       clearColumn(columnCounts.length-1);
       resizeAddColumn(EDirection.right);
+      expansions.push(EDirection.right);
     }
+    uiBus.emit('boardExpanded', {
+      origin: 'mergeBoard',
+      boardSize: {sizeX, sizeY},
+      boardSizeBefore: {sizeX: oSizeX, sizeY: oSizeY},
+      expansions,
+    })
   }
 
   function mergeGroups(groupIdsToMerge: Set<number>, stitchCount: number, newGroup: Group): Group {
