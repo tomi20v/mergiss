@@ -6,6 +6,7 @@ export default class Group {
 
   readonly group: number;
   ttl: number = 0;
+  public accelerateTime = 0;
 
   static fromPiece(position: Position, piece: Piece): Group {
     return new Group(
@@ -28,6 +29,10 @@ export default class Group {
   ) {
     this.group = numericId();
     this.ttl = ttl;
+  }
+
+  addAccelerateTime(time: number) {
+    this.accelerateTime += time;
   }
 
 }

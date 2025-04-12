@@ -111,7 +111,9 @@
       if (accelerating) {
         currentTimeout = Math.max(currentTimeout * q, minTimeout);
       }
+      const prevTtl = ttl;
       ttl = Math.floor((ttl-currentTimeout/1000)*10) / 10;
+      group.addAccelerateTime(prevTtl - ttl);
       if (ttl <= 0) {
         ttl = 0;
         group.ttl = 0;
