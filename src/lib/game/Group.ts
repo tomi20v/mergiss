@@ -6,14 +6,12 @@ export default class Group {
 
   readonly group: number;
   ttl: number = 0;
-  get score(): number {
-    return this.weight;
-  }
 
   static fromPiece(position: Position, piece: Piece): Group {
     return new Group(
       position.atX,
       position.atY,
+      piece.weight,
       piece.weight,
       // 4.5 seems to have nicer css animation than typical 4 \@/
       piece.weight + 0.5
@@ -25,7 +23,8 @@ export default class Group {
     readonly centerX: number,
     readonly centerY: number,
     readonly weight: number,
-    ttl = 4
+    readonly score: number = weight,
+    ttl: number,
   ) {
     this.group = numericId();
     this.ttl = ttl;

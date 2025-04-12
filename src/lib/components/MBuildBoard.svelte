@@ -368,10 +368,17 @@
         (prev.ttl * 1.05 + curr.ttl * 1.4 + 1),
         (prev.ttl + curr.ttl) * q
       );
+      const score = Math.min(
+        (prev.score*2 + curr.score),
+        (prev.score + curr.score*2),
+        (prev.score * 1.05 + curr.score * 1.4 + 1),
+        (prev.score + curr.score) * q
+      );
       return new Group(
         (prev.centerX*prev.weight + curr.centerX*curr.weight) / w,
         (prev.centerY*prev.weight + curr.centerY*curr.weight) / w,
         w,
+        score,
         ttl,
       );
     }
