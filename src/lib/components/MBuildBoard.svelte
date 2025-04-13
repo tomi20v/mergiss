@@ -41,22 +41,9 @@
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
-  // @todo these shall go into some game state ("save") management
-  // const sX = 3, sY = 3;
-  // const sX = 3, sY = 3;
-  const sX = 3, sY = 3;
-  // const sX = 5, sY = 5;
-  // const sX = 10, sY = 10;
-  // const sX = 15, sY = 15;
-  // const sX = 30, sY = 20;
-  // const sX = 5, sY = 20;
-  // const sX = 5, sY = 30;
-  // const sX = 30, sY = 30;
-  // const sX = 40, sY = 20;
-  // const sX = 42, sY = 42;
 
-  let sizeX: number = $state(sX);
-  let sizeY: number = $state(sY);
+  let sizeX: number = $derived(playStore.boardSizeX);
+  let sizeY: number = $derived(playStore.boardSizeY);
   // we'll need these so that [0;0] keeps the same ID when unshifting (when unshifting, we'll sub 1 from these)
   let startX: number = $state(0);
   let startY: number = $state(0);
@@ -123,6 +110,125 @@
       }
     }
     return true;
+  }
+
+  function clearRow(row: number) {
+    for (let i=0; i<sizeX; i++) {
+      fields[row][i].group = 0;
+      fields[row][i].color = null;
+    }
+  }
+  function clearColumn(column: number) {
+    for (let i=0; i<sizeY; i++) {
+      fields[i][column].group = 0;
+      fields[i][column].color = null;
+    }
+  }
+
+  function expandBoard() {
+    const rowCounts: number[] = fields.map(
+      eachRow => eachRow.filter(eachField => eachField.color != null).length
+    );
+    const columnCounts: number[] = fields.reduce(
+      (acc: number[], row) => row.map((field, x) => acc[x] + (field.color == null ? 0 : 1)),
+      Array(fields[0].length).fill(0)
+    )
+    const expansions: number[] = [];
+
+    const oSizeX = sizeX;
+    const oSizeY = sizeY;
+
+    // @todo re-count and/or adjust group center
+    if (rowCounts[0] == oSizeX) {
+      clearRow(0);
+      resizeAddRow(EDirection.up);
+      expansions.push(EDirection.up);
+    }
+    if (rowCounts[rowCounts.length-1] == oSizeX) {
+      clearRow(rowCounts.length-1);
+      resizeAddRow(EDirection.down);
+      expansions.push(EDirection.down);
+    }
+    if (columnCounts[0] == oSizeY) {
+      clearColumn(0);
+      resizeAddColumn(EDirection.left);
+      expansions.push(EDirection.left);
+    }
+    if (columnCounts[columnCounts.length-1] == oSizeY) {
+      clearColumn(columnCounts.length-1);
+      resizeAddColumn(EDirection.right);
+      expansions.push(EDirection.right);
+    }
+    if (expansions.length > 0) {
+      uiBus.emit('boardExpanded', {
+        origin: 'mergeBoard',
+        boardSizeBefore: {sizeX: oSizeX, sizeY: oSizeY},
+        expansions,
+      })
+    }
+  }
+
+  function expireEmptyGroup() {
+    // no need to check all groups, only the last group can be empty
+    // for (const group of groups) {
+    const group: Group = groups.slice(-1).pop() as Group;
+    if (!fields.flat().find(each => each.group == group.group)) {
+      group.ttl = 0;
+    }
+  }
+
+  function mergeGroups(groupIdsToMerge: Set<number>, stitchCount: number, newGroup: Group): Group {
+    const groupsToMerge: Group[] = groups
+      .filter(each => groupIdsToMerge.has(each.group));
+    const mergedGroup = groupsToMerge
+      .reduce(mergeMapper(groupsToMerge.length, stitchCount), newGroup);
+
+    // update group ID in fields which belong to a merged group
+    fields.flat().forEach(eachField => {
+      if (groupIdsToMerge.has(eachField.group)) {
+        eachField.group = mergedGroup.group;
+      }
+    })
+    // remove merged ones, and add the new one
+    groupsToMerge.forEach(each => {
+      groups.splice(groups.indexOf(each), 1);
+    });
+    // note: we shall not use a timeout here as it causes more problems than it solves
+    groups.push(mergedGroup);
+    return mergedGroup;
+  }
+
+  // curry this to get a (Group, Group) => Group merger function
+  // @todo add bonus for overlapping pieces? (MGS-66)
+  function mergeMapper(groupCount: number, stitchCount: number) {
+    // calculate new center and new TTL
+    return (prev: Group, curr: Group): Group => {
+      const w = prev.weight + curr.weight;
+      // sum of TTLs multiplied by a factor which is higher when joining multiple groups or having
+      //  more stitches - just slightly, and even like this it will have to be limited so that
+      //  when big pieces touch it won't result in huge TTLs
+      // const q = Math.pow(1+(groupsToMerge.length-1)/10+stitchCount/10, 1/4);
+      const q = Math.pow(1+(groupCount-1)/10 + Math.min(stitchCount, 9)/20, 1/4);
+      const ttl = Math.min(
+        (prev.ttl*2 + curr.ttl),
+        (prev.ttl + curr.ttl*2),
+        (prev.ttl * 1.05 + curr.ttl * 1.4 + 1),
+        (prev.ttl + curr.ttl) * q
+      );
+      const score = Math.min(
+        (prev.score*2 + curr.score),
+        (prev.score + curr.score*2),
+        (prev.score * 1.05 + curr.score * 1.4 + 1),
+        (prev.score + curr.score) * q
+      );
+      return new Group(
+        (prev.centerX*prev.weight + curr.centerX*curr.weight) / w,
+        (prev.centerY*prev.weight + curr.centerY*curr.weight) / w,
+        w,
+        score,
+        ttl,
+      );
+    }
   }
 
   function onGroupExpired({group}: {group: Group}) {
@@ -195,7 +301,6 @@
       piece: piece,
       dragTime,
       rotationCount,
-      boardSize: {sizeX, sizeY},
     });
 
   }
@@ -254,7 +359,6 @@
       mergedGroupCount: groupIdsToMerge.size,
       overlaps: overlaps,
       stitchCount: stitches.length,
-      boardSize: {sizeX, sizeY},
     })
 
     // delaying helps so that initially we show the piece in place, so that
@@ -266,128 +370,8 @@
 
   }
 
-  function clearRow(row: number) {
-    for (let i=0; i<sizeX; i++) {
-      fields[row][i].group = 0;
-      fields[row][i].color = null;
-    }
-  }
-  function clearColumn(column: number) {
-    for (let i=0; i<sizeY; i++) {
-      fields[i][column].group = 0;
-      fields[i][column].color = null;
-    }
-  }
-
-  function expireEmptyGroup() {
-    // no need to check all groups, only the last group can be empty
-    // for (const group of groups) {
-    const group: Group = groups.slice(-1).pop() as Group;
-    if (!fields.flat().find(each => each.group == group.group)) {
-      group.ttl = 0;
-    }
-  }
-
-  function expandBoard() {
-    const rowCounts: number[] = fields.map(
-      eachRow => eachRow.filter(eachField => eachField.color != null).length
-    );
-    const columnCounts: number[] = fields.reduce(
-      (acc: number[], row) => row.map((field, x) => acc[x] + (field.color == null ? 0 : 1)),
-      Array(fields[0].length).fill(0)
-    )
-    const expansions: number[] = [];
-
-    const oSizeX = sizeX;
-    const oSizeY = sizeY;
-
-    // @todo re-count and/or adjust group center
-    if (rowCounts[0] == oSizeX) {
-      clearRow(0);
-      resizeAddRow(EDirection.up);
-      expansions.push(EDirection.up);
-    }
-    if (rowCounts[rowCounts.length-1] == oSizeX) {
-      clearRow(rowCounts.length-1);
-      resizeAddRow(EDirection.down);
-      expansions.push(EDirection.down);
-    }
-    if (columnCounts[0] == oSizeY) {
-      clearColumn(0);
-      resizeAddColumn(EDirection.left);
-      expansions.push(EDirection.left);
-    }
-    if (columnCounts[columnCounts.length-1] == oSizeY) {
-      clearColumn(columnCounts.length-1);
-      resizeAddColumn(EDirection.right);
-      expansions.push(EDirection.right);
-    }
-    if (expansions.length > 0) {
-      uiBus.emit('boardExpanded', {
-        origin: 'mergeBoard',
-        boardSize: {sizeX, sizeY},
-        boardSizeBefore: {sizeX: oSizeX, sizeY: oSizeY},
-        expansions,
-      })
-    }
-  }
-
-  function mergeGroups(groupIdsToMerge: Set<number>, stitchCount: number, newGroup: Group): Group {
-    const groupsToMerge: Group[] = groups
-      .filter(each => groupIdsToMerge.has(each.group));
-    const mergedGroup = groupsToMerge
-      .reduce(mergeMapper(groupsToMerge.length, stitchCount), newGroup);
-
-    // update group ID in fields which belong to a merged group
-    fields.flat().forEach(eachField => {
-      if (groupIdsToMerge.has(eachField.group)) {
-        eachField.group = mergedGroup.group;
-      }
-    })
-    // remove merged ones, and add the new one
-    groupsToMerge.forEach(each => {
-      groups.splice(groups.indexOf(each), 1);
-    });
-    // note: we shall not use a timeout here as it causes more problems than it solves
-    groups.push(mergedGroup);
-    return mergedGroup;
-  }
-
-  // curry this to get a (Group, Group) => Group merger function
-  // @todo add bonus for overlapping pieces? (MGS-66)
-  function mergeMapper(groupCount: number, stitchCount: number) {
-    // calculate new center and new TTL
-    return (prev: Group, curr: Group): Group => {
-      const w = prev.weight + curr.weight;
-      // sum of TTLs multiplied by a factor which is higher when joining multiple groups or having
-      //  more stitches - just slightly, and even like this it will have to be limited so that
-      //  when big pieces touch it won't result in huge TTLs
-      // const q = Math.pow(1+(groupsToMerge.length-1)/10+stitchCount/10, 1/4);
-      const q = Math.pow(1+(groupCount-1)/10 + Math.min(stitchCount, 9)/20, 1/4);
-      const ttl = Math.min(
-        (prev.ttl*2 + curr.ttl),
-        (prev.ttl + curr.ttl*2),
-        (prev.ttl * 1.05 + curr.ttl * 1.4 + 1),
-        (prev.ttl + curr.ttl) * q
-      );
-      const score = Math.min(
-        (prev.score*2 + curr.score),
-        (prev.score + curr.score*2),
-        (prev.score * 1.05 + curr.score * 1.4 + 1),
-        (prev.score + curr.score) * q
-      );
-      return new Group(
-        (prev.centerX*prev.weight + curr.centerX*curr.weight) / w,
-        (prev.centerY*prev.weight + curr.centerY*curr.weight) / w,
-        w,
-        score,
-        ttl,
-      );
-    }
-  }
-
   function resizeAddColumn(direction: EDirection) {
-    sizeX++;
+    playStore.boardSizeX++;
     if (direction == EDirection.left) {
       startX--;
     }
@@ -395,7 +379,7 @@
     // fields.forEach(each => setTimeout(() => each.push(emptyField()), 400*Math.random()));
   }
   function resizeAddRow(direction: EDirection) {
-    sizeY++;
+    playStore.boardSizeY++;
     const row: FieldType[] = Array.from({length: sizeX}, emptyField);
     if (direction == EDirection.up) {
       fields.unshift(row);
@@ -409,7 +393,7 @@
     if (sizeX <= 3) {
       return;
     }
-    sizeX--;
+    playStore.boardSizeX--;
     fields.forEach(each => each.pop());
     // funky effect :D
     // fields.forEach(each => setTimeout(() => each.pop(), 400*Math.random()));
@@ -418,7 +402,7 @@
     if (sizeY <= 3) {
       return;
     }
-    sizeY--;
+    playStore.boardSizeY--;
     fields.pop();
   }
 

@@ -8,6 +8,8 @@ class PlayStore {
   availableColors: string[] = $state([]);
   generatorTime: number = $state(0.5);
   // board
+  boardSizeX: number = $state(3);
+  boardSizeY: number = $state(3);
   mergeBoardCellWidth: number = $state(0);
   // scores
   score: number = $state(0);
@@ -16,7 +18,12 @@ class PlayStore {
 // uiBus.on("playStart", (play: PlayConfigType) => {
 uiBus.on("playStart", () => {
   playStore.paused = false;
+  // generator
   playStore.generatorTime = 0.5;
+  // board
+  playStore.boardSizeX = 3;
+  playStore.boardSizeY = 3;
+  // score
   playStore.score = 0;
 })
 

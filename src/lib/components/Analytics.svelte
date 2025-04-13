@@ -27,6 +27,7 @@
     'ad_storage': 'denied',
     'wait_for_update': 500,
   }
+  let boardSize = $derived(playStore.boardSizeX + playStore.boardSizeY);
 
   onMount(() => {
 
@@ -35,7 +36,7 @@
     for (const [eventName, handler] of Object.entries({
       boardExpanded: onBoardExpanded,
       groupCreated: onGroupCreated,
-      // onGroupExpire,
+      groupExpired: onGroupExpired,
       onFullScreen,
       pieceDropped: onPieceDropped,
     })) {
@@ -79,14 +80,12 @@
 
   function onBoardExpanded(event: {
     origin: string,
-    boardSize: {sizeX: number, sizeY: number},
     boardSizeBefore: {sizeX: number, sizeY: number},
     expansions: number,
   }) {
     gtag('event', 'boardExpanded', {
-      boardSize: event.boardSize.sizeX + event.boardSize.sizeY,
+      boardSize,
       boardSizeBefore: event.boardSizeBefore.sizeX + event.boardSizeBefore.sizeY,
-      dimensions: event.boardSize,
       expansions: event.expansions,
       v: version,
     });
@@ -105,7 +104,6 @@
     piece: Piece,
     dragTime: number,
     rotationCount: number,
-    boardSize: {sizeX: number, sizeY: number}
   }) {
     if (event.origin == 'mergeBoard') {
       gtag('event', 'pieceToBoard', {
@@ -113,7 +111,7 @@
         rotationCount: event.rotationCount,
         shape: event.piece.shape,
         availableColorCount: playStore.availableColors.length,
-        boardSize: event.boardSize.sizeX + event.boardSize.sizeY,
+        boardSize,
         v: version,
       })
     }
@@ -124,7 +122,6 @@
     mergedGroupCount: number,
     overlaps: number,
     stitchCount: number,
-    boardSize: {sizeX: number, sizeY: number}
   }) {
     gtag('event', 'groupCreated', {
       ttl: event.group.ttl,
@@ -134,7 +131,7 @@
       overlaps: event.overlaps,
       stitchCount: event.stitchCount,
       availableColorCount: playStore.availableColors.length,
-      boardSize: event.boardSize.sizeX + event.boardSize.sizeY,
+      boardSize,
       v: version,
     });
   }
