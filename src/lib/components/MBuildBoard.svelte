@@ -175,6 +175,7 @@
     if (!fields.flat().find(each => each.group == group.group)) {
       group.ttl = 0;
     }
+    uiBus.emit('groupExpired', {group});
   }
 
   function mergeGroups(groupIdsToMerge: Set<number>, stitchCount: number, newGroup: Group): Group {
