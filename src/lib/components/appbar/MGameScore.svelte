@@ -54,7 +54,7 @@
   }
 
   function onGroupExpired({group, htmlId}: { group: Group, htmlId: string}) {
-    flyToScore(htmlId, () => addScore(group.weight));
+    flyToScore(htmlId, () => addScore(group.score));
   }
 
   function onStitchExpired({stitch, htmlId}: { stitch: PositionPair, htmlId: string}) {

@@ -174,8 +174,8 @@
     const group: Group = groups.slice(-1).pop() as Group;
     if (!fields.flat().find(each => each.group == group.group)) {
       group.ttl = 0;
+      uiBus.emit('groupExpired', {group});
     }
-    uiBus.emit('groupExpired', {group});
   }
 
   function mergeGroups(groupIdsToMerge: Set<number>, stitchCount: number, newGroup: Group): Group {
@@ -216,7 +216,7 @@
         (prev.ttl * 1.05 + curr.ttl * 1.4 + 1),
         (prev.ttl + curr.ttl) * q
       );
-      const score = Math.min(
+      const score = Math.sqrt(prev.score + curr.score) + Math.min(
         (prev.score*2 + curr.score),
         (prev.score + curr.score*2),
         (prev.score * 1.05 + curr.score * 1.4 + 1),
