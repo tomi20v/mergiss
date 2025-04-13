@@ -113,10 +113,14 @@
       }
       const prevTtl = ttl;
       ttl = Math.floor((ttl-currentTimeout/1000)*10) / 10;
-      group.addAccelerateTime(prevTtl - ttl);
+      if (accelerating) {
+        // not exact as some time would have passed without acceleration too
+        group.addAccelerateTime(prevTtl - ttl);
+      }
       if (ttl <= 0) {
         ttl = 0;
-        group.ttl = 0;
+        // group.ttl = 0;
+        group.setTtl(0);
         clearTimeout(timerId as unknown as number);
         // defer so the scale animation class will be removed before cloning
         setTimeout(() => {
@@ -124,7 +128,8 @@
         })
       }
       else {
-        group.ttl = ttl;
+        // group.ttl = ttl;
+        group.setTtl(ttl);
         startTimer();
       }
     }, currentTimeout);
