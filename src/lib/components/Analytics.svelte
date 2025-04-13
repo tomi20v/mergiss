@@ -95,26 +95,16 @@
     gtag('event', 'fullscreen', {fullscreen, version});
   }
 
-  // function onGroupExpire(group: Group) {
-  //   gtag('event', 'groupExpired', {group, v: version});
-  // }
-
-  function onPieceDropped(event: {
-    origin: string,
-    piece: Piece,
-    dragTime: number,
-    rotationCount: number,
+  function onGroupExpired(event: {
+    group: Group,
   }) {
-    if (event.origin == 'mergeBoard') {
-      gtag('event', 'pieceToBoard', {
-        dragTime: event.dragTime,
-        rotationCount: event.rotationCount,
-        shape: event.piece.shape,
-        availableColorCount: playStore.availableColors.length,
-        boardSize,
-        version,
-      })
-    }
+    gtag('event', 'groupExpired', {
+      accelerateTime: event.group.accelerateTime,
+      boardSize,
+      score: event.group.score,
+      weight: event.group.weight,
+      version
+    });
   }
 
   function onGroupCreated(event: {
@@ -134,6 +124,24 @@
       boardSize,
       version,
     });
+  }
+
+  function onPieceDropped(event: {
+    origin: string,
+    piece: Piece,
+    dragTime: number,
+    rotationCount: number,
+  }) {
+    if (event.origin == 'mergeBoard') {
+      gtag('event', 'pieceToBoard', {
+        dragTime: event.dragTime,
+        rotationCount: event.rotationCount,
+        shape: event.piece.shape,
+        availableColorCount: playStore.availableColors.length,
+        boardSize,
+        version,
+      })
+    }
   }
 
 </script>
