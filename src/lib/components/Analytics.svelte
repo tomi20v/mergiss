@@ -87,12 +87,12 @@
       boardSize,
       boardSizeBefore: event.boardSizeBefore.sizeX + event.boardSizeBefore.sizeY,
       expansions: event.expansions,
-      v: version,
+      version,
     });
   }
 
   function onFullScreen(fullscreen: boolean) {
-    gtag('event', 'fullscreen', {fullscreen, v: version});
+    gtag('event', 'fullscreen', {fullscreen, version});
   }
 
   // function onGroupExpire(group: Group) {
@@ -112,7 +112,7 @@
         shape: event.piece.shape,
         availableColorCount: playStore.availableColors.length,
         boardSize,
-        v: version,
+        version,
       })
     }
   }
@@ -132,7 +132,7 @@
       stitchCount: event.stitchCount,
       availableColorCount: playStore.availableColors.length,
       boardSize,
-      v: version,
+      version,
     });
   }
 

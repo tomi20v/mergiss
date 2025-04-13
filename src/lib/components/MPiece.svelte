@@ -106,7 +106,7 @@
   let dragging = $derived(dragButton !== MouseButtons.NOBUTTON);
   let dragImage!: HTMLElement;
   let dragRotation = $state(0);
-  let dragStartTime = new Date();
+  let dragStartTime = 0;
   let rotationCount = 0;
 
   function dragDrop() {

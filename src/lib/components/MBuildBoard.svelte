@@ -133,7 +133,7 @@
       (acc: number[], row) => row.map((field, x) => acc[x] + (field.color == null ? 0 : 1)),
       Array(fields[0].length).fill(0)
     )
-    const expansions: number[] = [];
+    const expansions: EDirection[] = [];
 
     const oSizeX = sizeX;
     const oSizeY = sizeY;
