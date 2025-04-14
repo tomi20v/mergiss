@@ -119,7 +119,7 @@
         clearTimeout(timerId as unknown as number);
         // defer so the scale animation class will be removed before cloning
         setTimeout(() => {
-          uiBus.emit('groupExpired', {group, htmlId: "countdown-" + group.group});
+          uiBus.emit('groupExpired', {group, htmlId: "group-countdown-" + group.group});
         })
       }
       else {
