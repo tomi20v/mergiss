@@ -9,6 +9,7 @@
      style:height="{width}px"
      style:font-size="{width/2}px"
      style:left="{left}"
+     style:top="{top}"
   >
     { formatTtl(group.ttl) }
   </div>
@@ -33,17 +34,29 @@
     const cellWidth = playStore.mergeBoardCellWidth;
     return Math.max(Math.min(50, cellWidth-1), 40);
   })
-  // when oversize, flex centering doesn't work and countdown starts moving to the right. With this dynamic left
-  //  it is kept in center (vertically no need, that works fine)
-  let left = $derived.by(() => {
-    const w = width;
-    const cellWidth = playStore.mergeBoardCellWidth;
-    return cellWidth > w ? 'auto' : (Math.floor((cellWidth-w)/2) + 'px');
+  let countdownSpeedClass = $derived.by(() => {
+    const ttl = group.ttl;
+    if (ttl == 0) {
+      return '';
+    }
+    else if (ttl < 2) {
+      return 'countdown-fastest';
+    }
+    else if (ttl < 6) {
+      return 'countdown-faster';
+    }
+    else if (ttl <= 10) {
+      return 'countdown-fast';
+    }
   })
-
-  // keep ttl updated, as it is not explicitly reactive
-  $effect(() => {
-    ttl = group.ttl;
+  // container will put at the center of the cell, offset it somewhat by the decimals
+  let left = $derived.by(() => {
+    const offset = group.centerX % 1 - 0.5;
+    return offset * playStore.mergeBoardCellWidth * 0.8 + 'px';
+  })
+  let top = $derived.by(() => {
+    const offset = group.centerY % 1 - 0.5;
+    return offset * playStore.mergeBoardCellWidth * 0.8 + 'px';
   })
 
   onMount(() => {
@@ -68,22 +81,6 @@
       }
       // subtract 1 second for a click, click dashing is faster for short-mid term
       group.setTtl(Math.max(0, group.ttl -1));
-    }
-  }
-
-  function countdownSpeedClass(ttl: number) {
-    const ttl = group.ttl;
-    if (ttl == 0) {
-      return '';
-    }
-    else if (ttl < 2) {
-      return 'countdown-fastest';
-    }
-    else if (ttl < 6) {
-      return 'countdown-faster';
-    }
-    else if (ttl <= 10) {
-      return 'countdown-fast';
     }
   }
 
@@ -115,7 +112,7 @@
       }
       const newTtl = Math.floor((group.ttl-currentTimeout/1000)*10) / 10;
       if (newTtl <= 0) {
-        group.ttl = 0;
+        group.setTtl(0);
         clearTimeout(timerId as unknown as number);
         // defer so the scale animation class will be removed before cloning
         setTimeout(() => {
@@ -123,8 +120,7 @@
         })
       }
       else {
-        // group.setTtl(newTtl);
-        group.ttl = newTtl;
+        group.setTtl(newTtl);
         startTimer();
       }
     }, currentTimeout);

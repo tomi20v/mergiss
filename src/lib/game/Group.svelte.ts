@@ -31,4 +31,8 @@ export default class Group {
     this.ttl = ttl;
   }
 
+  setTtl(ttl: number) {
+    this.ttl = ttl;
+  }
+
 }

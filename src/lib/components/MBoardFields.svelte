@@ -6,7 +6,7 @@
     <!--{#each row as field, iX (field.id)}-->
     {#each row as field, iX (iX + startX + '-' + iY + '-' + field.id)}
       <div id="board-field-{iX+startX}-{iY+startY}"
-           class="flex m-board-field"
+           class="flex m-board-field relative"
            style="color: white;
                   aspect-ratio: 1;
                   background-size: 100%;
@@ -37,14 +37,12 @@
               style="border-radius: 15%; background-color: {color}; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray;"
               in:blur={{duration: 200}}
               out:blur={{duration: 400}}
-          >
-              {#if (groupCenterAt(iX, iY))}
-                <MGroupCountdown group={groupCenterAt(iX, iY) as Group} color={color} />
-              {/if}
-          </div>
-        {:else if (groupCenterAt(iX, iY))}
-          <div class="flex grow m-0.5 items-center justify-center">
-            <MGroupCountdown group={groupCenterAt(iX, iY) as Group} color={''} />
+          ></div>
+        {/if}
+
+        {#if (groupCenterAt(iX, iY))}
+          <div class="flex m-0.5 absolute top-0 right-0 bottom-0 left-0 items-center justify-center">
+            <MGroupCountdown group={groupCenterAt(iX, iY)} color={''} />
           </div>
         {/if}
 
@@ -97,9 +95,9 @@
 
   function groupCenterAt(atX: number, atY: number): Group | undefined {
     // I have to take the floor() to match with group centers like 1.5, 4.8 etc. These could be offset later
-    // return groups.find(each => (Math.floor(each.centerX) == atX) && (Math.floor(each.centerY) == atY));
+    return groups.find(each => (Math.floor(each.centerX) == atX) && (Math.floor(each.centerY) == atY));
     // return groups.find(each => (Math.ceil(each.centerX) == atX) && (Math.ceil(each.centerY) == atY));
-    return groups.find(each => (Math.round(each.centerX) == atX) && (Math.round(each.centerY) == atY));
+    // return groups.find(each => (Math.round(each.centerX) == atX) && (Math.round(each.centerY) == atY));
   }
 
   function onMouseDown(atX: number, atY: number) {
