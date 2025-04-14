@@ -33,7 +33,7 @@
   import MBoardFields from "$lib/components/MBoardFields.svelte";
   import {emptyField, type FieldType} from "$lib/game/fields.svelte";
   import {FlatteningIterator, move, rotateCoords,} from "@tomi20v/iterators";
-  import Group from "$lib/game/Group";
+  import Group from "$lib/game/Group.svelte";
   import playStore from "$lib/playStore.svelte";
   import {type PositionPair, sortedPositionPair} from "$lib/game/geometry/positionPair";
   import {EDirection} from "$lib/game/geometry/EDirection";

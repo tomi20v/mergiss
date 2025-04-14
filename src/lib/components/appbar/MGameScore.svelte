@@ -17,7 +17,7 @@
   import { onMount, onDestroy } from "svelte";
   import { Spring, Tween, } from "svelte/motion";
   import { expoOut } from "svelte/easing";
-  import type Group from "$lib/game/Group";
+  import type Group from "$lib/game/Group.svelte";
   import type {PositionPair} from "$lib/game/geometry/positionPair";
   import {flyTo} from "$lib/util/flyTo";
 

@@ -1,7 +1,7 @@
 <svelte:document onmouseup={resetVelocity} />
 {#if group}
   <div id="group-countdown-{group.group}"
-     class="countdown {countdownSpeedClass(ttl)} {accelerating ? 'countdown-accelerating' : ''}"
+     class="countdown {countdownSpeedClass} {accelerating ? 'countdown-accelerating' : ''}"
      style="position: relative;"
      style:color="{color}"
      style:background-color="{color == colors.black ? 'gray' : ''}"
@@ -9,22 +9,19 @@
      style:height="{width}px"
      style:font-size="{width/2}px"
      style:left="{left}"
->
-  <!-- leaving here for debugging only -->
-<!--  <span style="font-size: 15px">{ formatTtl(ttl) }<br/><span style="font-size: 12px">#{group.group}</span></span>-->
-    { formatTtl(ttl) }
+  >
+    { formatTtl(group.ttl) }
   </div>
 {/if}
 <script lang="ts">
 
-  import Group from "$lib/game/Group.js";
+  import Group from "$lib/game/Group.svelte.js";
   import { onMount, onDestroy } from "svelte";
   import colors from "$lib/game/colors";
   import {uiBus} from "$lib/util/uiBus";
   import playStore from "$lib/playStore.svelte.js";
 
   let {group, color}: {group: Group, color: string} = $props();
-  let ttl = $state(0);
   let timerId: ReturnType<typeof setTimeout> | null = null;
   let currentTimeout = 100; // Current timeout duration in ms (dynamically updated)
   const minTimeout = 0.1;
@@ -69,11 +66,13 @@
         // increase initial speed
         currentTimeout/= 2;
       }
-      ttl -= 1;
+      // subtract 1 second for a click, click dashing is faster for short-mid term
+      group.setTtl(Math.max(0, group.ttl -1));
     }
   }
 
   function countdownSpeedClass(ttl: number) {
+    const ttl = group.ttl;
     if (ttl == 0) {
       return '';
     }
@@ -114,9 +113,8 @@
       if (accelerating) {
         currentTimeout = Math.max(currentTimeout * q, minTimeout);
       }
-      ttl = Math.floor((ttl-currentTimeout/1000)*10) / 10;
-      if (ttl <= 0) {
-        ttl = 0;
+      const newTtl = Math.floor((group.ttl-currentTimeout/1000)*10) / 10;
+      if (newTtl <= 0) {
         group.ttl = 0;
         clearTimeout(timerId as unknown as number);
         // defer so the scale animation class will be removed before cloning
@@ -125,7 +123,8 @@
         })
       }
       else {
-        group.ttl = ttl;
+        // group.setTtl(newTtl);
+        group.ttl = newTtl;
         startTimer();
       }
     }, currentTimeout);

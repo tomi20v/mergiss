@@ -59,7 +59,7 @@
   import elasticTransition from "$lib/transitions/elasticTransition";
   import type {FieldType} from "$lib/game/fields.svelte";
   import MGroupCountdown from "$lib/components/MGroupCountdown.svelte";
-  import Group from "$lib/game/Group.js";
+  import Group from "$lib/game/Group.svelte.js";
   import {uiBus} from "$lib/util/uiBus";
   import type {PositionPair} from "$lib/game/geometry/positionPair";
 
