@@ -5,7 +5,10 @@ import {numericId} from "$lib/util/numericId";
 export default class Group {
 
   readonly group: number;
-  ttl: number = 0;
+  // bit weird having reactive prop in a "native" class but works fine
+  // (more than that, ttl is managed outside in the countdown component,
+  //  that is historical)
+  ttl: number = $state(0);
 
   static fromPiece(position: Position, piece: Piece): Group {
     return new Group(
@@ -25,6 +28,10 @@ export default class Group {
     ttl = 4
   ) {
     this.group = numericId();
+    this.ttl = ttl;
+  }
+
+  setTtl(ttl: number) {
     this.ttl = ttl;
   }
 
