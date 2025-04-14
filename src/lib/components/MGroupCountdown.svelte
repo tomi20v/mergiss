@@ -52,11 +52,11 @@
   // container will put at the center of the cell, offset it somewhat by the decimals
   let left = $derived.by(() => {
     const offset = group.centerX % 1 - 0.5;
-    return offset * playStore.mergeBoardCellWidth * 0.8 + 'px';
+    return offset * playStore.mergeBoardCellWidth + 'px';
   })
   let top = $derived.by(() => {
     const offset = group.centerY % 1 - 0.5;
-    return offset * playStore.mergeBoardCellWidth * 0.8 + 'px';
+    return offset * playStore.mergeBoardCellWidth + 'px';
   })
 
   onMount(() => {

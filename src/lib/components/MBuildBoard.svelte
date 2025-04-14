@@ -186,7 +186,12 @@
 
   function putOnBoard(piece: Piece, iterator: FlatteningIterator<number>) {
     // first just create a new grooup. We'll merge it with connecting groups later
-    const newGroup = Group.fromPiece(new Position(cursorAt!.atX, cursorAt!.atY), piece);
+    const p = [...iterator]
+      .filter(each => each.value)
+      .reduce(
+        (acc, each) => ({ x: acc.x + each.x + 0.5, y: acc.y + each.y + 0.5, cnt: acc.cnt + 1 }),
+        {x: 0, y: 0, cnt: 0});
+    const newGroup = Group.fromPiece(new Position(p.x/p.cnt, p.y/p.cnt), piece);
     const groupIdsToMerge: Set<number> = new Set();
     const stitches: PositionPair[] = [];
 
