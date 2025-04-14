@@ -1,4 +1,5 @@
 <svelte:document onmouseup={resetVelocity} />
+{#if group}
   <div id="group-countdown-{group.group}"
      class="countdown {countdownSpeedClass(ttl)} {accelerating ? 'countdown-accelerating' : ''}"
      style="position: relative;"
@@ -11,8 +12,9 @@
 >
   <!-- leaving here for debugging only -->
 <!--  <span style="font-size: 15px">{ formatTtl(ttl) }<br/><span style="font-size: 12px">#{group.group}</span></span>-->
-  { formatTtl(ttl) }
-</div>
+    { formatTtl(ttl) }
+  </div>
+{/if}
 <script lang="ts">
 
   import Group from "$lib/game/Group.js";
@@ -60,7 +62,8 @@
   })
 
   function accelerate(g: number) {
-    if (g == group.group) {
+    // we should always have a group, unless sometimes we don't, so just check
+    if (group && (g == group.group)) {
       if (!accelerating) {
         accelerating = true;
         // increase initial speed
