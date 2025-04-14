@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import Group from "./Group";
+import Group from "./Group.svelte";
 import Position from "./geometry/Position";
 import Piece from "$lib/game/piece/Piece";
 
