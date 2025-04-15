@@ -9,7 +9,7 @@ export default class Group {
   // (more than that, ttl is managed outside in the countdown component,
   //  that is historical)
   ttl: number = $state(0);
-  public accelerateTime = 0;
+  public acceleratedTime = 0;
 
   static fromPiece(position: Position, piece: Piece): Group {
     return new Group(
@@ -34,12 +34,12 @@ export default class Group {
     this.ttl = ttl;
   }
 
-  setTtl(ttl: number) {
-    this.ttl = ttl;
+  addAcceleratedTime(time: number) {
+    this.acceleratedTime += time;
   }
 
-  addAccelerateTime(time: number) {
-    this.accelerateTime += time;
+  setTtl(ttl: number) {
+    this.ttl = ttl;
   }
 
 }

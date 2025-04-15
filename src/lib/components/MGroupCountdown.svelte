@@ -114,7 +114,7 @@
       const newTtl = Math.floor((group.ttl-currentTimeout/1000)*10) / 10;
       if (accelerating) {
         // not exact as some time would have passed without acceleration too
-        group.addAccelerateTime(prevTtl - newTtl);
+        group.addAcceleratedTime(prevTtl - newTtl);
       }
       if (newTtl <= 0) {
         group.setTtl(0);

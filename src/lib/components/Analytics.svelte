@@ -13,7 +13,7 @@
   import { dev, version } from '$app/environment';
   import type Piece from "$lib/game/piece/Piece";
   import playStore from "$lib/playStore.svelte";
-  import type Group from "$lib/game/Group";
+  import type Group from "$lib/game/Group.svelte";
 
   let {
     measurementId,
@@ -28,6 +28,16 @@
     'wait_for_update': 500,
   }
   let boardSize = $derived(playStore.boardSizeX + playStore.boardSizeY);
+  let versionNumber: number = $derived.by(() => {
+    const v = version.split('.').reverse();
+    let ret = 0;
+    let i = 1;
+    v.forEach(each => {
+      ret += each * i;
+      i*= 100;
+    });
+    return ret;
+  })
 
   onMount(() => {
 
@@ -54,9 +64,9 @@
 
     const config: {
       debug_mode?: boolean,
-      v: string,
+      version: number,
     } = {
-      v: version,
+      version: versionNumber,
     };
 
     if (dev) {
@@ -87,24 +97,12 @@
       boardSize,
       boardSizeBefore: event.boardSizeBefore.sizeX + event.boardSizeBefore.sizeY,
       expansions: event.expansions,
-      version,
+      version: versionNumber,
     });
   }
 
   function onFullScreen(fullscreen: boolean) {
-    gtag('event', 'fullscreen', {fullscreen, version});
-  }
-
-  function onGroupExpired(event: {
-    group: Group,
-  }) {
-    gtag('event', 'groupExpired', {
-      accelerateTime: event.group.accelerateTime,
-      boardSize,
-      score: event.group.score,
-      weight: event.group.weight,
-      version
-    });
+    gtag('event', 'fullscreen', {fullscreen, version: versionNumber});
   }
 
   function onGroupCreated(event: {
@@ -122,7 +120,19 @@
       stitchCount: event.stitchCount,
       availableColorCount: playStore.availableColors.length,
       boardSize,
-      version,
+      version: versionNumber,
+    });
+  }
+
+  function onGroupExpired(event: {
+    group: Group,
+  }) {
+    gtag('event', 'groupExpired', {
+      acceleratedTime: event.group.acceleratedTime,
+      boardSize,
+      score: event.group.score,
+      weight: event.group.weight,
+      version: versionNumber
     });
   }
 
@@ -139,7 +149,7 @@
         shape: event.piece.shape,
         availableColorCount: playStore.availableColors.length,
         boardSize,
-        version,
+        version: versionNumber,
       })
     }
   }
