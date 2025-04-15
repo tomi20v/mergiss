@@ -1,6 +1,7 @@
 import type {PixelMapType} from "$lib/game/piece/PixelMapType";
 import {uniqueId} from "lui-g";
 import { FlatteningIterator } from "@tomi20v/iterators";
+import now from "$lib/util/now";
 
 export default class Piece {
 
@@ -10,8 +11,8 @@ export default class Piece {
   readonly shadowColor: string;
   // when re-constructed from JSON, this originalTs will hold original value
   readonly originalUniqueId: string = '';
-
   readonly uniqueId: string = uniqueId();
+  readonly createdTime: number = now();
 
   static fromJSON(json: string): Piece {
     const data = JSON.parse(json);
@@ -30,6 +31,7 @@ export default class Piece {
     this.color = color;
     this.shadowColor = shadowColor;
     this.originalUniqueId = originalUniqueId;
+    this.createdTime = now();
   }
 
   get weight(): number {

@@ -1,6 +1,7 @@
 import type Position from "$lib/game/geometry/Position";
 import type Piece from "$lib/game/piece/Piece";
 import {numericId} from "$lib/util/numericId";
+import now from "$lib/util/now";
 
 export default class Group {
 
@@ -18,7 +19,8 @@ export default class Group {
       piece.weight,
       piece.weight,
       // 4.5 seems to have nicer css animation than typical 4 \@/
-      piece.weight + 0.5
+      piece.weight + 0.5,
+      now()
     );
   }
 
@@ -27,8 +29,9 @@ export default class Group {
     readonly centerX: number,
     readonly centerY: number,
     readonly weight: number,
-    readonly score: number = weight,
+    readonly score: number,
     ttl: number,
+    public readonly createdAt: number
   ) {
     this.group = numericId();
     this.ttl = ttl;

@@ -12,13 +12,15 @@ const anyShape = 'anyShape';
 describe('Goup', () => {
 
   it('should create an instance of Goup', () => {
-    const group = new Group(anyCenter.x, anyCenter.y, anyWeight, anyScore, anyTtl);
+    const anyNow = 78126;
+    const group = new Group(anyCenter.x, anyCenter.y, anyWeight, anyScore, anyTtl, anyNow);
     expect(group).toBeInstanceOf(Group);
     expect(group.centerX).toEqual(anyCenter.x);
     expect(group.centerY).toEqual(anyCenter.y);
     expect(group.weight).toEqual(anyWeight);
     expect(group.score).toEqual(anyScore);
     expect(group.ttl).toEqual(anyTtl);
+    expect(group.createdAt).toEqual(anyNow);
   });
 
   it('should create from piece', () => {

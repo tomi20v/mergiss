@@ -228,6 +228,7 @@
         w,
         score,
         ttl,
+        Math.min(prev.createdAt, curr.createdAt)
       );
     }
   }

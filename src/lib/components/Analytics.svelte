@@ -38,7 +38,7 @@
     let ret = 0;
     let i = 1;
     v.forEach((each: string) => {
-      ret += each.to * i;
+      ret += parseFloat(each) * i;
       i*= 100;
     });
     return ret;
@@ -140,6 +140,7 @@
       score: event.group.score,
       weight: event.group.weight,
       elapsed: elapsed(lastGroupExpired),
+      life: elapsed(event.group.createdAt),
       version: versionNumber
     });
     lastGroupExpired = now();
@@ -159,6 +160,7 @@
         availableColorCount: playStore.availableColors.length,
         boardSize,
         elapsed: elapsed(lastPieceToBoard),
+        life: elapsed(event.piece.createdTime),
         version: versionNumber,
       });
       lastPieceToBoard = now();
