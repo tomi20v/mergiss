@@ -22,12 +22,16 @@
     measurementId: string,
     consentCategories: string[],
   } = $props();
+
+  let boardSize = $derived(playStore.boardSizeX + playStore.boardSizeY);
   let currentCategories: object = {
     'analytics_storage': 'denied',
     'ad_storage': 'denied',
     'wait_for_update': 500,
   }
-  let boardSize = $derived(playStore.boardSizeX + playStore.boardSizeY);
+  let lastBoardExpanded = 0;
+  let lastGroupExpired = 0;
+  let lastPieceDropped = 0;
   let versionNumber: number = $derived.by(() => {
     const v = version.split('.').reverse();
     let ret = 0;
@@ -97,8 +101,10 @@
       boardSize,
       boardSizeBefore: event.boardSizeBefore.sizeX + event.boardSizeBefore.sizeY,
       expansions: event.expansions,
+      elapsed: lastBoardExpanded ? 0 : elapsed(lastBoardExpanded),
       version: versionNumber,
     });
+    lastBoardExpanded = timeNow();
   }
 
   function onFullScreen(fullscreen: boolean) {
@@ -132,8 +138,10 @@
       boardSize,
       score: event.group.score,
       weight: event.group.weight,
+      elapsed: elapsed(lastGroupExpired),
       version: versionNumber
     });
+    lastGroupExpired = timeNow();
   }
 
   function onPieceDropped(event: {
@@ -149,9 +157,19 @@
         shape: event.piece.shape,
         availableColorCount: playStore.availableColors.length,
         boardSize,
+        elapsed: elapsed(lastPieceDropped),
         version: versionNumber,
-      })
+      });
+      lastPieceDropped = timeNow();
     }
+  }
+
+  function timeNow() {
+    return (new Date()).getTime()/1000;
+  }
+
+  function elapsed(lastTime: number) {
+    return lastTime ? timeNow() - lastTime : 0;
   }
 
 </script>
