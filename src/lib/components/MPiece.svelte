@@ -34,6 +34,7 @@
   import {blur} from "svelte/transition";
   import {bounceOut} from "svelte/easing";
   import MouseButtons from "$lib/MouseButtons";
+  import now from "$lib/util/now";
 
   const DragAtOptions = {
     topLeft: 0,
@@ -117,7 +118,7 @@
     setTimeout(() => uiBus.emit('pieceDrop', {
       piece,
       dragAt: new Position(dragAtX, dragAtY, dragRotation),
-      dragTime: Date.now()/1000 - dragStartTime,
+      dragTime: now() - dragStartTime,
       rotationCount,
     }));
   }
@@ -128,7 +129,7 @@
     dragButton = event.button;
     dragRotation = 0;
     rotationCount = 0;
-    dragStartTime = Date.now()/1000;
+    dragStartTime = now();
 
     // Ensure the target is an HTMLElement
     const target = event.currentTarget as HTMLElement;

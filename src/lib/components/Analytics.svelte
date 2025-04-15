@@ -14,6 +14,7 @@
   import type Piece from "$lib/game/piece/Piece";
   import playStore from "$lib/playStore.svelte";
   import type Group from "$lib/game/Group.svelte";
+  import now from "$lib/util/now";
 
   let {
     measurementId,
@@ -36,8 +37,8 @@
     const v = version.split('.').reverse();
     let ret = 0;
     let i = 1;
-    v.forEach(each => {
-      ret += each * i;
+    v.forEach((each: string) => {
+      ret += each.to * i;
       i*= 100;
     });
     return ret;
@@ -104,7 +105,7 @@
       elapsed: lastBoardExpanded ? 0 : elapsed(lastBoardExpanded),
       version: versionNumber,
     });
-    lastBoardExpanded = timeNow();
+    lastBoardExpanded = now();
   }
 
   function onFullScreen(fullscreen: boolean) {
@@ -141,7 +142,7 @@
       elapsed: elapsed(lastGroupExpired),
       version: versionNumber
     });
-    lastGroupExpired = timeNow();
+    lastGroupExpired = now();
   }
 
   function onPieceDropped(event: {
@@ -160,16 +161,12 @@
         elapsed: elapsed(lastPieceToBoard),
         version: versionNumber,
       });
-      lastPieceToBoard = timeNow();
+      lastPieceToBoard = now();
     }
   }
 
-  function timeNow() {
-    return Date.now()/1000;
-  }
-
   function elapsed(lastTime: number) {
-    return lastTime ? timeNow() - lastTime : 0;
+    return lastTime ? now() - lastTime : 0;
   }
 
 </script>
