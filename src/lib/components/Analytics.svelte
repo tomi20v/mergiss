@@ -31,7 +31,7 @@
   }
   let lastBoardExpanded = 0;
   let lastGroupExpired = 0;
-  let lastPieceDropped = 0;
+  let lastPieceToBoard = 0;
   let versionNumber: number = $derived.by(() => {
     const v = version.split('.').reverse();
     let ret = 0;
@@ -157,15 +157,15 @@
         shape: event.piece.shape,
         availableColorCount: playStore.availableColors.length,
         boardSize,
-        elapsed: elapsed(lastPieceDropped),
+        elapsed: elapsed(lastPieceToBoard),
         version: versionNumber,
       });
-      lastPieceDropped = timeNow();
+      lastPieceToBoard = timeNow();
     }
   }
 
   function timeNow() {
-    return (new Date()).getTime()/1000;
+    return Date.now()/1000;
   }
 
   function elapsed(lastTime: number) {

@@ -117,7 +117,7 @@
     setTimeout(() => uiBus.emit('pieceDrop', {
       piece,
       dragAt: new Position(dragAtX, dragAtY, dragRotation),
-      dragTime: ((new Date()).getTime() - dragStartTime)/1000,
+      dragTime: Date.now()/1000 - dragStartTime,
       rotationCount,
     }));
   }
@@ -128,7 +128,7 @@
     dragButton = event.button;
     dragRotation = 0;
     rotationCount = 0;
-    dragStartTime = (new Date()).getTime();
+    dragStartTime = Date.now()/1000;
 
     // Ensure the target is an HTMLElement
     const target = event.currentTarget as HTMLElement;
