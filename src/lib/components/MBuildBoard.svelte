@@ -328,6 +328,8 @@
       if (groupUnder) {
         overlaps++;
         groupIdsToMerge.add(groupUnder);
+        const p = new Position(i.x, i.y);
+        stitches.push(sortedPositionPair(p, p, stitchLevel(p, piece.color, p, fields[i.y][i.x].color)));
       }
       fields[i.y][i.x].color = piece.color;
       fields[i.y][i.x].group = newGroup.group;
