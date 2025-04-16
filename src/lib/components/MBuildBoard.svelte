@@ -35,10 +35,10 @@
   import {FlatteningIterator, move, rotateCoords,} from "@tomi20v/iterators";
   import Group from "$lib/game/Group.svelte";
   import playStore from "$lib/playStore.svelte";
-  import {type PositionPair, sortedPositionPair} from "$lib/game/geometry/positionPair";
+  import {sortedPositionPair} from "$lib/game/geometry/positionPair";
   import {EDirection} from "$lib/game/geometry/EDirection";
   import throttle from 'lodash.throttle';
-  import {stitchLevel} from "$lib/game/stitches";
+  import {type Stitch, stitchLevel} from "$lib/game/stitches";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -318,7 +318,7 @@
     const newGroup = Group.fromPiece(new Position(p.x/p.cnt, p.y/p.cnt), piece);
     const groupIdsToMerge: Set<number> = new Set();
     let overlaps = 0;
-    const stitches: PositionPair[] = [];
+    const stitches: Stitch[] = [];
     let mergedGroup!: Group;
 
     // set fields to contain new color and group, gather groups with which the new piece overlaps
@@ -329,7 +329,11 @@
         overlaps++;
         groupIdsToMerge.add(groupUnder);
         const p = new Position(i.x, i.y);
-        stitches.push(sortedPositionPair(p, p, stitchLevel(p, piece.color, p, fields[i.y][i.x].color)));
+        stitches.push({
+          ...sortedPositionPair(p, p),
+          level: stitchLevel(p, piece.color, p, fields[i.y][i.x].color ?? ''),
+          group: newGroup.group,
+        });
       }
       fields[i.y][i.x].color = piece.color;
       fields[i.y][i.x].group = newGroup.group;
@@ -349,12 +353,11 @@
           groupIdsToMerge.add(otherGroupId);
           if (otherGroupId != newGroup.group) {
             // Set cnt to 1 if colors match, 0 if different
-            const pair = sortedPositionPair(
-              position,
-              otherPosition,
-              stitchLevel(position, piece.color, otherPosition, otherField.color)
-            );
-            stitches.push(pair);
+            stitches.push({
+              ...sortedPositionPair(position, otherPosition),
+              level: stitchLevel(position, piece.color, otherPosition, otherField.color ?? ''),
+              group: newGroup.group,
+            });
           }
         })
     }

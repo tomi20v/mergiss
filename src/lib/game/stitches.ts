@@ -1,4 +1,5 @@
 import type Position from "$lib/game/geometry/Position";
+import type {PositionPair} from "$lib/game/geometry/positionPair";
 
 enum EStitchLevel {
   normal = 1,
@@ -26,4 +27,9 @@ function stitchLevel(
   return EStitchLevel.matchingColors;
 }
 
-export { EStitchLevel, stitchLevel };
+type Stitch = PositionPair & {
+  level: EStitchLevel;
+  group: number;
+}
+
+export { EStitchLevel, stitchLevel, type Stitch };
