@@ -38,6 +38,7 @@
   import {type PositionPair, sortedPositionPair} from "$lib/game/geometry/positionPair";
   import {EDirection} from "$lib/game/geometry/EDirection";
   import throttle from 'lodash.throttle';
+  import {stitchLevel} from "$lib/game/stitches";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -333,17 +334,25 @@
     }
 
     // look around each field and check touching groups
+    // stitches for underlying fields were added already
     for (const i of iterator) {
       if (!i.value) continue;
       const position = new Position(i.x, i.y);
       boardPositionsAround(position)
         .forEach(otherPosition => {
-          const otherGroupId = fields[otherPosition.atY][otherPosition.atX].group;
+          const otherField = fields[otherPosition.atY][otherPosition.atX];
+          const otherGroupId = otherField.group;
           if (!otherGroupId) return;
           // this will pick up newGroup.id as well, so it will be merged too
           groupIdsToMerge.add(otherGroupId);
           if (otherGroupId != newGroup.group) {
-            stitches.push(sortedPositionPair(position, otherPosition));
+            // Set cnt to 1 if colors match, 0 if different
+            const pair = sortedPositionPair(
+              position,
+              otherPosition,
+              stitchLevel(position, piece.color, otherPosition, otherField.color)
+            );
+            stitches.push(pair);
           }
         })
     }
