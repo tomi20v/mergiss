@@ -11,6 +11,10 @@
   import {onMount} from "svelte";
   import CookieConsent from "$lib/components/CookieConsent.svelte";
   import { dev, version } from '$app/environment';
+  import type Piece from "$lib/game/piece/Piece";
+  import playStore from "$lib/playStore.svelte";
+  import type Group from "$lib/game/Group.svelte";
+  import now from "$lib/util/now";
 
   let {
     measurementId,
@@ -19,19 +23,37 @@
     measurementId: string,
     consentCategories: string[],
   } = $props();
+
+  let boardSize = $derived(playStore.boardSizeX + playStore.boardSizeY);
   let currentCategories: object = {
     'analytics_storage': 'denied',
     'ad_storage': 'denied',
     'wait_for_update': 500,
   }
+  let lastBoardExpanded = 0;
+  let lastGroupExpired = 0;
+  let lastPieceToBoard = 0;
+  let versionNumber: number = $derived.by(() => {
+    const v = version.split('.').reverse();
+    let ret = 0;
+    let i = 1;
+    v.forEach((each: string) => {
+      ret += parseFloat(each) * i;
+      i*= 100;
+    });
+    return ret;
+  })
 
   onMount(() => {
 
     initAnalytics();
 
     for (const [eventName, handler] of Object.entries({
-      // onGroupExpire,
+      boardExpanded: onBoardExpanded,
+      groupCreated: onGroupCreated,
+      groupExpired: onGroupExpired,
       onFullScreen,
+      pieceDropped: onPieceDropped,
     })) {
       uiBus.on(eventName, handler);
     }
@@ -47,9 +69,9 @@
 
     const config: {
       debug_mode?: boolean,
-      v: string,
+      version: number,
     } = {
-      v: version,
+      version: versionNumber,
     };
 
     if (dev) {
@@ -71,12 +93,82 @@
     gtag('consent', 'update', categoryMap);
   }
 
-  function onFullScreen(fullscreen: boolean) {
-    gtag('event', 'fullscreen', {fullscreen, v: version});
+  function onBoardExpanded(event: {
+    origin: string,
+    boardSizeBefore: {sizeX: number, sizeY: number},
+    expansions: number,
+  }) {
+    gtag('event', 'boardExpanded', {
+      boardSize,
+      boardSizeBefore: event.boardSizeBefore.sizeX + event.boardSizeBefore.sizeY,
+      expansions: event.expansions,
+      elapsed: lastBoardExpanded ? 0 : elapsed(lastBoardExpanded),
+      version: versionNumber,
+    });
+    lastBoardExpanded = now();
   }
 
-  // function onGroupExpire(group: Group) {
-  //   gtag('event', 'groupExpired', {group, v: version});
-  // }
+  function onFullScreen(fullscreen: boolean) {
+    gtag('event', 'fullscreen', {fullscreen, version: versionNumber});
+  }
+
+  function onGroupCreated(event: {
+    group: Group,
+    mergedGroupCount: number,
+    overlaps: number,
+    stitchCount: number,
+  }) {
+    gtag('event', 'groupCreated', {
+      ttl: event.group.ttl,
+      score: event.group.score,
+      weight: event.group.weight,
+      mergedGroupCount: event.mergedGroupCount,
+      overlaps: event.overlaps,
+      stitchCount: event.stitchCount,
+      availableColorCount: playStore.availableColors.length,
+      boardSize,
+      version: versionNumber,
+    });
+  }
+
+  function onGroupExpired(event: {
+    group: Group,
+  }) {
+    gtag('event', 'groupExpired', {
+      acceleratedTime: event.group.acceleratedTime,
+      boardSize,
+      score: event.group.score,
+      weight: event.group.weight,
+      elapsed: elapsed(lastGroupExpired),
+      life: elapsed(event.group.createdAt),
+      version: versionNumber
+    });
+    lastGroupExpired = now();
+  }
+
+  function onPieceDropped(event: {
+    origin: string,
+    piece: Piece,
+    dragTime: number,
+    rotationCount: number,
+  }) {
+    if (event.origin == 'mergeBoard') {
+      gtag('event', 'pieceToBoard', {
+        dragTime: event.dragTime,
+        rotationCount: event.rotationCount,
+        shape: event.piece.shape,
+        availableColorCount: playStore.availableColors.length,
+        boardSize,
+        elapsed: elapsed(lastPieceToBoard),
+        life: elapsed(event.piece.createdTime),
+        version: versionNumber,
+      });
+      lastPieceToBoard = now();
+    }
+  }
+
+  function elapsed(lastTime: number) {
+    return lastTime ? now() - lastTime : 0;
+  }
 
 </script>

@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.7.10",
-  "description": "fix group acceleration",
+  "version": "0.7.11",
+  "description": "measure block movements",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {

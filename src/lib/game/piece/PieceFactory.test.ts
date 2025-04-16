@@ -24,10 +24,11 @@ describe('PieceFactory.ts', () => {
 
     const pieceFactory = new PieceFactory();
 
-    test.each(pieceCatalogue)('should create', (eachProtoMap) => {
-      (randomArrayItem as Mock).mockReturnValue(eachProtoMap);
+    test.each(Object.keys(pieceCatalogue))('should create', (eachShape) => {
+      (randomArrayItem as Mock).mockReturnValue(eachShape);
       const p = pieceFactory.randomPiece();
-      expect(p.pixelMap).to.equal(eachProtoMap);
+      expect(p.shape).to.equal(eachShape);
+      expect(p.pixelMap).to.equal(pieceCatalogue[eachShape]);
       expect(p.color).to.equal(anyColor);
       expect(p.shadowColor).to.equal(anyOtherColor);
       expect(p.uniqueId).not.to.equal('');

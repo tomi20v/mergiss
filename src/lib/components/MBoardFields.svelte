@@ -40,8 +40,8 @@
           ></div>
         {/if}
 
-        {#if (groupCenterAt(iX+startX, iY+startY))}
-          {@const group = groupCenterAt(iX+startX, iY+startY)}
+        {#if (groupCenterAt(iX, iY))}
+          {@const group = groupCenterAt(iX, iY)}
           <div class="flex m-0.5 absolute top-0 right-0 bottom-0 left-0 items-center justify-center">
             <MGroupCountdown group={group as Group} color={''} />
           </div>

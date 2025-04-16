@@ -1,19 +1,20 @@
 import { describe, expect, it, test } from "vitest";
 import Piece from "$lib/game/piece/Piece";
 import pieceCatalogue from "$lib/game/piece/pieceCatalogue";
-import type {PixelMapType} from "$lib/game/piece/PixelMapType";
 import { FlatteningIterator } from "@tomi20v/iterators";
 
 const anyProtoMap = [[1,0],[1,1]];
+const anyShape = 'anyShape';
 const anyColor = 'anyColor';
 const anyShadowColor = 'anyShadowColor';
 const anyUniqueId = '12487';
 
 describe('Piece.ts', () => {
 
-  describe.each(pieceCatalogue)('with each protomap', (...eachProtoMap: PixelMapType) => {
+  describe.each(Object.keys(pieceCatalogue))('with each protomap', (eachShape) => {
 
-    const p = new Piece(eachProtoMap, anyColor, anyShadowColor);
+    const eachProtoMap = pieceCatalogue[eachShape];
+    const p = new Piece(eachShape, eachProtoMap, anyColor, anyShadowColor);
 
     it('should construct', () => {
       expect(p.pixelMap).toEqual(eachProtoMap);
@@ -33,17 +34,18 @@ describe('Piece.ts', () => {
   });
 
   it('should return default size X 0', () => {
-    const p = new Piece([], anyColor, anyShadowColor);
+    const p = new Piece(anyShape, [], anyColor, anyShadowColor);
     expect(p.sizeX()).toEqual(0);
   })
 
   it('should take original unique ID', () => {
-    const p = new Piece(anyProtoMap, anyColor, anyShadowColor, anyUniqueId);
+    const p = new Piece(anyShape, pieceCatalogue[anyShape], anyColor, anyShadowColor, anyUniqueId);
     expect(p.originalUniqueId).toEqual(anyUniqueId);
   });
 
   it('should create from JSON', () => {
     const json = JSON.stringify({
+      shape: anyShape,
       pixelMap: anyProtoMap,
       color: anyColor,
       shadowColor: anyShadowColor,
@@ -57,12 +59,12 @@ describe('Piece.ts', () => {
   })
 
   it('should return weight', () => {
-    const p = new Piece([[1,0],[1,1]], anyColor, anyShadowColor);
+    const p = new Piece(anyShape, [[1,0],[1,1]], anyColor, anyShadowColor);
     expect(p.weight).toEqual(3);
   })
 
   it('should return flat iterator', () => {
-    const p = new Piece(anyProtoMap, anyColor, anyShadowColor);
+    const p = new Piece(anyShape, anyProtoMap, anyColor, anyShadowColor);
     const iter = p.getFlatIterator();
     expect(iter).toBeInstanceOf(FlatteningIterator);
     expect((iter as any).data).toEqual(anyProtoMap);
@@ -70,17 +72,17 @@ describe('Piece.ts', () => {
   })
 
   it('should test equality', () => {
-    const p1 = new Piece(anyProtoMap, anyColor, anyShadowColor);
+    const p1 = new Piece(anyShape, anyProtoMap, anyColor, anyShadowColor);
     expect(p1.equals(p1)).toBe(true);
   })
 
   test.each([
-    new Piece(anyProtoMap, anyColor, anyShadowColor),
-    new Piece(anyProtoMap.concat([1,0]), anyColor, anyShadowColor),
-    new Piece(anyProtoMap, anyColor, anyShadowColor),
-    new Piece(anyProtoMap, anyColor, anyShadowColor),
+    new Piece(anyShape, anyProtoMap, anyColor, anyShadowColor),
+    new Piece(anyShape, anyProtoMap.concat([1,0]), anyColor, anyShadowColor),
+    new Piece(anyShape, anyProtoMap, anyColor, anyShadowColor),
+    new Piece(anyShape, anyProtoMap, anyColor, anyShadowColor),
   ])('should return false when not equal', (otherPiece) => {
-    const p1 = new Piece(anyProtoMap, anyColor, anyShadowColor);
+    const p1 = new Piece(anyShape, anyProtoMap, anyColor, anyShadowColor);
     expect(p1.equals(otherPiece)).toBe(false);
   })
 

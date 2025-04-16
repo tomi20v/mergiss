@@ -33,6 +33,7 @@
   import {uiBus} from "$lib/util/uiBus";
   import playStore from "$lib/playStore.svelte";
   import CircularProgress from '@smui/circular-progress';
+  import now from "$lib/util/now";
 
   let { disabled = false } = $props();
 
@@ -74,7 +75,7 @@
     if (!disabled && !piece) {
       // when still in progress, skip 1 second, and increase current value accordingly
       if (progress < 1) {
-        progressEndAt = Math.max((new Date()).getTime()/1000, progressEndAt - 1);
+        progressEndAt = Math.max(now(), progressEndAt - 1);
         progress = Math.min(1, progress + 1/playStore.generatorTime);
       }
       // if we're already in easing, we can just skip to generating the piece
@@ -99,12 +100,12 @@
   }
 
   function startProgress() {
-    progressEndAt = (new Date()).getTime()/1000 + playStore.generatorTime - easingTime;
+    progressEndAt = now() + playStore.generatorTime - easingTime;
   }
 
   function update() {
     if (!disabled && !piece && progress < 1) {
-      const remainingDuration = Math.max(0, progressEndAt - (new Date()).getTime()/1000);
+      const remainingDuration = Math.max(0, progressEndAt - now());
       progress = Math.min(1, progress + interval/remainingDuration);
       if (progress == 1) {
         inEasing = true;

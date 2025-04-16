@@ -16,7 +16,7 @@
 {/if}
 <script lang="ts">
 
-  import Group from "$lib/game/Group.svelte.js";
+  import Group from "$lib/game/Group.svelte";
   import { onMount, onDestroy } from "svelte";
   import colors from "$lib/game/colors";
   import {uiBus} from "$lib/util/uiBus";
@@ -110,7 +110,12 @@
       if (accelerating) {
         currentTimeout = Math.max(currentTimeout * q, minTimeout);
       }
+      const prevTtl = group.ttl;
       const newTtl = Math.floor((group.ttl-currentTimeout/1000)*10) / 10;
+      if (accelerating) {
+        // not exact as some time would have passed without acceleration too
+        group.addAcceleratedTime(prevTtl - newTtl);
+      }
       if (newTtl <= 0) {
         group.setTtl(0);
         clearTimeout(timerId as unknown as number);

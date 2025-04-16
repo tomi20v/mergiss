@@ -34,6 +34,7 @@
   import {blur} from "svelte/transition";
   import {bounceOut} from "svelte/easing";
   import MouseButtons from "$lib/MouseButtons";
+  import now from "$lib/util/now";
 
   const DragAtOptions = {
     topLeft: 0,
@@ -106,13 +107,20 @@
   let dragging = $derived(dragButton !== MouseButtons.NOBUTTON);
   let dragImage!: HTMLElement;
   let dragRotation = $state(0);
+  let dragStartTime = 0;
+  let rotationCount = 0;
 
   function dragDrop() {
     // this eliminates flickering between mouseup and removing the piece (if it is to be removed)
     setTimeout(() => dragButton = MouseButtons.NOBUTTON, 1);
     document.body.removeChild(dragImage);
     // putting in a setTimeout results in better sequence: mouseUp here, enter on other (board cell), onPieceDrop on other (board)
-    setTimeout(() => uiBus.emit('pieceDrop', {piece, dragAt: new Position(dragAtX, dragAtY, dragRotation)}));
+    setTimeout(() => uiBus.emit('pieceDrop', {
+      piece,
+      dragAt: new Position(dragAtX, dragAtY, dragRotation),
+      dragTime: now() - dragStartTime,
+      rotationCount,
+    }));
   }
 
   // specific mouse down on piece itself (fires before generic onMouseDown)
@@ -120,6 +128,8 @@
 
     dragButton = event.button;
     dragRotation = 0;
+    rotationCount = 0;
+    dragStartTime = now();
 
     // Ensure the target is an HTMLElement
     const target = event.currentTarget as HTMLElement;
@@ -197,6 +207,7 @@
     if (dragging) {
       dragRotation += clockwise ? 90 : -90;
       dragImage.style.transform = `rotate(${dragRotation}deg)`;
+      rotationCount++;
     }
   }
 
