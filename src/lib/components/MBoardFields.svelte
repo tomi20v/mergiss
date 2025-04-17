@@ -116,7 +116,9 @@
         stitches.splice(stitches.indexOf(s), 1);
         uiBus.emit('stitchExpired', {stitch: s, htmlId: 'stitch-' + stitch.id});
       }
-    }, 300);
+    // }, 300);
+    // looks better with a bit of randomization
+    }, 150 + Math.random() * 500);
   }
 
   function stitchesAt(atX: number, atY: number): PositionPair[] {
