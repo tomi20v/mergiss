@@ -2,9 +2,9 @@ import type Position from "$lib/game/geometry/Position";
 import type {PositionPair} from "$lib/game/geometry/positionPair";
 
 enum EStitchLevel {
-  normal = 1,
-  matchingColors = 2,
-  matchingColorsOverlap = 3,
+  normal,
+  matchingColors,
+  matchingColorsOverlap,
 }
 
 function stitchLevel(

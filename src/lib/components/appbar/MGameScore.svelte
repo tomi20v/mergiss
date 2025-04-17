@@ -18,14 +18,20 @@
   import { Spring, Tween, } from "svelte/motion";
   import { expoOut } from "svelte/easing";
   import type Group from "$lib/game/Group.svelte";
-  import type {PositionPair} from "$lib/game/geometry/positionPair";
   import {flyTo} from "$lib/util/flyTo";
+  import {EStitchLevel, type Stitch} from "$lib/game/stitches";
 
   const htmlId = 'game-score';
   // these together (and with addScore) make a nice "pop" when score is increased
   let scale = new Spring(1, { stiffness: 0.8, damping: 1 });
   let score = Tween.of(() => playStore.score, {duration: 300, easing: expoOut});
   let scoreFormatted = $derived(Math.floor(score.current).toLocaleString());
+
+  const stitchLevelMultipliers: Record<EStitchLevel, number> = {
+    [EStitchLevel.normal]: 1,
+    [EStitchLevel.matchingColors]: Math.sqrt(2),
+    [EStitchLevel.matchingColorsOverlap]: Math.sqrt(5),
+  };
 
   // DEV code only
   if (import.meta.env.MODE === 'development') {
@@ -43,10 +49,13 @@
     uiBus.off("stitchExpired");
   })
 
-  function addScore(score: number) {
-    playStore.score += score;
+  function addScore(score: number): number {
+    // here we can apply bonuses later
+    const scoreToAdd = score;
+    playStore.score += scoreToAdd;
     scale.set(1.18);
     setTimeout(() => scale.set(1), 150);
+    return scoreToAdd;
   }
 
   function flyToScore(flyId: string, onTransitionEnd: () => void = () => {}) {
@@ -57,14 +66,16 @@
     flyToScore(htmlId, () => addScore(group.score));
   }
 
-  function onStitchExpired({stitch, htmlId}: { stitch: PositionPair, htmlId: string}) {
+  function onStitchExpired({stitch, htmlId}: { stitch: Stitch, htmlId: string}) {
     // using sqrt will keep the earned points more linear (as the event is
     //  emitted as many times as many stitches)
-    flyToScore(htmlId, () => addScore(
-      // Math.sqrt(stitch.cnt||0)
+    flyToScore(htmlId, () => {
+      // const baseScore = Math.sqrt(stitch.cnt||0)
       // let's be a bit more generous, stitches higher than 4 are really rare
-      Math.pow(stitch.cnt||0, 2/3)
-    ));
+      const baseScore = Math.pow(stitch.cnt||0, 2/3) * stitchLevelMultipliers[stitch.level];
+      const score = addScore(baseScore);
+      uiBus.emit("stitchScore", { stitch, baseScore, score });
+    });
   }
 
 </script>
