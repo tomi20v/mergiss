@@ -64,7 +64,7 @@
     for (const [eventName, handler] of Object.entries({
       boardExpanded: onBoardExpanded,
       groupCreated: onGroupCreated,
-      groupExpired: onGroupExpired,
+      groupExpiredScore: onGroupExpired,
       onFullScreen,
       pieceDropped: onPieceDropped,
       stitchScore: onStitchScore,
@@ -143,7 +143,7 @@
       mergedGroupCount: event.mergedGroupCount,
       overlaps: event.overlaps,
       stitchCount: event.stitchCount,
-      availableColorCount: playStore.availableColors.length,
+      availableColorCount,
       boardSize,
       version: versionNumber,
     });
@@ -151,13 +151,15 @@
 
   function onGroupExpired(event: {
     group: Group,
+    score: number,
   }) {
     gtag('event', 'groupExpired', {
       acceleratedTime: event.group.acceleratedTime,
-      boardSize,
-      score: event.group.score,
+      baseScore: event.group.score,
+      score: event.score,
       weight: event.group.weight,
       elapsed: elapsed(lastGroupExpired),
+      boardSize,
       life: elapsed(event.group.createdAt),
       version: versionNumber
     });
@@ -174,11 +176,11 @@
       gtag('event', 'pieceToBoard', {
         dragTime: event.dragTime,
         rotationCount: event.rotationCount,
-        shape: event.piece.shape,
-        availableColorCount: playStore.availableColors.length,
-        boardSize,
         elapsed: elapsed(lastPieceToBoard),
         life: elapsed(event.piece.createdTime),
+        shape: event.piece.shape,
+        availableColorCount,
+        boardSize,
         version: versionNumber,
       });
       lastPieceToBoard = now();

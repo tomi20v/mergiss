@@ -63,7 +63,10 @@
   }
 
   function onGroupExpired({group, htmlId}: { group: Group, htmlId: string}) {
-    flyToScore(htmlId, () => addScore(group.score));
+    flyToScore(htmlId, () => {
+      const score = addScore(group.score);
+      uiBus.emit("groupExpiredScore", { group, score });
+    });
   }
 
   function onStitchExpired({stitch, htmlId}: { stitch: Stitch, htmlId: string}) {
