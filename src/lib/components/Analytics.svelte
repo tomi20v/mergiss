@@ -34,6 +34,7 @@
     'wait_for_update': 500,
   }
   let lastBoardExpanded = 0;
+  let lastGroupCreated = 0;
   let lastGroupExpired = 0;
   let lastPieceToBoard = 0;
   let lastStitchScore = 0;
@@ -117,9 +118,10 @@
     expansions: number,
   }) {
     gtag('event', 'boardExpanded', {
-      boardSize,
       boardSizeBefore: event.boardSizeBefore.sizeX + event.boardSizeBefore.sizeY,
       expansions: event.expansions,
+      availableColorCount,
+      boardSize,
       elapsed: lastBoardExpanded ? 0 : elapsed(lastBoardExpanded),
       version: versionNumber,
     });
@@ -127,7 +129,12 @@
   }
 
   function onFullScreen(fullscreen: boolean) {
-    gtag('event', 'fullscreen', {fullscreen, version: versionNumber});
+    gtag('event', 'fullscreen', {
+      fullscreen,
+      availableColorCount,
+      boardSize,
+      version: versionNumber
+    });
   }
 
   function onGroupCreated(event: {
@@ -137,16 +144,18 @@
     stitchCount: number,
   }) {
     gtag('event', 'groupCreated', {
-      ttl: event.group.ttl,
-      score: event.group.score,
-      weight: event.group.weight,
       mergedGroupCount: event.mergedGroupCount,
       overlaps: event.overlaps,
+      baseScore: event.group.score,
+      ttl: event.group.ttl,
+      weight: event.group.weight,
       stitchCount: event.stitchCount,
       availableColorCount,
       boardSize,
+      elapsed: elapsed(lastGroupCreated),
       version: versionNumber,
     });
+    lastGroupCreated = now();
   }
 
   function onGroupExpired(event: {
@@ -156,11 +165,12 @@
     gtag('event', 'groupExpired', {
       acceleratedTime: event.group.acceleratedTime,
       baseScore: event.group.score,
+      lifeTime: elapsed(event.group.createdAt),
       score: event.score,
       weight: event.group.weight,
-      elapsed: elapsed(lastGroupExpired),
+      availableColorCount,
       boardSize,
-      life: elapsed(event.group.createdAt),
+      elapsed: elapsed(lastGroupExpired),
       version: versionNumber
     });
     lastGroupExpired = now();
@@ -176,11 +186,11 @@
       gtag('event', 'pieceToBoard', {
         dragTime: event.dragTime,
         rotationCount: event.rotationCount,
-        elapsed: elapsed(lastPieceToBoard),
         life: elapsed(event.piece.createdTime),
         shape: event.piece.shape,
         availableColorCount,
         boardSize,
+        elapsed: elapsed(lastPieceToBoard),
         version: versionNumber,
       });
       lastPieceToBoard = now();
@@ -193,7 +203,7 @@
     score: number
   }) {
     const groupId = event.stitch.group;
-    
+
     // Get or create aggregation for this group
     let aggregation = stitchAggregates.get(groupId);
     if (!aggregation) {
@@ -215,7 +225,7 @@
 
     // Reset the debounce timer
     aggregation.debouncedSend();
-  
+
   }
 
   // receiving groupId instead of the aggregate is strange but we need
@@ -231,9 +241,9 @@
       maxLevel: aggregate.maxLevel,
       score: aggregate.score,
       stitchCount: aggregate.stitchCount,
-      elapsed: elapsed(lastStitchScore),
       availableColorCount,
       boardSize,
+      elapsed: elapsed(lastStitchScore),
       version: versionNumber,
     });
 
