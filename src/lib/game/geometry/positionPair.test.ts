@@ -47,4 +47,12 @@ describe('sortedPositionPair', () => {
     const result = sortedPositionPair(p1, p2)
     expect(result).toEqual({ p1, p2, id: 42 })
   })
+
+  it('uses provided cnt parameter', () => {
+    const p1 = new Position(1, 1)
+    const p2 = new Position(1, 2)
+    const result = sortedPositionPair(p1, p2, 5)
+    expect(result).toEqual({ p1, p2, id: 42, cnt: 5 })
+  })
+
 })

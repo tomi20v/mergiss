@@ -15,6 +15,8 @@
   import playStore from "$lib/playStore.svelte";
   import type Group from "$lib/game/Group.svelte";
   import now from "$lib/util/now";
+  import type {Stitch} from "$lib/game/stitches";
+  import debounce from 'lodash.debounce';
 
   let {
     measurementId,
@@ -24,6 +26,7 @@
     consentCategories: string[],
   } = $props();
 
+  let availableColorCount = $derived(playStore.availableColors.length);
   let boardSize = $derived(playStore.boardSizeX + playStore.boardSizeY);
   let currentCategories: object = {
     'analytics_storage': 'denied',
@@ -31,8 +34,10 @@
     'wait_for_update': 500,
   }
   let lastBoardExpanded = 0;
+  let lastGroupCreated = 0;
   let lastGroupExpired = 0;
   let lastPieceToBoard = 0;
+  let lastStitchScore = 0;
   let versionNumber: number = $derived.by(() => {
     const v = version.split('.').reverse();
     let ret = 0;
@@ -44,6 +49,15 @@
     return ret;
   })
 
+  type StitchAggregate = {
+    baseScore: number,
+    maxLevel: number
+    score: number,
+    stitchCount: number,
+    debouncedSend: () => void,
+  };
+  let stitchAggregates = new Map<number, StitchAggregate>();
+
   onMount(() => {
 
     initAnalytics();
@@ -51,14 +65,19 @@
     for (const [eventName, handler] of Object.entries({
       boardExpanded: onBoardExpanded,
       groupCreated: onGroupCreated,
-      groupExpired: onGroupExpired,
+      groupExpiredScore: onGroupExpired,
       onFullScreen,
       pieceDropped: onPieceDropped,
+      stitchScore: onStitchScore,
     })) {
       uiBus.on(eventName, handler);
     }
 
   })
+
+  function elapsed(lastTime: number) {
+    return lastTime ? now() - lastTime : 0;
+  }
 
   function gtag(..._: any[]) {
     window.dataLayer = window.dataLayer || [];
@@ -93,82 +112,137 @@
     gtag('consent', 'update', categoryMap);
   }
 
-  function onBoardExpanded(event: {
-    origin: string,
-    boardSizeBefore: {sizeX: number, sizeY: number},
-    expansions: number,
-  }) {
-    gtag('event', 'boardExpanded', {
+  // Refactored common properties function
+  function commonProperties(lastTimestamp?: number) {
+    return {
+      availableColorCount,
       boardSize,
+      elapsed: lastTimestamp ? elapsed(lastTimestamp) : 0,
+      playScore: playStore.score,
+      version: versionNumber,
+    };
+  }
+
+  // Example usage of commonProperties in events below:
+
+  function onBoardExpanded(event: {
+    origin: string;
+    boardSizeBefore: { sizeX: number, sizeY: number };
+    expansions: number;
+  }) {
+    gtag("event", "boardExpanded", {
       boardSizeBefore: event.boardSizeBefore.sizeX + event.boardSizeBefore.sizeY,
       expansions: event.expansions,
-      elapsed: lastBoardExpanded ? 0 : elapsed(lastBoardExpanded),
-      version: versionNumber,
+      ...commonProperties(lastBoardExpanded),
     });
     lastBoardExpanded = now();
   }
 
   function onFullScreen(fullscreen: boolean) {
-    gtag('event', 'fullscreen', {fullscreen, version: versionNumber});
-  }
-
-  function onGroupCreated(event: {
-    group: Group,
-    mergedGroupCount: number,
-    overlaps: number,
-    stitchCount: number,
-  }) {
-    gtag('event', 'groupCreated', {
-      ttl: event.group.ttl,
-      score: event.group.score,
-      weight: event.group.weight,
-      mergedGroupCount: event.mergedGroupCount,
-      overlaps: event.overlaps,
-      stitchCount: event.stitchCount,
-      availableColorCount: playStore.availableColors.length,
-      boardSize,
-      version: versionNumber,
+    gtag("event", "fullscreen", {
+      fullscreen,
+      ...commonProperties(),
     });
   }
 
-  function onGroupExpired(event: {
-    group: Group,
+  function onGroupCreated(event: {
+    group: Group;
+    mergedGroupCount: number;
+    overlaps: number;
+    stitchCount: number;
   }) {
-    gtag('event', 'groupExpired', {
-      acceleratedTime: event.group.acceleratedTime,
-      boardSize,
-      score: event.group.score,
+    gtag("event", "groupCreated", {
+      mergedGroupCount: event.mergedGroupCount,
+      overlaps: event.overlaps,
+      baseScore: event.group.score,
+      ttl: event.group.ttl,
       weight: event.group.weight,
-      elapsed: elapsed(lastGroupExpired),
-      life: elapsed(event.group.createdAt),
-      version: versionNumber
+      stitchCount: event.stitchCount,
+      ...commonProperties(lastGroupCreated),
+    });
+    lastGroupCreated = now();
+  }
+
+  function onGroupExpired(event: {
+    group: Group;
+    score: number;
+  }) {
+    gtag("event", "groupExpired", {
+      acceleratedTime: event.group.acceleratedTime,
+      baseScore: event.group.score,
+      lifeTime: elapsed(event.group.createdAt),
+      score: event.score,
+      weight: event.group.weight,
+      ...commonProperties(lastGroupExpired),
     });
     lastGroupExpired = now();
   }
 
   function onPieceDropped(event: {
-    origin: string,
-    piece: Piece,
-    dragTime: number,
-    rotationCount: number,
+    origin: string;
+    piece: Piece;
+    dragTime: number;
+    rotationCount: number;
   }) {
-    if (event.origin == 'mergeBoard') {
-      gtag('event', 'pieceToBoard', {
+    if (event.origin == "mergeBoard") {
+      gtag("event", "pieceToBoard", {
         dragTime: event.dragTime,
         rotationCount: event.rotationCount,
-        shape: event.piece.shape,
-        availableColorCount: playStore.availableColors.length,
-        boardSize,
-        elapsed: elapsed(lastPieceToBoard),
         life: elapsed(event.piece.createdTime),
-        version: versionNumber,
+        shape: event.piece.shape,
+        ...commonProperties(lastPieceToBoard),
       });
       lastPieceToBoard = now();
     }
   }
 
-  function elapsed(lastTime: number) {
-    return lastTime ? now() - lastTime : 0;
+  function onStitchScore(event: {
+    stitch: Stitch,
+    baseScore: number,
+    score: number
+  }) {
+    const groupId = event.stitch.group;
+
+    // Get or create aggregation for this group
+    let aggregation = stitchAggregates.get(groupId);
+    if (!aggregation) {
+      aggregation = {
+        baseScore: 0,
+        maxLevel: 0,
+        score: 0,
+        stitchCount: 0,
+        debouncedSend: debounce(() => sendStitchScore(groupId), 1000),
+      };
+      stitchAggregates.set(groupId, aggregation);
+    }
+
+    // Aggregate the metrics
+    aggregation.baseScore += event.baseScore;
+    aggregation.maxLevel = Math.max(aggregation.maxLevel, event.stitch.level);
+    aggregation.score += event.score;
+    aggregation.stitchCount++;
+
+    // Reset the debounce timer
+    aggregation.debouncedSend();
+  }
+
+  // receiving groupId instead of the aggregate is strange but we need
+  //  groupId to remove that aggregation (in worst case it would be re-created,
+  //  but group IDs are unique and not reused so makes sense to delete)
+  function sendStitchScore(groupId: number) {
+    const aggregate = stitchAggregates.get(groupId);
+    if (!aggregate) return;
+
+    gtag("event", "stitchScore", {
+      baseScore: aggregate.baseScore,
+      maxLevel: aggregate.maxLevel,
+      score: aggregate.score,
+      stitchCount: aggregate.stitchCount,
+      ...commonProperties(lastStitchScore),
+    });
+
+    lastStitchScore = now();
+    stitchAggregates.delete(groupId);
   }
 
 </script>

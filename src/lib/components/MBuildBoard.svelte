@@ -35,9 +35,10 @@
   import {FlatteningIterator, move, rotateCoords,} from "@tomi20v/iterators";
   import Group from "$lib/game/Group.svelte";
   import playStore from "$lib/playStore.svelte";
-  import {type PositionPair, sortedPositionPair} from "$lib/game/geometry/positionPair";
+  import {sortedPositionPair} from "$lib/game/geometry/positionPair";
   import {EDirection} from "$lib/game/geometry/EDirection";
   import throttle from 'lodash.throttle';
+  import {type Stitch, stitchLevel} from "$lib/game/stitches";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -317,7 +318,7 @@
     const newGroup = Group.fromPiece(new Position(p.x/p.cnt, p.y/p.cnt), piece);
     const groupIdsToMerge: Set<number> = new Set();
     let overlaps = 0;
-    const stitches: PositionPair[] = [];
+    const stitches: Stitch[] = [];
     let mergedGroup!: Group;
 
     // set fields to contain new color and group, gather groups with which the new piece overlaps
@@ -327,23 +328,36 @@
       if (groupUnder) {
         overlaps++;
         groupIdsToMerge.add(groupUnder);
+        const p = new Position(i.x, i.y);
+        stitches.push({
+          ...sortedPositionPair(p, p),
+          level: stitchLevel(p, piece.color, p, fields[i.y][i.x].color ?? ''),
+          group: newGroup.group,
+        });
       }
       fields[i.y][i.x].color = piece.color;
       fields[i.y][i.x].group = newGroup.group;
     }
 
     // look around each field and check touching groups
+    // stitches for underlying fields were added already
     for (const i of iterator) {
       if (!i.value) continue;
       const position = new Position(i.x, i.y);
       boardPositionsAround(position)
         .forEach(otherPosition => {
-          const otherGroupId = fields[otherPosition.atY][otherPosition.atX].group;
+          const otherField = fields[otherPosition.atY][otherPosition.atX];
+          const otherGroupId = otherField.group;
           if (!otherGroupId) return;
           // this will pick up newGroup.id as well, so it will be merged too
           groupIdsToMerge.add(otherGroupId);
           if (otherGroupId != newGroup.group) {
-            stitches.push(sortedPositionPair(position, otherPosition));
+            // Set cnt to 1 if colors match, 0 if different
+            stitches.push({
+              ...sortedPositionPair(position, otherPosition),
+              level: stitchLevel(position, piece.color, otherPosition, otherField.color ?? ''),
+              group: newGroup.group,
+            });
           }
         })
     }
