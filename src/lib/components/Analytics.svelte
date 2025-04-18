@@ -15,6 +15,8 @@
   import playStore from "$lib/playStore.svelte";
   import type Group from "$lib/game/Group.svelte";
   import now from "$lib/util/now";
+  import type {Stitch} from "$lib/game/stitches";
+  import debounce from 'lodash.debounce';
 
   let {
     measurementId,
@@ -24,6 +26,7 @@
     consentCategories: string[],
   } = $props();
 
+  let availableColorCount = $derived(playStore.availableColors.length);
   let boardSize = $derived(playStore.boardSizeX + playStore.boardSizeY);
   let currentCategories: object = {
     'analytics_storage': 'denied',
@@ -33,6 +36,7 @@
   let lastBoardExpanded = 0;
   let lastGroupExpired = 0;
   let lastPieceToBoard = 0;
+  let lastStitchScore = 0;
   let versionNumber: number = $derived.by(() => {
     const v = version.split('.').reverse();
     let ret = 0;
@@ -44,6 +48,15 @@
     return ret;
   })
 
+  type StitchAggregate = {
+    baseScore: number,
+    maxLevel: number
+    score: number,
+    stitchCount: number,
+    debouncedSend: () => void,
+  };
+  let stitchAggregates = new Map<number, StitchAggregate>();
+
   onMount(() => {
 
     initAnalytics();
@@ -54,11 +67,16 @@
       groupExpired: onGroupExpired,
       onFullScreen,
       pieceDropped: onPieceDropped,
+      stitchScore: onStitchScore,
     })) {
       uiBus.on(eventName, handler);
     }
 
   })
+
+  function elapsed(lastTime: number) {
+    return lastTime ? now() - lastTime : 0;
+  }
 
   function gtag(..._: any[]) {
     window.dataLayer = window.dataLayer || [];
@@ -167,8 +185,59 @@
     }
   }
 
-  function elapsed(lastTime: number) {
-    return lastTime ? now() - lastTime : 0;
+  function onStitchScore(event: {
+    stitch: Stitch,
+    baseScore: number,
+    score: number
+  }) {
+    const groupId = event.stitch.group;
+    
+    // Get or create aggregation for this group
+    let aggregation = stitchAggregates.get(groupId);
+    if (!aggregation) {
+      aggregation = {
+        baseScore: 0,
+        maxLevel: 0,
+        score: 0,
+        stitchCount: 0,
+        debouncedSend: debounce(() => sendStitchScore(groupId), 1000),
+      };
+      stitchAggregates.set(groupId, aggregation);
+    }
+
+    // Aggregate the metrics
+    aggregation.baseScore += event.baseScore;
+    aggregation.maxLevel = Math.max(aggregation.maxLevel, event.stitch.level);
+    aggregation.score += event.score;
+    aggregation.stitchCount++;
+
+    // Reset the debounce timer
+    aggregation.debouncedSend();
+  
+  }
+
+  // receiving groupId instead of the aggregate is strange but we need
+  //  groupId to remove that aggregation (in worst case it would be re-created,
+  //  but group IDs are unique and not reused so makes sense to delete)
+  function sendStitchScore(groupId: number) {
+
+    const aggregate = stitchAggregates.get(groupId);
+    if (!aggregate) return;
+
+    gtag('event', 'stitchScore', {
+      baseScore: aggregate.baseScore,
+      maxLevel: aggregate.maxLevel,
+      score: aggregate.score,
+      stitchCount: aggregate.stitchCount,
+      elapsed: elapsed(lastStitchScore),
+      availableColorCount,
+      boardSize,
+      version: versionNumber,
+    });
+
+    lastStitchScore = now();
+    stitchAggregates.delete(groupId);
+
   }
 
 </script>
