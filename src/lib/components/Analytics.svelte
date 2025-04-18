@@ -112,86 +112,85 @@
     gtag('consent', 'update', categoryMap);
   }
 
-  function onBoardExpanded(event: {
-    origin: string,
-    boardSizeBefore: {sizeX: number, sizeY: number},
-    expansions: number,
-  }) {
-    gtag('event', 'boardExpanded', {
-      boardSizeBefore: event.boardSizeBefore.sizeX + event.boardSizeBefore.sizeY,
-      expansions: event.expansions,
+  // Refactored common properties function
+  function commonProperties(lastTimestamp?: number) {
+    return {
       availableColorCount,
       boardSize,
-      elapsed: lastBoardExpanded ? 0 : elapsed(lastBoardExpanded),
+      elapsed: lastTimestamp ? elapsed(lastTimestamp) : 0,
+      playScore: playStore.score,
       version: versionNumber,
+    };
+  }
+
+  // Example usage of commonProperties in events below:
+
+  function onBoardExpanded(event: {
+    origin: string;
+    boardSizeBefore: { sizeX: number, sizeY: number };
+    expansions: number;
+  }) {
+    gtag("event", "boardExpanded", {
+      boardSizeBefore: event.boardSizeBefore.sizeX + event.boardSizeBefore.sizeY,
+      expansions: event.expansions,
+      ...commonProperties(lastBoardExpanded),
     });
     lastBoardExpanded = now();
   }
 
   function onFullScreen(fullscreen: boolean) {
-    gtag('event', 'fullscreen', {
+    gtag("event", "fullscreen", {
       fullscreen,
-      availableColorCount,
-      boardSize,
-      version: versionNumber
+      ...commonProperties(),
     });
   }
 
   function onGroupCreated(event: {
-    group: Group,
-    mergedGroupCount: number,
-    overlaps: number,
-    stitchCount: number,
+    group: Group;
+    mergedGroupCount: number;
+    overlaps: number;
+    stitchCount: number;
   }) {
-    gtag('event', 'groupCreated', {
+    gtag("event", "groupCreated", {
       mergedGroupCount: event.mergedGroupCount,
       overlaps: event.overlaps,
       baseScore: event.group.score,
       ttl: event.group.ttl,
       weight: event.group.weight,
       stitchCount: event.stitchCount,
-      availableColorCount,
-      boardSize,
-      elapsed: elapsed(lastGroupCreated),
-      version: versionNumber,
+      ...commonProperties(lastGroupCreated),
     });
     lastGroupCreated = now();
   }
 
   function onGroupExpired(event: {
-    group: Group,
-    score: number,
+    group: Group;
+    score: number;
   }) {
-    gtag('event', 'groupExpired', {
+    gtag("event", "groupExpired", {
       acceleratedTime: event.group.acceleratedTime,
       baseScore: event.group.score,
       lifeTime: elapsed(event.group.createdAt),
       score: event.score,
       weight: event.group.weight,
-      availableColorCount,
-      boardSize,
-      elapsed: elapsed(lastGroupExpired),
-      version: versionNumber
+      ...commonProperties(lastGroupExpired),
     });
     lastGroupExpired = now();
   }
 
   function onPieceDropped(event: {
-    origin: string,
-    piece: Piece,
-    dragTime: number,
-    rotationCount: number,
+    origin: string;
+    piece: Piece;
+    dragTime: number;
+    rotationCount: number;
   }) {
-    if (event.origin == 'mergeBoard') {
-      gtag('event', 'pieceToBoard', {
+    if (event.origin == "mergeBoard") {
+      gtag("event", "pieceToBoard", {
         dragTime: event.dragTime,
         rotationCount: event.rotationCount,
         life: elapsed(event.piece.createdTime),
         shape: event.piece.shape,
-        availableColorCount,
-        boardSize,
-        elapsed: elapsed(lastPieceToBoard),
-        version: versionNumber,
+        ...commonProperties(lastPieceToBoard),
       });
       lastPieceToBoard = now();
     }
@@ -225,31 +224,25 @@
 
     // Reset the debounce timer
     aggregation.debouncedSend();
-
   }
 
   // receiving groupId instead of the aggregate is strange but we need
   //  groupId to remove that aggregation (in worst case it would be re-created,
   //  but group IDs are unique and not reused so makes sense to delete)
   function sendStitchScore(groupId: number) {
-
     const aggregate = stitchAggregates.get(groupId);
     if (!aggregate) return;
 
-    gtag('event', 'stitchScore', {
+    gtag("event", "stitchScore", {
       baseScore: aggregate.baseScore,
       maxLevel: aggregate.maxLevel,
       score: aggregate.score,
       stitchCount: aggregate.stitchCount,
-      availableColorCount,
-      boardSize,
-      elapsed: elapsed(lastStitchScore),
-      version: versionNumber,
+      ...commonProperties(lastStitchScore),
     });
 
     lastStitchScore = now();
     stitchAggregates.delete(groupId);
-
   }
 
 </script>
