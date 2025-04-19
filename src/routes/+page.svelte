@@ -2,25 +2,8 @@
         onresize={onResize}
         oncontextmenu={event => event.preventDefault()}
 />
-<TopAppBar
-  variant="standard"
-  dense
-  >
-  <Row>
-    <Section>
-      <IconButton class="material-icons">merge</IconButton>
-      <Title>MERGISS</Title>
-    </Section>
-    <Section align="end" >
-      <MGameScore />
-    </Section>
-    <Section align="end" toolbar>
-      <IconButton class="material-icons" onclick={onToggleFullScreen}>fullscreen</IconButton>
-    </Section>
-  </Row>
-</TopAppBar>
-
-<div class="flex flex-col h-screen text-white bg-black" >
+<!--
+<div class="flex flex-col h-screen text-white" >
   <div id="top-container" class="flex mt-12 p-2 md:p-3 lg:p-4 gap-5 flex-row" >
     <div class="flex">
       <MGenerator />
@@ -35,10 +18,25 @@
       <MGenerator disabled />
     </div>
   </div>
-  <div class="flex flex-grow flex-row align-middle justify-center items-center pl-2 pr-2  gap-2">
-<!--    <div id="left-tab" class="flex flex-col flex-1" style="border: 1px solid green; height: 100%; min-width: 200px; max-width: 25%;">asd</div>-->
-    <MBuildBoard boardWidth={boardWidth} boardHeight={boardHeight} />
-<!--    <div id="right-tab" class="flex flex-col flex-1" style="border: 1px solid green; height: 100%; min-width: 200px; max-width: 25%;">asd</div>-->
+  <div class="flex flex-grow flex-row align-middle justify-center items-center py-2 px-4 m-2 gap-5">
+    <div id="left-tab" class="flex flex-col flex-1 gap-5 h-full max-w-60 min-w-10%">
+      <div class="flex flex-row gap-3 grow">
+        <div class="flex grow panel-border">aaa</div>
+        <div class="flex grow panel-border">bbb</div>
+      </div>
+      <div class="panel-border" style="height: 20%;">asd</div>
+    </div>
+    <div style="height: 100%" class="flex flex-col grow panel-border">
+      -->
+    <MBuildBoard boardWidth={boardWidth} boardHeight={boardHeight}/>
+<!--
+    </div>
+    <div id="left-tab" class="flex flex-col flex-1 gap-5 h-full "
+         style="min-width: 10%; max-width: 15em;">
+      <div class="panel-border" style="height: 20%;">asd</div>
+      <div class="flex flex-row gap-3 grow panel-border">bbb</div>
+      <div class="panel-border" style="height: 20%;">asd</div>
+    </div>
   </div>
   <div id="bottom-container" class="p-2 border" >
     {#if (dev)}
@@ -46,35 +44,23 @@
     {/if}
   </div>
 </div>
-
-<!-- this could be put in +layout.svelte -->
-<Analytics measurementId="G-EQDFD52XPM" consentCategories={["analytics_storage"]} />
-
+-->
 <script lang="ts">
 
   import "../app.css";
-  import IconButton from '@smui/icon-button';
-  import TopAppBar, {Row, Section, Title} from '@smui/top-app-bar';
-  import MBuildBoard from "$lib/components/MBuildBoard.svelte";
-  import MGenerator from "$lib/components/MGenerator.svelte";
+  import MBuildBoard from "$lib/components/board/MBuildBoard.svelte";
+  import MGenerator from "$lib/components/piece/MGenerator.svelte";
   import ColorSamples from "$lib/components/dev/ColorSamples.svelte";
   import {dev} from "$app/environment";
   import {onMount} from "svelte";
-  import MGameScore from "$lib/components/appbar/MGameScore.svelte";
-  import Analytics from "$lib/components/Analytics.svelte";
-  import {uiBus} from "$lib/util/uiBus";
 
-  let isFullScreen = false;
   let boardHeight = $state(400);
   let boardWidth = $state(400);
-
-  var documentElement!: HTMLElement;
 
   let topContainer: HTMLElement|null = null;
   let bottomContainer: HTMLElement|null = null;
 
   onMount(() => {
-    documentElement = document.documentElement;
     topContainer = document.querySelector("#top-container");
     bottomContainer = document.querySelector("#bottom-container");
     onResize();
@@ -93,51 +79,6 @@
     boardWidth = windowWidth;
   }
 
-  function onToggleFullScreen() {
-    if (isFullScreen) {
-      closeFullscreen();
-      uiBus.emit("onFullScreen", false);
-    } else {
-      openFullscreen();
-      uiBus.emit("onFullScreen", true);
-    }
-  }
-
-  /* View in fullscreen */
-  function openFullscreen() {
-    if (!documentElement) return;
-    isFullScreen = true;
-    if (documentElement.requestFullscreen) {
-      documentElement.requestFullscreen();
-    // @ts-expect-error legacy
-    } else if (documentElement.webkitRequestFullscreen) { /* Safari */
-    // @ts-expect-error legacy
-      documentElement.webkitRequestFullscreen();
-    // @ts-expect-error legacy
-    } else if (documentElement.msRequestFullscreen) { /* IE11 */
-    // @ts-expect-error legacy
-      documentElement.msRequestFullscreen();
-    } else {
-      isFullScreen = false;
-    }
-  }
-
-  /* Close fullscreen */
-  function closeFullscreen() {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    // @ts-expect-error legacy
-    } else if (document.webkitExitFullscreen) { /* Safari */
-    // @ts-expect-error legacy
-      document.webkitExitFullscreen();
-    // @ts-expect-error legacy
-    } else if (document.msExitFullscreen) { /* IE11 */
-    // @ts-expect-error legacy
-      document.msExitFullscreen();
-    }
-    isFullScreen = false;
-  }
-
 </script>
 
 <style lang="postcss">
@@ -147,4 +88,53 @@
     * :global(.myClass) {
         font-style: italic;
     }
+    .color1 {
+        color: #19181A;
+    }
+    .color2 {
+        color: #101010;
+    }
+    :global(.panel-border) {
+        border: 4px solid #262626;
+        border-radius: 1.5em;
+        background: #000;
+    }
+    #app-grid {
+        /*width: 100%;*/
+        /*height: 100%;*/
+        background: #101010;
+        grid-template-columns:
+                auto
+                2fr
+                auto
+        ;
+        /*grid-template-columns: 80px 2fr 80px;*/
+        grid-template-rows:
+                auto
+                8fr
+                2fr
+        ;
+        grid-template-areas:
+          "top top top"
+          "left main right"
+          "bottom bottom bottom";
+    }
+    #top-container {
+        grid-area: top;
+    }
+    #left-column {
+        width: 20px;
+        transition: width ease 0.5s;
+    }
+    #left-column:hover {
+        width: 300px;
+        /*transition: width ease 1.5s;*/
+    }
+    #bottom-container {
+        grid-area: bottom;
+    }
+    /** just an example found on net */
+    /*#grid:has(#left:hover) {*/
+    /*    grid-template-columns: 30% auto;*/
+    /*}*/
 </style>
