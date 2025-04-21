@@ -134,12 +134,6 @@
         height: 100%;
         overflow: hidden;
     }
-    .color1 {
-        color: #19181A;
-    }
-    .color2 {
-        color: #101010;
-    }
     :global(.panel-border) {
         border: 4px solid #262626;
         border-radius: 1.5em;

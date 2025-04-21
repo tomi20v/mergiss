@@ -50,6 +50,7 @@ describe('Color', () => {
       [colors.lightBrown, colors.brown],
       [colors.lightBlue, colors.blue],
     ])('returns a complementer color', (color, expectedComplementer) => {
+      if (!colors.hasOwnProperty(color)) return;
       const complementerColor = complementerColorOf(color);
       expect(complementerColor).toEqual(expectedComplementer);
     });

@@ -1,7 +1,7 @@
 import tailwindColors from 'tailwindcss/colors';
 
 const colors: {[key:string]: string} = {
-  black: tailwindColors.black, // 0
+  // black: tailwindColors.black, // 0
   white: tailwindColors.white, // 1
   red: tailwindColors.red[600], // 2
   purple: tailwindColors.purple[500], // 3
@@ -30,7 +30,9 @@ const randomColorPair = (): { color: string, otherColor: string } => {
 const complementerColorOf = (color: string): string => {
   const colorValues = Object.values(colors);
   const colorRand = colorValues.indexOf(color);
-  return colorValues[colorRand < 8 ? colorRand + 8 : colorRand - 8];
+  const colorCount = Math.floor(Object.keys(colors).length/2);
+  // return colorValues[colorRand < 8 ? colorRand + 8 : colorRand - 8];
+  return colorValues[colorRand < colorCount ? colorRand + colorCount : colorRand - colorCount];
 }
 
 export {colors, randomColorPair, complementerColorOf};

@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.8.0",
-  "description": "measure scores",
+  "version": "0.8.1",
+  "description": "new UI",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
