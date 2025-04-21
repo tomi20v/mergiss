@@ -1,5 +1,5 @@
 <svelte:window onmousemove={throttledOnMouseMove} />
-<div bind:this={elem} class="flex flex-grow flex-col gap-0 p-2 text-white justify-center align-middle relative">
+<div bind:this={elem} class="flex flex-grow flex-col gap-0 text-white justify-center align-middle relative">
   {#if (dev)}
     <div class="flex flex-col gap-1 absolute top-0 right-0 bg-red-600 justify-center align-middle" >
       <div class="flex flex-row gap-1 items-center justify-center">
@@ -30,7 +30,7 @@
   import Position from "$lib/game/geometry/Position";
   import Piece from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util/uiBus";
-  import MBoardFields from "$lib/components/MBoardFields.svelte";
+  import MBoardFields from "$lib/components/board/MBoardFields.svelte";
   import {emptyField, type FieldType} from "$lib/game/fields.svelte";
   import {FlatteningIterator, move, rotateCoords,} from "@tomi20v/iterators";
   import Group from "$lib/game/Group.svelte";
@@ -54,14 +54,11 @@
   let cursorAt: Position|null = $state(null);
 
   let cellWidth: number = $derived.by(() => {
-    // this makes sure we update the width when the table size changes
-    // const s = serial;
-    const extraWidth = sizeX >= 5 ? 2.2 : 1.8;
-    const extraHeight = sizeY >= 5 ? 1 : 1.8;
-    const perWidth = Math.floor(boardWidth / (sizeX+extraWidth));
-    const perHeight = Math.floor(boardHeight / (sizeY+extraHeight));
-    const ret = Math.min(perWidth, perHeight);
-    return ret;
+    const extraWidth = sizeX >= 5 ? 1 : 1.2;
+    const extraHeight = sizeY >= 5 ? 1 : 1.2;
+    const perWidth = (0.96*boardWidth / (sizeX+extraWidth));
+    const perHeight = (0.92*boardHeight / (sizeY+extraHeight));
+    return Math.min(perWidth, perHeight);
   })
   // keep it updated in the store too
   $effect(() => {
