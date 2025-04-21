@@ -17,54 +17,53 @@
   </Row>
 </TopAppBar>
 -->
-
-<div id="app-grid"
-     class="h-screen grid gap-4 p-4"
-     style="">
-  <div id="top-container"
-       class="text-white"
-       style:background="{devDraw ? '#f8c' : ''}">
-<!--    <img src="generator.png" width="200px"/>-->
-    AAA
-  </div>
-  <div id="left-column"
-       class=""
-       style:background="{devDraw ? '#fc8' : ''}">
-    <!--    <img src="generator.png" width="200px"/>-->
-    AAA
-  </div>
-  <div id="main"
-       class="panel-border"
-       style:background="{devDraw ? '#8cf' : ''}">
-    {@render children()}
-  </div>
-  <div id="right-column"
-       class=""
-       style:background="{devDraw ? '#fc8' : ''}">
-    <!--    <img src="generator.png" width="200px"/>-->
-    BBB
-  </div>
-  <div id="bottom-container"
-       class="panel-border"
-       style:background="{devDraw ? '#c8f' : ''}">
-    bbb
+<div class="h-screen">
+  <div id="app-grid"
+       class="grow grid">
+    <div id="top-container"
+         class="text-white"
+         style:background="{devDraw ? '#f8c' : ''}">
+      <MGenerators />
+    </div>
+    <div id="left-column"
+         class=""
+         style="background-color: {devDraw ? '#fc8' : ''};">
+      ---
+    </div>
+    <div id="main"
+         class="panel-border flex align-middle justify-center"
+         style:background="{devDraw ? '#8cf' : ''}">
+      {@render children()}
+    </div>
+    <div id="right-column"
+         class=""
+         style="background-color: {devDraw ? '#fc8' : ''};">
+      <MGameScore />
+    </div>
+    <div id="bottom-container"
+         class="panel-border"
+         style:background="{devDraw ? '#c8f' : ''}">
+      <ColorSamples />
+    </div>
   </div>
 </div>
 
-<!-- this could be put in +layout.svelte -->
 <Analytics measurementId="G-EQDFD52XPM" consentCategories={["analytics_storage"]} />
 
 <script lang="ts">
+
+  import {dev} from "$app/environment";
   import {onMount} from "svelte";
-  import IconButton from '@smui/icon-button';
-  import TopAppBar, {Row, Section, Title} from '@smui/top-app-bar';
   import MGameScore from "$lib/components/MGameScore.svelte";
+  import ColorSamples from "$lib/components/dev/ColorSamples.svelte";
   import Analytics from "$lib/components/Analytics.svelte";
   import {uiBus} from "$lib/util/uiBus";
+  import MGenerators from "$lib/components/piece/MGenerators.svelte";
 
   let { children } = $props();
 
-  let devDraw = $state(true);
+  // let devDraw = true;
+  let devDraw = false;
 
   var documentElement!: HTMLElement;
   let isFullScreen = false;
@@ -122,10 +121,18 @@
 </script>
 
 <style lang="postcss">
-    :global(body), :global(html) {
-        /*background-color: #8cf !important;*/
-        background-color: #140A0A;
-        min-width: 320px;
+    :global(html) {
+        font-family: 'Orbitron', sans-serif;
+        /*background-color: #140A4A;*/
+        /*min-width: 320px;*/
+        min-width: 420px;
+        height: 100%;
+        overflow: hidden;
+    }
+    :global(body) {
+        background-color: #100808;
+        min-width: 420px;
+        height: 100%;
         overflow: hidden;
     }
     .color1 {
@@ -139,31 +146,36 @@
         border-radius: 1.5em;
         background: #000;
     }
+    :global(.panel-padding-small) {
+        padding: 1vw;
+    }
+    :global(.panel-padding) {
+        padding: 1.5vw;
+    }
     #app-grid {
-        /*width: 100%;*/
-        /*height: 100%;*/
-        background: #101010;
+        /** with this we don't have to use padding which'd mess with height:100% */
+        position: absolute;
+        /*top: 16px; left: 16px; right: 16px; bottom: 16px;*/
+        top: 1.5vw; left: 1.5vw; right: 1.5vw; bottom: 1.5vw;
+        display: grid;
         grid-template-columns:
-                auto
-                2fr
-                auto
-    ;
-        /*grid-template-columns: 80px 2fr 80px;*/
-        grid-template-rows:
-                2fr
-                8fr
+                minmax(80px, 10%)
                 1fr
-    ;
+                minmax(120px, 15%);
+        grid-template-rows:
+                auto
+                1fr
+                auto;
         grid-template-areas:
           "top top top"
           "left main right"
           "bottom bottom bottom";
+        gap: 1.5vw;
     }
     #top-container {
         grid-area: top;
     }
     #left-column {
-        width: 20px;
         transition: width ease 0.5s;
     }
     #left-column:hover {
