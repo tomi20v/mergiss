@@ -43,7 +43,7 @@
     <div id="bottom-container"
          class="panel-border"
          style:background="{devDraw ? '#c8f' : ''}">
-      <ColorSamples />
+      <MColorSamples />
     </div>
   </div>
 </div>
@@ -52,10 +52,9 @@
 
 <script lang="ts">
 
-  import {dev} from "$app/environment";
   import {onMount} from "svelte";
   import MGameScore from "$lib/components/MGameScore.svelte";
-  import ColorSamples from "$lib/components/dev/ColorSamples.svelte";
+  import MColorSamples from "$lib/components/dev/MColorSamples.svelte";
   import Analytics from "$lib/components/Analytics.svelte";
   import {uiBus} from "$lib/util/uiBus";
   import MGenerators from "$lib/components/piece/MGenerators.svelte";

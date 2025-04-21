@@ -18,7 +18,7 @@
 
   import Group from "$lib/game/Group.svelte";
   import { onMount, onDestroy } from "svelte";
-  import colors from "$lib/game/colors";
+  import {colors} from "$lib/game/colors";
   import {uiBus} from "$lib/util/uiBus";
   import playStore from "$lib/playStore.svelte.js";
 

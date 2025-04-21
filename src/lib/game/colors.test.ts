@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from "vitest";
-import colors, {complementerColorOf, randomColorPair} from "./colors";
+import {colors, complementerColorOf, randomColorPair} from "./colors";
 
 describe('Color', () => {
   describe('randomColorPair', () => {

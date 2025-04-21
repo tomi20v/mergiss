@@ -10,13 +10,13 @@ const colors: {[key:string]: string} = {
   brown: tailwindColors.amber[500], // 6
   blue: tailwindColors.blue[500], // 7
   gray: tailwindColors.slate[500], // 8
-  silver: tailwindColors.zinc[500], // 9
-  lightRed: tailwindColors.red[300], // 10
-  lightPurple: tailwindColors.purple[300], // 11
-  cyan: tailwindColors.cyan[500], // 12
-  lightGreen: tailwindColors.lime[300], // 13
-  lightBrown: tailwindColors.amber[300], // 14
-  lightBlue: tailwindColors.blue[300], // 15
+  // silver: tailwindColors.zinc[500], // 9
+  // lightRed: tailwindColors.red[300], // 10
+  // lightPurple: tailwindColors.purple[300], // 11
+  // cyan: tailwindColors.cyan[500], // 12
+  // lightGreen: tailwindColors.lime[300], // 13
+  // lightBrown: tailwindColors.amber[300], // 14
+  // lightBlue: tailwindColors.blue[300], // 15
 };
 
 const randomColorPair = (): { color: string, otherColor: string } => {
@@ -33,6 +33,4 @@ const complementerColorOf = (color: string): string => {
   return colorValues[colorRand < 8 ? colorRand + 8 : colorRand - 8];
 }
 
-export {randomColorPair, complementerColorOf};
-
-export default colors;
+export {colors, randomColorPair, complementerColorOf};
