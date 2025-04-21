@@ -10,9 +10,9 @@
   <div class="flex">
     <MGenerator disabled />
   </div>
-  <div class="flex">
-    <MGenerator disabled />
-  </div>
+<!--  <div class="flex">-->
+<!--    <MGenerator disabled />-->
+<!--  </div>-->
 </div>
 <script lang="ts">
   import MGenerator from "$lib/components/piece/MGenerator.svelte";
