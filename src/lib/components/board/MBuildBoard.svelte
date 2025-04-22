@@ -72,11 +72,13 @@
     );
     uiBus.on('pieceDrop', onPieceDrop);
     uiBus.on('groupExpired', onGroupExpired);
+    uiBus.on('expireBiggestGroup', onExpireBiggestGroup);
   })
 
   onDestroy(() => {
     uiBus.off('pieceDrop', onPieceDrop);
     uiBus.off('groupExpired', onGroupExpired);
+    uiBus.off('expireBiggestGroup', onExpireBiggestGroup);
   });
 
   function areValidCoordinates(x: number, y: number): boolean {
@@ -229,6 +231,31 @@
         Math.min(prev.createdAt, curr.createdAt)
       );
     }
+  }
+
+  function onExpireBiggestGroup() {
+    if (groups.length === 0) {
+        return; // No groups to expire
+    }
+
+    // Find the group with the maximum weight
+    let biggestGroup = groups[0];
+    for (let i = 1; i < groups.length; i++) {
+        if (groups[i].weight > biggestGroup.weight) {
+            biggestGroup = groups[i];
+        }
+    }
+
+    // Expire the biggest group by setting its TTL to 0
+    biggestGroup.setTtl(0);
+
+    // Emit the standard groupExpired event with the CORRECT htmlId format
+    uiBus.emit('groupExpired', { 
+        group: biggestGroup, 
+        htmlId: `group-countdown-${biggestGroup.group}` // Use the standard ID format
+    });
+
+    console.log(`Expire Biggest Group requested: Expiring group ${biggestGroup.group} with weight ${biggestGroup.weight}`);
   }
 
   function onGroupExpired({group}: {group: Group}) {

@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.8.1",
-  "description": "new UI",
+  "version": "0.8.2",
+  "description": "launch button",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
