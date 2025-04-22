@@ -29,9 +29,14 @@
       <MGenerators />
     </div>
     <div id="left-column"
-         class=""
-         style="background-color: {devDraw ? '#fc8' : ''};">
-      ---
+         class="flex flex-col gap-2 text-white"
+         style="background-color: {devDraw ? '#fc8' : 'cf8'};">
+      <div class="flex grow" style="border: 1px solid red;">
+        AAA
+      </div>
+      <div class="flex justify-center">
+        <MLaunchButton />
+      </div>
     </div>
     <div id="main"
          class="panel-border flex align-middle justify-center"
@@ -61,6 +66,7 @@
   import Analytics from "$lib/components/Analytics.svelte";
   import {uiBus} from "$lib/util/uiBus";
   import MGenerators from "$lib/components/piece/MGenerators.svelte";
+  import MLaunchButton from "$lib/components/MLaunchButton.svelte";
 
   let { children } = $props();
 
