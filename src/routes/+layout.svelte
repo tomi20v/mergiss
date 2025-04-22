@@ -163,9 +163,11 @@
         top: 0; left: 1.5vw; right: 1.5vw; bottom: 1.5vw;
         display: grid;
         grid-template-columns:
-                minmax(80px, 10%)
+                /*minmax(80px, 10%)*/
+                clamp(80px, 10%, 250px)
                 1fr
-                minmax(120px, 15%);
+                /*clamp(120px, 15%, 300px);*/
+                minmax(120px, 16.5%);
         grid-template-rows:
                 auto
                 auto
