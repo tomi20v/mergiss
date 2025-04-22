@@ -1,7 +1,7 @@
 <!-- I can't use classes on components, but I can use styles :/ -->
 <div class="score-card panel-border panel-padding-small">
   <div class="h1">
-    SCORE
+    SC0RΞ
   </div>
   <div class="score-box">
     <div id="game-score" class="score" style="transform: scale({scaleSpring.current});">

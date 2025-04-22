@@ -20,6 +20,9 @@
 <div class="h-screen">
   <div id="app-grid"
        class="grow grid">
+    <div id="app-bar" class="h1">
+      MΞЯGIS<div class="reverse">S</div>
+    </div>
     <div id="top-container"
          class="text-white"
          style:background="{devDraw ? '#f8c' : ''}">
@@ -133,6 +136,7 @@
         min-width: 420px;
         height: 100%;
         overflow: hidden;
+        user-select: none;
     }
     :global(.panel-border) {
         border: 4px solid #262626;
@@ -149,7 +153,8 @@
         /** with this we don't have to use padding which'd mess with height:100% */
         position: absolute;
         /*top: 16px; left: 16px; right: 16px; bottom: 16px;*/
-        top: 1.5vw; left: 1.5vw; right: 1.5vw; bottom: 1.5vw;
+        /*top: 1.5vw; left: 1.5vw; right: 1.5vw; bottom: 1.5vw;*/
+        top: 0; left: 1.5vw; right: 1.5vw; bottom: 1.5vw;
         display: grid;
         grid-template-columns:
                 minmax(80px, 10%)
@@ -157,23 +162,25 @@
                 minmax(120px, 15%);
         grid-template-rows:
                 auto
+                auto
                 1fr
                 auto;
         grid-template-areas:
+          "app-bar app-bar app-bar"
           "top top top"
           "left main right"
           "bottom bottom bottom";
         gap: 1.5vw;
     }
+    #app-bar {
+        /*background-color: #262626;*/
+        grid-area: app-bar;
+    }
     #top-container {
         grid-area: top;
     }
     #left-column {
-        transition: width ease 0.5s;
-    }
-    #left-column:hover {
-        width: 300px;
-        /*transition: width ease 1.5s;*/
+        grid-area: left;
     }
     #bottom-container {
         grid-area: bottom;
@@ -182,4 +189,20 @@
     /*#grid:has(#left:hover) {*/
     /*    grid-template-columns: 30% auto;*/
     /*}*/
+    .h1 {
+        padding-top: 2vh;
+        font-size: 3vw;
+        font-weight: bold;
+        line-height: 1.6vw;
+        letter-spacing: 1vw;
+        margin-bottom: 0.5vh;
+        text-shadow: 0 0 20px #ff9900;
+        color: orange;
+        justify-self: center;
+    }
+    .h1 .reverse {
+        transform: scale(-1,1);
+        display: inline-block;
+        letter-spacing: 0;
+    }
 </style>
