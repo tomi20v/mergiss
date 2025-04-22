@@ -1,8 +1,7 @@
 <div class="flex gap-2 justify-center" style="user-select: none;" >
   {#if !disabled}
     <Image src="generator.png" class="w-2/3 cursor-pointer" onclick={onClick} draggable="false" />
-    <div class="flex text-white m-1 justify-center items-center w-1/3
-            border-3 border-blue-300 border-double rounded-lg border-x-0"
+    <div class="flex text-white m-1 justify-center items-center w-1/3 panel-border"
          style:padding="{margin}px"
          style:padding-left="{marginX}px"
          style:padding-right="{marginX}px"
@@ -15,10 +14,8 @@
     </div>
   {:else}
     <Image src="generator-disabled.png" class="w-2/3" draggable="false" />
-    <div class="flex text-white m-1 justify-center items-center w-1/3
-            border-3 border-slate-500 border-double rounded-lg border-l-0 border-r-0"
-    >
-      <div class="flex text-xs border-slate-600 border-2 border-dotted">BUY</div>
+    <div class="flex text-white m-1 justify-center items-center w-1/3 panel-border">
+      <div class="flex text-xs border-slate-600 border-2 border-dotted">SOON</div>
     </div>
   {/if}
 </div>
@@ -28,7 +25,7 @@
   import {Image} from "@smui/image-list";
   import Piece from "$lib/game/piece/Piece";
   import {pieceFactory} from "$lib/game/services";
-  import MPiece from "$lib/components/MPiece.svelte";
+  import MPiece from "$lib/components/piece/MPiece.svelte";
   import {onDestroy, onMount} from "svelte";
   import {uiBus} from "$lib/util/uiBus";
   import playStore from "$lib/playStore.svelte";

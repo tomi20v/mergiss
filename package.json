@@ -1,13 +1,13 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.8.0",
-  "description": "measure scores",
+  "version": "0.8.1",
+  "description": "new UI",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
     "dev": "vite dev --host",
-    "build": "npm run check && vite build",
+    "build": "npm run test && npm run check && vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",

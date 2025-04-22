@@ -29,6 +29,7 @@ function initStore() {
   playStore.boardSizeY = 3;
   // score
   playStore.score = 0;
+  // playStore.score = 99125808;
 }
 initStore();
 

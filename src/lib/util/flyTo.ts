@@ -28,7 +28,7 @@ export function flyTo(flyingId: string, targetId: string, onTransitionEnd: () =>
   const deltaX = (targetRect.left + targetRect.right)/2 - (flyingRect.left + flyingRect.right)/2;
   const deltaY = (targetRect.top + targetRect.bottom)/2 - (flyingRect.top + flyingRect.bottom)/2;
 
-  clone.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.5)`;
+  clone.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.2)`;
   clone.style.transition = `transform 0.3s ease, opacity 0.5s ease`;
   clone.addEventListener('transitionend', () => {
     onTransitionEnd();

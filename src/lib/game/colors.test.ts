@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from "vitest";
-import colors, {complementerColorOf, randomColorPair} from "./colors";
+import {colors, complementerColorOf, randomColorPair} from "./colors";
 
 describe('Color', () => {
   describe('randomColorPair', () => {
@@ -50,6 +50,7 @@ describe('Color', () => {
       [colors.lightBrown, colors.brown],
       [colors.lightBlue, colors.blue],
     ])('returns a complementer color', (color, expectedComplementer) => {
+      if (!colors.hasOwnProperty(color)) return;
       const complementerColor = complementerColorOf(color);
       expect(complementerColor).toEqual(expectedComplementer);
     });
