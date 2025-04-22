@@ -31,8 +31,8 @@
     <div id="left-column"
          class="flex flex-col gap-2 text-white"
          style="background-color: {devDraw ? '#fc8' : 'cf8'};">
-      <div class="flex grow" style="border: 1px solid red;">
-        AAA
+      <div class="flex grow" >
+<!--        AAA-->
       </div>
       <div class="flex justify-center">
         <MLaunchButton />
