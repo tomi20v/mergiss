@@ -51,6 +51,7 @@
 
   onMount(() => {
     uiBus.on("pieceDropped", onPieceDropped);
+    uiBus.on("launchButtonFill", onFill);
   });
   
   onDestroy(() => {
@@ -94,6 +95,11 @@
       // Explicitly call updateScale to reset the scale
       updateScale(fill, oldFill);
     }
+  }
+
+  function onFill() {
+    fill = 1;
+    updateScale(fill, fill);
   }
   
   function triggerOvershootAnimation(increase: number): void {

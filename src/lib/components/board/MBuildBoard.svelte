@@ -18,6 +18,7 @@
         {:else}
         <button onclick={() => playStore.paused=true}>||</button>
         {/if}
+        <button onclick={() => uiBus.emit('launchButtonFill')}>R</button>
       </div>
     </div>
   {/if}
