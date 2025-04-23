@@ -165,13 +165,17 @@
 
   function onGroupExpired(event: {
     group: Group;
+    remainingTTL: number;
     score: number;
+    origin: string;
   }) {
     gtag("event", "groupExpired", {
       acceleratedTime: event.group.acceleratedTime,
       baseScore: event.group.score,
       lifeTime: elapsed(event.group.createdAt),
+      remainingTTL: event.remainingTTL,
       score: event.score,
+      origin: event.origin,
       weight: event.group.weight,
       ...commonProperties(lastGroupExpired),
     });

@@ -63,10 +63,20 @@
     flyTo(flyId, 'game-score', onTransitionEnd);
   }
 
-  function onGroupExpired({group, htmlId}: { group: Group, htmlId: string}) {
+  function onGroupExpired({
+      group,
+      htmlId,
+      origin,
+      remainingTTL,
+    }: {
+      group: Group,
+      htmlId: string,
+      origin: string,
+      remainingTTL: number,
+    }) {
     flyToScore(htmlId, () => {
       const score = addScore(group.score);
-      uiBus.emit("groupExpiredScore", { group, score });
+      uiBus.emit("groupExpiredScore", { group, score, remainingTTL, origin: origin });
     });
   }
 

@@ -18,6 +18,7 @@
         {:else}
         <button onclick={() => playStore.paused=true}>||</button>
         {/if}
+        <button onclick={() => uiBus.emit('launchButtonFill')}>R</button>
       </div>
     </div>
   {/if}
@@ -72,11 +73,13 @@
     );
     uiBus.on('pieceDrop', onPieceDrop);
     uiBus.on('groupExpired', onGroupExpired);
+    uiBus.on('expireBiggestGroup', onExpireBiggestGroup);
   })
 
   onDestroy(() => {
     uiBus.off('pieceDrop', onPieceDrop);
     uiBus.off('groupExpired', onGroupExpired);
+    uiBus.off('expireBiggestGroup', onExpireBiggestGroup);
   });
 
   function areValidCoordinates(x: number, y: number): boolean {
@@ -229,6 +232,29 @@
         Math.min(prev.createdAt, curr.createdAt)
       );
     }
+  }
+
+  function onExpireBiggestGroup(event: {origin: string}) {
+    if (groups.length === 0) {
+        return; // No groups to expire
+    }
+
+    // Find the group with the maximum weight
+    let biggestGroup = groups[0];
+    for (let i = 1; i < groups.length; i++) {
+        if (groups[i].weight > biggestGroup.weight) {
+            biggestGroup = groups[i];
+        }
+    }
+
+    // Emit the standard groupExpired event with the CORRECT htmlId format
+    uiBus.emit('groupExpired', { 
+      group: biggestGroup,
+      htmlId: `group-countdown-${biggestGroup.group}`,
+      remainingTTL: biggestGroup.ttl,
+      origin: event.origin,
+    });
+
   }
 
   function onGroupExpired({group}: {group: Group}) {

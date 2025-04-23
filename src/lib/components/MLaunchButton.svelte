@@ -1,10 +1,201 @@
-<div class="rocket-button">
-  <!-- NOTE adjusting the size of the actual icon by css seems not to work -->
-  <Icon class="material-icons">rocket_launch</Icon>
-</div>
+<button id="launch-button" 
+    class="rocket-button" 
+    style="transform: scale({currentScale});" 
+    onclick={onClick} 
+    class:pulsating={isRotating}
+    >
+  <img 
+    id="rocket-icon"
+    src="/rocket.svg" 
+    alt="Rocket" 
+    class="rocket-icon" 
+    class:rotating={isRotating}
+    style="opacity: {opacity};"
+  />
+</button>
 
 <script lang="ts">
-  import { Icon } from '@smui/button';
+  import type Piece from "$lib/game/piece/Piece";
+  import { uiBus } from "$lib/util/uiBus";
+  import { onDestroy, onMount } from "svelte";
+  import { flyTo } from "$lib/util/flyTo";
+  
+  // Icon import can be removed if you're not using it anymore
+  // import { Icon } from '@smui/button';
+  
+  const increment = 0.05;
+  const scaleMinimum = 0.07;
+  const overshootFactor = 3; // How much to overshoot (3x the increment)
+  const scaleCompleteAt = 0.8; // Scale reaches 1 at this fill value
+  const opacityStart = 0.2; // Opacity at scaleCompleteAt
+  
+  let fill = $state(0);
+  let isRotating = $state(false);
+  let currentScale = $state(scaleMinimum);
+  let targetScale = $state(scaleMinimum);
+  let animationId: number | null = null;
+
+  // Calculate opacity based on fill value
+  let opacity = $derived.by<number>(() => {
+    if (fill <= scaleCompleteAt) {
+      // Opacity increases from 0 to opacityStart as fill goes from 0 to scaleCompleteAt
+      return (fill / scaleCompleteAt) * opacityStart;
+    } else {
+      // Opacity increases from opacityStart to 1 as fill goes from scaleCompleteAt to 1
+      const remainingFill = fill - scaleCompleteAt;
+      const remainingOpacity = 1 - opacityStart;
+      const ratio = remainingFill / (1 - scaleCompleteAt);
+      return opacityStart + (ratio * remainingOpacity);
+    }
+  });
+
+  onMount(() => {
+    uiBus.on("pieceDropped", onPieceDropped);
+    uiBus.on("launchButtonFill", onFill);
+  });
+  
+  onDestroy(() => {
+    uiBus.off("pieceDropped", onPieceDropped);
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+    }
+  });
+
+  function onPieceDropped(event: {
+    origin: string;
+    piece: Piece;
+    dragTime: number;
+    rotationCount: number;
+  }) {
+    const oldFill = fill;
+    // Increase fill by random value between 0-0.1, capped at 1
+    const randomIncrease = Math.random() * increment;
+    fill = Math.min(1, fill + randomIncrease);
+    updateScale(fill, oldFill);
+  }
+  
+  function onClick() {
+    if (fill < 1) {
+      const oldFill = fill;
+      // fill = Math.min(1, fill + (fill < 0.7 ? 0.1 : 0.025));
+      fill = Math.min(1, fill + 0.05);
+      updateScale(fill, oldFill);
+    }
+    else {
+      // Emit event to expire the biggest group
+      uiBus.emit('expireBiggestGroup', {origin: 'launchButton'});
+      
+      flyTo('rocket-icon', 'game-score');
+      
+      // Reset fill and rotation state after activation
+      const oldFill = fill;
+      fill = 0;
+      isRotating = false;
+
+      // Explicitly call updateScale to reset the scale
+      updateScale(fill, oldFill);
+    }
+  }
+
+  function onFill() {
+    fill = 1;
+    updateScale(fill, fill);
+  }
+  
+  function triggerOvershootAnimation(increase: number): void {
+    // Cancel any existing animation
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+    }
+    
+    // Calculate overshoot target (limited to a max scale of 1.2)
+    const overshootTarget = Math.min(1.2, currentScale + (increase * overshootFactor));
+    
+    // Start animation timestamp
+    let startTime: number | null = null;
+    const duration = 600; // Animation duration in ms
+    
+    function animate(timestamp: number): void {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      
+      // First 33% of animation - overshoot
+      if (progress < 0.33) {
+        const overshootProgress = progress / 0.33;
+        currentScale = targetScale - increase + (overshootTarget - targetScale + increase) * overshootProgress;
+      } 
+      // Last 67% of animation - bounce back
+      else {
+        const bounceProgress = (progress - 0.33) / 0.67;
+        currentScale = overshootTarget - (overshootTarget - targetScale) * bounceProgress;
+      }
+      
+      if (progress < 1) {
+        animationId = requestAnimationFrame(animate);
+      } else {
+        currentScale = targetScale;
+        animationId = null;
+      }
+    }
+    
+    animationId = requestAnimationFrame(animate);
+  }
+
+  function updateScale(newFill: number, oldFill: number): void {
+    // Calculate the new target scale based on fill, reaching 1 at SCALE_COMPLETE_AT
+    let newTargetScale;
+    if (newFill <= scaleCompleteAt) {
+      // Scale from scaleMinimum to 1 as fill goes from 0 to SCALE_COMPLETE_AT
+      const scalingRange = 1 - scaleMinimum;
+      const ratio = newFill / scaleCompleteAt;
+      newTargetScale = scaleMinimum + (ratio * scalingRange);
+    } else {
+      // Keep scale at 1 after SCALE_COMPLETE_AT
+      newTargetScale = 1;
+    }
+
+    const fillIncreased = newFill > oldFill;
+
+    // 1. Final Boost: Check if fill crosses the threshold >= 1
+    if (newFill >= 1 && oldFill < 1) {
+      targetScale = 1; // Ensure target scale is exactly 1
+      triggerOvershootAnimation(0.2); // Trigger final boost with fixed increment
+      isRotating = true; // Start rotation
+    }
+    // 2. Normal Increase: Handle increases below the threshold < 1
+    else if (fillIncreased && newFill < 1) {
+      if (newTargetScale > targetScale) {
+        // Normal increase phase (fill 0 to 0.8)
+        const increase = newTargetScale - targetScale;
+        targetScale = newTargetScale;
+        triggerOvershootAnimation(increase);
+      } else if (newFill > scaleCompleteAt) {
+        // Special phase (fill 0.8 to < 1) - use actual fill increase for bounce
+        const fillIncrease = newFill - oldFill;
+        targetScale = 1; // Target scale remains 1
+        triggerOvershootAnimation(fillIncrease);
+      } else {
+        // Fill increased, but target scale didn't. Update silently if needed.
+        if (targetScale !== newTargetScale) {
+           targetScale = newTargetScale;
+           currentScale = targetScale;
+        }
+      }
+    }
+    // 3. Decrease or No Change (and not crossing the fill=1 threshold upwards)
+    else if (!fillIncreased) {
+      // Update scale directly without animation if target changes
+      if (targetScale !== newTargetScale) {
+          targetScale = newTargetScale;
+          currentScale = targetScale;
+      }
+      // Optional: Stop rotation if fill drops below 1
+      // if (newFill < 1 && isRotating) { isRotating = false; }
+    }
+
+    // Rotation start is now handled within the final boost logic
+  }
 </script>
 
 <style lang="postcss">
@@ -17,11 +208,14 @@
             inset 0 0 8px #a93226,
             0 4px 8px rgba(0, 0, 0, 0.6);
     color: white;
-    /*padding: 16px 24px;*/
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
+    transition: none; /* Remove transition to avoid conflicting with our animation */
     width: 100%;
     aspect-ratio: 16/9;
+    /* Added display flex for centering */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .rocket-button:hover {
@@ -31,4 +225,47 @@
             0 6px 12px rgba(0, 0, 0, 0.7);
 }
 
+.rocket-icon {
+    height: 80%; /* Makes the icon respond to container size */
+    width: auto; /* Maintains aspect ratio */
+    object-fit: contain; /* Ensures the image scales properly */
+    filter: brightness(0) invert(1);
+    /* Apply base translation to compensate for shifted origin */
+    transform: translateX(10%); 
+    transform-origin: 70% 50%; /* Keep the desired origin for rotation */
+    transition: opacity 0.3s ease-in-out;
+}
+
+@keyframes spin {
+    from {
+        /* Include translation in rotation */
+        transform: translateX(-10%) rotate(0deg);
+    }
+    to {
+        /* Include translation in rotation */
+        transform: translateX(-10%) rotate(360deg);
+    }
+}
+
+.rocket-icon.rotating {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    /* Use the final scale from JS as base */
+    transform: scale(1); 
+  }
+  50% {
+    /* Pulse slightly larger */
+    transform: scale(1.12); 
+  }
+}
+
+.rocket-button.pulsating {
+  /* Apply the pulse animation ON TOP of the JS scale */
+  /* Note: This might conflict visually if JS is still animating scale */
+  /* But should take over once JS animation stops at scale 1 */
+  animation: pulse 0.8s ease-in-out infinite;
+}
 </style>

@@ -11,7 +11,7 @@ const anyShape = 'anyShape';
 
 describe('Goup', () => {
 
-  it('should create an instance of Goup', () => {
+  it('should create an instance of Group', () => {
     const anyNow = 78126;
     const group = new Group(anyCenter.x, anyCenter.y, anyWeight, anyScore, anyTtl, anyNow);
     expect(group).toBeInstanceOf(Group);

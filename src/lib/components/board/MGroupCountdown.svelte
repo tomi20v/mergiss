@@ -80,7 +80,8 @@
         currentTimeout/= 2;
       }
       // subtract 1 second for a click, click dashing is faster for short-mid term
-      group.setTtl(Math.max(0, group.ttl -1));
+      group.setTtl(Math.max(0, group.ttl - 1));
+      group.addAcceleratedTime(1);
     }
   }
 
@@ -121,7 +122,12 @@
         clearTimeout(timerId as unknown as number);
         // defer so the scale animation class will be removed before cloning
         setTimeout(() => {
-          uiBus.emit('groupExpired', {group, htmlId: "group-countdown-" + group.group});
+          uiBus.emit('groupExpired', {
+            group,
+            htmlId: "group-countdown-" + group.group,
+            origin: origin,
+            remainingTTL: 0,
+          });
         })
       }
       else {
