@@ -80,7 +80,8 @@
         currentTimeout/= 2;
       }
       // subtract 1 second for a click, click dashing is faster for short-mid term
-      group.setTtl(Math.max(0, group.ttl -1));
+      group.setTtl(Math.max(0, group.ttl - 1));
+      group.addAcceleratedTime(1);
     }
   }
 
