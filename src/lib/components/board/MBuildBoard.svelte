@@ -233,7 +233,7 @@
     }
   }
 
-  function onExpireBiggestGroup() {
+  function onExpireBiggestGroup(event: {origin: string}) {
     if (groups.length === 0) {
         return; // No groups to expire
     }
@@ -246,16 +246,14 @@
         }
     }
 
-    // Expire the biggest group by setting its TTL to 0
-    biggestGroup.setTtl(0);
-
     // Emit the standard groupExpired event with the CORRECT htmlId format
     uiBus.emit('groupExpired', { 
-        group: biggestGroup, 
-        htmlId: `group-countdown-${biggestGroup.group}` // Use the standard ID format
+      group: biggestGroup,
+      htmlId: `group-countdown-${biggestGroup.group}`,
+      remainingTTL: biggestGroup.ttl,
+      origin: event.origin,
     });
 
-    console.log(`Expire Biggest Group requested: Expiring group ${biggestGroup.group} with weight ${biggestGroup.weight}`);
   }
 
   function onGroupExpired({group}: {group: Group}) {

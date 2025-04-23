@@ -82,7 +82,7 @@
     }
     else {
       // Emit event to expire the biggest group
-      uiBus.emit('expireBiggestGroup');
+      uiBus.emit('expireBiggestGroup', {origin: 'launchButton'});
       
       flyTo('rocket-icon', 'game-score');
       
