@@ -1,7 +1,7 @@
 <!-- I can't use classes on components, but I can use styles :/ -->
 <div class="score-card panel-border panel-padding-small">
   <div class="h1">
-    SC0RΞ
+    {leetize("score")}
   </div>
   <div class="score-box">
     <div id="game-score" class="score" style="transform: scale({scaleSpring.current});">
@@ -21,12 +21,15 @@
   import type Group from "$lib/game/Group.svelte";
   import {flyTo} from "$lib/util/flyTo";
   import {EStitchLevel, type Stitch} from "$lib/game/stitches";
+  import {leetize} from "../../util/texts";
 
   // these together (and with addScore) make a nice "pop" when score is increased
   // let scaleSpring = new Spring(1, { stiffness: 0.8, damping: 1 });
   let scaleSpring = new Spring(1, { stiffness: 0.3, damping: 0.25 });
   let score = Tween.of(() => playStore.score, {duration: 300, easing: expoOut});
   let formattedScore = $derived(Math.floor(score.current).toLocaleString());
+  // bonus: 1-5 deplending on bonus multiplier (which is 0-100)
+  let bonusMultiplier = $derived(1 + playStore.bonusMultiplier/25);
 
   const stitchLevelMultipliers: Record<EStitchLevel, number> = {
     [EStitchLevel.normal]: 1,
@@ -52,7 +55,8 @@
 
   function addScore(score: number): number {
     // here we can apply bonuses later
-    const scoreToAdd = score;
+    // const scoreToAdd = score;
+    const scoreToAdd = score * bonusMultiplier;
     playStore.score += scoreToAdd;
     scaleSpring.set(1.25);
     setTimeout(() => scaleSpring.set(1), 150);
@@ -119,6 +123,7 @@
       text-shadow: 0 0 20px #ff9900;
       color: orange;
       justify-self: center;
+      text-transform: uppercase;
   }
 
   .score-box {

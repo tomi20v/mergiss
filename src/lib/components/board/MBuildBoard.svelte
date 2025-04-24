@@ -210,7 +210,8 @@
       //  more stitches - just slightly, and even like this it will have to be limited so that
       //  when big pieces touch it won't result in huge TTLs
       // const q = Math.pow(1+(groupsToMerge.length-1)/10+stitchCount/10, 1/4);
-      const q = Math.pow(1+(groupCount-1)/10 + Math.min(stitchCount, 9)/20, 1/4);
+      // const q = Math.pow(1+(groupCount-1)/10 + Math.min(stitchCount, 9)/20, 1/4);
+      const q = Math.pow(1+(groupCount-1)/15 + Math.min(stitchCount, 9)/25, 1/6);
       const ttl = Math.min(
         (prev.ttl*2 + curr.ttl),
         (prev.ttl + curr.ttl*2),

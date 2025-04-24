@@ -1,27 +1,10 @@
-<!--
-<TopAppBar
-        variant="standard"
-        dense
->
-  <Row>
-    <Section>
-      <IconButton class="material-icons">merge</IconButton>
-      <Title>MERGISS</Title>
-    </Section>
-    <Section align="end" >
-      <MGameScore />
-    </Section>
-    <Section align="end" toolbar>
-      <IconButton class="material-icons" onclick={onToggleFullScreen}>fullscreen</IconButton>
-    </Section>
-  </Row>
-</TopAppBar>
--->
 <div class="h-screen">
   <div id="app-grid"
        class="grow grid">
-    <div id="app-bar" class="h1">
-      MΞЯGIS<div class="reverse">S</div>
+    <div id="app-bar" class="h1 flex flex-row justify-between items-center w-full">
+      <div class="w-1/6"></div>
+      <div class="flex-grow flex justify-center">{leetize("MERGIS")}<div class="reverse">S</div></div>
+      <div class="w-1/6 text-right text-xs tracking-normal">v{versionString}</div>
     </div>
     <div id="top-container"
          class="text-white"
@@ -29,10 +12,11 @@
       <MGenerators />
     </div>
     <div id="left-column"
-         class="flex flex-col gap-2 text-white"
+         class="flex flex-col text-white"
          style="background-color: {devDraw ? '#fc8' : 'cf8'};">
-      <div class="flex grow" >
-<!--        AAA-->
+      <div class="flex grow flex-row">
+        <MBonusBar />
+        <MProgressBar color="green" value={0} label={leetize("LEVEL")} markPositions={[21, 50, 90]} />
       </div>
       <div class="flex justify-center">
         <MLaunchButton />
@@ -66,7 +50,11 @@
   import Analytics from "$lib/components/Analytics.svelte";
   import {uiBus} from "$lib/util/uiBus";
   import MGenerators from "$lib/components/piece/MGenerators.svelte";
+  import MProgressBar from "$lib/components/MProgressBar.svelte";
   import MLaunchButton from "$lib/components/MLaunchButton.svelte";
+  import { leetize } from "$lib/../util/texts";
+  import MBonusBar from "$lib/components/scores/MBonusBar.svelte";
+  import { version } from '$app/environment';
 
   let { children } = $props();
 
@@ -75,6 +63,7 @@
 
   var documentElement!: HTMLElement;
   let isFullScreen = false;
+  let versionString = $derived(version.split('.').slice(0, 2).join('.'));
 
   onMount(() => {
     documentElement = document.documentElement;
@@ -145,7 +134,7 @@
         user-select: none;
     }
     :global(.panel-border) {
-        border: 4px solid #262626;
+        border: clamp(3px, 0.33vw, 5px) solid #262626;
         border-radius: 1.5em;
         background: #000;
     }
@@ -189,6 +178,10 @@
     }
     #left-column {
         grid-area: left;
+        gap: 0.5vw;
+    }
+    #left-column > div {
+        gap: 1.2vw;
     }
     #bottom-container {
         grid-area: bottom;
