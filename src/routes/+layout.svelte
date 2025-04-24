@@ -1,22 +1,3 @@
-<!--
-<TopAppBar
-        variant="standard"
-        dense
->
-  <Row>
-    <Section>
-      <IconButton class="material-icons">merge</IconButton>
-      <Title>MERGISS</Title>
-    </Section>
-    <Section align="end" >
-      <MGameScore />
-    </Section>
-    <Section align="end" toolbar>
-      <IconButton class="material-icons" onclick={onToggleFullScreen}>fullscreen</IconButton>
-    </Section>
-  </Row>
-</TopAppBar>
--->
 <div class="h-screen">
   <div id="app-grid"
        class="grow grid">
@@ -29,7 +10,7 @@
       <MGenerators />
     </div>
     <div id="left-column"
-         class="flex flex-col gap-2 text-white"
+         class="flex flex-col text-white"
          style="background-color: {devDraw ? '#fc8' : 'cf8'};">
       <div class="flex grow" >
 <!--        AAA-->
@@ -146,7 +127,7 @@
         user-select: none;
     }
     :global(.panel-border) {
-        border: 4px solid #262626;
+        border: clamp(3px, 0.33vw, 5px) solid #262626;
         border-radius: 1.5em;
         background: #000;
     }
@@ -190,6 +171,10 @@
     }
     #left-column {
         grid-area: left;
+        gap: 0.5vw;
+    }
+    #left-column > div {
+        gap: 1.2vw;
     }
     #bottom-container {
         grid-area: bottom;

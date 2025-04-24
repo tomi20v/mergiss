@@ -1,4 +1,4 @@
-<div class="panel-border progress-bar-container h-full flex grow">
+<div class="panel-border progress-bar-container h-full flex grow" >
   <div class="progress-bar-track">
     {#if label}
       <div class="progress-bar-label"
@@ -28,14 +28,14 @@
   import {adjustColorBrightness, hexToRgba} from "$lib/components/colorUtils";
 
   let {
-    fill = 0,
+    value = 0,
     markPositions = [33, 66],
     color = 'amber',
     label = '' // Default to empty string
   } = $props();
 
   // Ensure fill is between 2% and 99%
-  let clampedFill = $derived(Math.min(99, Math.max(2, fill)));
+  let clampedFill = $derived(Math.min(99, Math.max(2, value)));
 
   // Calculate label color based on fill percentage
   // Dark gray when low, white when high
@@ -135,6 +135,7 @@
 
   // Get current color variant based on fill percentage
   let currentVariant = $derived(generateColorVariant(baseColors[color], clampedFill));
+
 </script>
 
 <style lang="postcss">
@@ -169,6 +170,8 @@
         align-items: center;
         /*color: orange; !* Match the orange color used in score *!*/
         /*color: white; !* Match the orange color used in score *!*/
+        /* TODOOOOOOOOOOOOOOO label text sometimes too big (on big screen) */
+        /*font-size: max(1.8vw, 1em); !* Adjusted for Orbitron which appears larger *!*/
         font-size: max(1.8vw, 1em); /* Adjusted for Orbitron which appears larger */
         letter-spacing: 0; /* Increased spacing between letters */
         z-index: 3; /* Ensure label is above fill and marks */
@@ -202,8 +205,5 @@
         background: #3a3a3a;
         z-index: 2; /* Marks above fill, below label */
     }
-
-    /* Remove duplicate rules */
-    /* .progress-bar-container, .progress-bar-track, .progress-bar-fill, .progress-bar-mark styles were duplicated, removed the second set */
 
 </style>
