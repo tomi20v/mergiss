@@ -117,6 +117,8 @@
     return {
       availableColorCount,
       boardSize,
+      bonusLevel: playStore.bonusMultiplier,
+      bonusMultiplier: (1 + playStore.bonusMultiplier/25),
       elapsed: lastTimestamp ? elapsed(lastTimestamp) : 0,
       playScore: playStore.score,
       version: versionNumber,
