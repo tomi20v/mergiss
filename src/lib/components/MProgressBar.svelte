@@ -168,11 +168,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        /*color: orange; !* Match the orange color used in score *!*/
-        /*color: white; !* Match the orange color used in score *!*/
-        /* TODOOOOOOOOOOOOOOO label text sometimes too big (on big screen) */
-        /*font-size: max(1.8vw, 1em); !* Adjusted for Orbitron which appears larger *!*/
-        font-size: max(1.8vw, 1em); /* Adjusted for Orbitron which appears larger */
+        font-size: clamp(1em, 1.8vw, 1.4em); /* Adjusted for Orbitron which appears larger */
         letter-spacing: 0; /* Increased spacing between letters */
         z-index: 3; /* Ensure label is above fill and marks */
         text-align: center;
