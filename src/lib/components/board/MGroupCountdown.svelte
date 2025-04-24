@@ -68,7 +68,7 @@
     if (timerId) {
       clearTimeout(timerId);
     }
-    uiBus.off('groupClickStart', accelerate);
+    uiBus.off('accelerateGroup', accelerate);
   })
 
   function accelerate(g: number) {
