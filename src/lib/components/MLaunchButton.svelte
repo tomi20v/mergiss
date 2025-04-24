@@ -24,7 +24,8 @@
   import { onDestroy, onMount } from "svelte";
   import { flyTo } from "$lib/util/flyTo";
 
-  const increment = 0.05;
+  // const increment = 0.05;
+  const increment = 0.1;
   const scaleMinimum = 0.07;
   const overshootFactor = 3; // How much to overshoot (3x the increment)
   const scaleCompleteAt = 0.8; // Scale reaches 1 at this fill value
