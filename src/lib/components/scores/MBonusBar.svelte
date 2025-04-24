@@ -13,8 +13,7 @@
   import playStore from "$lib/playStore.svelte";
 
   const maxBonus = 100;
-  // const depletionRate = 14; // Bonus depletes by this per second
-  const depletionRate = 7; // Bonus depletes by this per second
+  const depletionRate = 14; // Bonus depletes by this per second
   const depletionInterval = 100; // Check every 100ms
   let depleteTimerId: ReturnType<typeof setInterval> | null = null;
   let suspendDepletion = false;
