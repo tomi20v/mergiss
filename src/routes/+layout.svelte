@@ -21,7 +21,7 @@
   <div id="app-grid"
        class="grow grid">
     <div id="app-bar" class="h1">
-      MΞЯGIS<div class="reverse">S</div>
+      {leetize("MERGIS")}<div class="reverse">S</div>
     </div>
     <div id="top-container"
          class="text-white"
@@ -67,6 +67,7 @@
   import {uiBus} from "$lib/util/uiBus";
   import MGenerators from "$lib/components/piece/MGenerators.svelte";
   import MLaunchButton from "$lib/components/MLaunchButton.svelte";
+  import { leetize } from "$lib/../util/texts";
 
   let { children } = $props();
 

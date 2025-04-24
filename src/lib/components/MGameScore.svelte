@@ -1,7 +1,7 @@
 <!-- I can't use classes on components, but I can use styles :/ -->
 <div class="score-card panel-border panel-padding-small">
   <div class="h1">
-    SC0RΞ
+    {leetize("score")}
   </div>
   <div class="score-box">
     <div id="game-score" class="score" style="transform: scale({scaleSpring.current});">
@@ -21,6 +21,7 @@
   import type Group from "$lib/game/Group.svelte";
   import {flyTo} from "$lib/util/flyTo";
   import {EStitchLevel, type Stitch} from "$lib/game/stitches";
+  import {leetize} from "../../util/texts";
 
   // these together (and with addScore) make a nice "pop" when score is increased
   // let scaleSpring = new Spring(1, { stiffness: 0.8, damping: 1 });
@@ -119,6 +120,7 @@
       text-shadow: 0 0 20px #ff9900;
       color: orange;
       justify-self: center;
+      text-transform: uppercase;
   }
 
   .score-box {
