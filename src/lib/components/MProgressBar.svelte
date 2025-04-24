@@ -32,6 +32,11 @@
     markPositions = [33, 66],
     color = 'amber',
     label = '' // Default to empty string
+  }: {
+    value: number,
+    markPositions?: number[],
+    color?: 'amber'|'green',
+    label: string,
   } = $props();
 
   // Ensure fill is between 2% and 99%

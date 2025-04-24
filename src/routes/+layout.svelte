@@ -16,7 +16,7 @@
          style="background-color: {devDraw ? '#fc8' : 'cf8'};">
       <div class="flex grow flex-row">
         <MBonusBar />
-        <MProgressBar color="green" value="0" label={leetize("LEVEL")}/>
+        <MProgressBar color="green" value={0} label={leetize("LEVEL")} markPositions={[21, 50, 90]} />
       </div>
       <div class="flex justify-center">
         <MLaunchButton />

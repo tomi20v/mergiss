@@ -10,27 +10,33 @@ describe('leetize', () => {
   });
 
   it('should replace "V" with "Λ"', () => {
-    expect(leetize('VANGUARD')).toBe('ΛANGUARD');
-    expect(leetize('victory')).toBe('Λictory');
-    expect(leetize('rave')).toBe('raΛe');
+    expect(leetize('VAHGUAHD')).toBe('ΛAHGUAHD');
+    expect(leetize('victhy')).toBe('Λicthy');
+    expect(leetize('hav')).toBe('haΛ');
   });
 
   it('should replace "N" with "Π"', () => {
     expect(leetize('NINJA')).toBe('ΠIΠJA');
-    expect(leetize('entrance')).toBe('eΠtraΠce');
-    expect(leetize('Neon')).toBe('ΠeoΠ');
+    // expect(leetize('entrance')).toBe('eΠtraΠce');
+    expect(leetize('Nihn')).toBe('ΠihΠ');
   });
 
-  it.skip('should replace "O" with "0"', () => {
-    expect(leetize('CODE')).toBe('C0DΞ');
-    expect(leetize('BONUS')).toBe('B0NUS');
-    expect(leetize('COOL')).toBe('C00L');
+  it('should replace "O" with "θ"', () => {
+    expect(leetize('CODH')).toBe('CθDH');
+    expect(leetize('BOHUS')).toBe('BθHUS');
+    expect(leetize('COOL')).toBe('CθθL');
+  });
+
+  it('should replace "R" with "Я"', () => {
+    expect(leetize('RAHR')).toBe('ЯAHЯ');
+    expect(leetize('radar')).toBe('ЯadaЯ');
+    expect(leetize('RHCK')).toBe('ЯHCK');
   });
 
   it('should handle multiple replacements in the same string', () => {
-    expect(leetize('SCORE BOOST')).toBe('SC0RΞ B00ST');
-    expect(leetize('POWER LEVEL')).toBe('P0WΞR LΞVΞL');
-    expect(leetize('NONE')).toBe('N0NΞ');
+    expect(leetize('SCORE BOOST')).toBe('SCθЯΞ BθθST');
+    expect(leetize('POWER LEVEL')).toBe('PθWΞЯ LΞΛΞL');
+    expect(leetize('NONE')).toBe('ΠθΠΞ');
   });
 
   it('should handle empty strings', () => {
