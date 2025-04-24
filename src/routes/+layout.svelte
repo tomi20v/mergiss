@@ -12,8 +12,9 @@
     <div id="left-column"
          class="flex flex-col text-white"
          style="background-color: {devDraw ? '#fc8' : 'cf8'};">
-      <div class="flex grow" >
-<!--        AAA-->
+      <div class="flex grow flex-row">
+        <MBonusBar />
+        <MProgressBar color="green" value="100" label={leetize("LEVEL")}/>
       </div>
       <div class="flex justify-center">
         <MLaunchButton />
@@ -47,8 +48,10 @@
   import Analytics from "$lib/components/Analytics.svelte";
   import {uiBus} from "$lib/util/uiBus";
   import MGenerators from "$lib/components/piece/MGenerators.svelte";
+  import MProgressBar from "$lib/components/MProgressBar.svelte";
   import MLaunchButton from "$lib/components/MLaunchButton.svelte";
   import { leetize } from "$lib/../util/texts";
+  import MBonusBar from "$lib/components/scores/MBonusBar.svelte";
 
   let { children } = $props();
 
