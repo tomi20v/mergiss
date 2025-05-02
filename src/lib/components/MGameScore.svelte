@@ -19,7 +19,7 @@
   import { Spring, Tween, } from "svelte/motion";
   import { expoOut } from "svelte/easing";
   import type Group from "$lib/game/Group.svelte";
-  import {flyTo} from "$lib/util/flyTo";
+  import {flyTo} from "html-trajectory";
   import {EStitchLevel, type Stitch} from "$lib/game/stitches";
   import {leetize} from "../../util/texts";
 
@@ -64,7 +64,7 @@
   }
 
   function flyToScore(flyId: string, onTransitionEnd: () => void = () => {}) {
-    flyTo(flyId, 'game-score', onTransitionEnd);
+    flyTo(flyId, 'game-score', {onTransitionEnd, removeOriginal: false});
   }
 
   function onGroupExpired({

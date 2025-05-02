@@ -22,7 +22,7 @@
   import type Piece from "$lib/game/piece/Piece";
   import { uiBus } from "$lib/util/uiBus";
   import { onDestroy, onMount } from "svelte";
-  import { flyTo } from "$lib/util/flyTo";
+  import { flyTo } from "html-trajectory";
 
   // const increment = 0.05;
   const increment = 0.1;
@@ -87,7 +87,7 @@
       // Emit event to expire the biggest group
       uiBus.emit('expireBiggestGroup', {origin: 'launchButton'});
 
-      flyTo('rocket-icon', 'game-score');
+      flyTo('rocket-icon', 'game-score', {removeOriginal: false});
 
       // Reset fill and rotation state after activation
       const oldFill = fill;
