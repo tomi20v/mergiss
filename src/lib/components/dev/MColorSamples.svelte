@@ -2,6 +2,7 @@
     {#each Object.keys(colors) as key}
       {@const color = colors[key]}
       <div class="sample flex-1"
+           id="color-sample-{key}"
            style="background-color: {color};"
 
       ></div>

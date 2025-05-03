@@ -22,7 +22,7 @@
   import type Piece from "$lib/game/piece/Piece";
   import { uiBus } from "$lib/util/uiBus";
   import { onDestroy, onMount } from "svelte";
-  import { flyTo } from "html-trajectory";
+  import { projectile } from "html-trajectory";
 
   // const increment = 0.05;
   const increment = 0.1;
@@ -84,17 +84,26 @@
       updateScale(fill, oldFill);
     }
     else {
+      isRotating = false;
       // Emit event to expire the biggest group
       uiBus.emit('expireBiggestGroup', {origin: 'launchButton'});
+      // setTimeout() is added so isRotating is updated (removed) before cloning
+      setTimeout(() => {
+        projectile('rocket-icon', 'game-score', {
+          // I could tweak this based on aspect/screen size?
+          duration: 0.6,
+          acceleration: 50,
+          removeOriginal: false,
+          scale: 0.1,
+        });
 
-      flyTo('rocket-icon', 'game-score', {removeOriginal: false});
+        // Reset fill and rotation state after activation
+        const oldFill = fill;
+        fill = 0;
 
-      // Reset fill and rotation state after activation
-      const oldFill = fill;
-      fill = 0;
-
-      // Explicitly call updateScale to reset the scale
-      updateScale(fill, oldFill);
+        // Explicitly call updateScale to reset the scale
+        updateScale(fill, oldFill);
+      })
     }
   }
 
@@ -273,4 +282,10 @@
         text-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
         animation: pulse 0.8s ease-in-out infinite;
     }
+
+    /** this sets a useful size, since original "60%" would translate to 60% screen height when attached to body */
+    :global(.rocket-icon.html-trajectory-cloned) {
+        height: 10vw !important;
+    }
+
 </style>
