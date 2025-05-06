@@ -23,15 +23,30 @@
     </div>
   {/if}
   {#if showRocketLate}
-    <div class="absolute inset-0 flex items-center justify-center" style="z-index: 1000">
-      <img 
+    <div class="absolute inset-0 flex items-center justify-center" style="z-index: 1000; transform: rotate(-12deg);">
+      <img
         src="/rocketLate.png"
         alt="Rocket arrived late"
         class="w-[90%] h-auto object-contain select-none pointer-events-none"
-        style="transform: rotate(-12deg); user-drag: none;"
+        style="user-drag: none;"
         draggable="false"
         in:scale={{ duration: 600, easing: elasticInOut }}
       />
+    </div>
+  {/if}
+  {#if showRocketBoom}
+    <div class="absolute inset-0 w-2/3 place-self-center flex items-center justify-center" style="z-index: 1000; transform: rotate(-12deg);">
+        <img
+          src="/rocketBoom.png"
+          alt="Rocket boom"
+          class="w-[90%] h-auto object-contain select-none pointer-events-none"
+          style="user-drag: none;"
+          draggable="false"
+          in:scale={{ duration: 450, easing: elasticInOut }}
+        />
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="boom-text">{rocketBoomMultiplier}x</span>
+        </div>
     </div>
   {/if}
   <MBoardFields fields={fields} groups={groups} cellWidth={cellWidth} startX={startX} startY={startY} />
@@ -58,7 +73,6 @@
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
-  let showRocketLate: boolean = $state(false);
 
   let sizeX: number = $derived(playStore.boardSizeX);
   let sizeY: number = $derived(playStore.boardSizeY);
@@ -69,6 +83,10 @@
   const groups: Group[] = $state([]);
 
   let cursorAt: Position|null = $state(null);
+
+  let rocketBoomMultiplier: number = $state(0);
+  let showRocketBoom: boolean = $state(false);
+  let showRocketLate: boolean = $state(false);
 
   let cellWidth: number = $derived.by(() => {
     const extraWidth = sizeX >= 5 ? 1 : 1.2;
@@ -251,7 +269,10 @@
     }
   }
 
-  function onGroupExpired({group}: {group: Group}) {
+  function onGroupExpired({group, origin}: {group: Group, origin: string}) {
+    if (origin == "rocketLaunch") {
+      onRocketBoom();
+    }
     const index = groups.indexOf(group);
     fields.flat().forEach(field => {
       if (field.group == group.group) {
@@ -417,7 +438,16 @@
       showRocketLate = false;
     }, 999);
   }
-  
+
+  function onRocketBoom() {
+    rocketBoomMultiplier = Number((playStore.bonusMultiplier * playStore.rocketMultiplier).toFixed(1));
+    showRocketBoom = true;
+    // Hide the image after a few seconds
+    setTimeout(() => {
+      showRocketBoom = false;
+    }, 799);
+  }
+
   function onRocketLaunch(event: {
     origin: string,
     flyingId: string,
@@ -511,3 +541,31 @@
   }
 
 </script>
+
+<style lang="postcss">
+  .boom-text {
+    font-size: 5vw;
+    font-weight: bold;
+    color: #ff0000;
+    text-shadow:
+      -2px -2px 0 #fff,
+      2px -2px 0 #fff,
+      -2px 2px 0 #fff,
+      2px 2px 0 #fff,
+      0 0 15px #ff9900,
+      0 0 30px #ff9900;
+    transform: rotate(8deg);
+    animation: pulse-boom 0.2s ease-in-out infinite alternate;
+    letter-spacing: 0.5vw;
+    user-select: none;
+  }
+
+  @keyframes pulse-boom {
+    from {
+      transform: scale(1) rotate(8deg);
+    }
+    to {
+      transform: scale(1.2) rotate(-8deg);
+    }
+  }
+</style>

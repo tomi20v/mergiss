@@ -28,8 +28,7 @@
   let scaleSpring = new Spring(1, { stiffness: 0.3, damping: 0.25 });
   let score = Tween.of(() => playStore.score, {duration: 300, easing: expoOut});
   let formattedScore = $derived(Math.floor(score.current).toLocaleString());
-  // bonus: 1-5 deplending on bonus multiplier (which is 0-100)
-  let bonusMultiplier = $derived(1 + playStore.bonusPcnt/25);
+  let bonusMultiplier = $derived(playStore.bonusMultiplier);
 
   const stitchLevelMultipliers: Record<EStitchLevel, number> = {
     [EStitchLevel.normal]: 1,
@@ -85,7 +84,7 @@
       origin: string,
     }) {
     flyToScore(htmlId, () => {
-      const rocketMultiplier = origin == 'rocketLaunch' ? 10 : 1;
+      const rocketMultiplier = origin == 'rocketLaunch' ? playStore.rocketMultiplier : 1;
       const score = addScore(group.score * rocketMultiplier);
       uiBus.emit("groupExpiredScore", { group, score, origin });
       if (origin == 'rocketLaunch') {
