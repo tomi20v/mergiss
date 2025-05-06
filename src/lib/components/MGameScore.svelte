@@ -84,6 +84,9 @@
       htmlId: string,
       origin: string,
     }) {
+    if (origin == 'rocketLaunch') {
+      uiBus.emit("resetBonusBar");
+    }
     flyToScore(htmlId, () => {
       const rocketMultiplier = origin == 'rocketLaunch' ? 10 : 1;
       const score = addScore(group.score * rocketMultiplier);

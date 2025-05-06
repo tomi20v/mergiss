@@ -25,7 +25,7 @@
   onMount(() => {
     // Subscribe to the 'pieceDropped' event
     uiBus.on('pieceDropped', onPieceDropped);
-    uiBus.on('rocketLaunched', onRocketLaunched);
+    uiBus.on('resetBonusBar', onReset);
 
     // Start the depletion timer
     depleteTimerId = setInterval(() => {
@@ -52,7 +52,7 @@
 
   onDestroy(() => {
     uiBus.off('pieceDropped', onPieceDropped);
-    uiBus.off('rocketLaunched', onRocketLaunched);
+    uiBus.off('rocketLaunched', onReset);
     // Additional safety to clear the interval
     if (depleteTimerId) {
       clearInterval(depleteTimerId);
@@ -88,7 +88,7 @@
     // No need to update local state 'value' as it's derived
   }
 
-  function onRocketLaunched() {
+  function onReset() {
     playStore.bonusMultiplier = 0;
   }
 
