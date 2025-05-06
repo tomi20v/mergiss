@@ -20,7 +20,7 @@
   let suspendTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   // Use $derived to reactively read the bonusMultiplier from the store
-  let value = $derived(playStore.bonusMultiplier);
+  let value = $derived(playStore.bonusPcnt);
   
   onMount(() => {
     // Subscribe to the 'pieceDropped' event
@@ -33,7 +33,7 @@
         // Calculate depletion amount per interval
         const depleteAmount = depletionRate * (depletionInterval / 1000);
         // Ensure bonus doesn't go below 0
-        playStore.bonusMultiplier = Math.max(0, playStore.bonusMultiplier - depleteAmount);
+        playStore.bonusPcnt = Math.max(0, playStore.bonusPcnt - depleteAmount);
       }
     }, depletionInterval);
 
@@ -70,7 +70,7 @@
     rotationCount: number;
   }) {
     // Update the bonusMultiplier in the store directly
-    playStore.bonusMultiplier = Math.min(playStore.bonusMultiplier + event.piece.weight * 6.5, maxBonus);
+    playStore.bonusPcnt = Math.min(playStore.bonusPcnt + event.piece.weight * 6.5, maxBonus);
     
     // Suspend depletion for half a second
     suspendDepletion = true;
@@ -89,7 +89,7 @@
   }
 
   function onReset() {
-    playStore.bonusMultiplier = 0;
+    playStore.bonusPcnt = 0;
   }
 
 </script>

@@ -29,7 +29,7 @@
   let score = Tween.of(() => playStore.score, {duration: 300, easing: expoOut});
   let formattedScore = $derived(Math.floor(score.current).toLocaleString());
   // bonus: 1-5 deplending on bonus multiplier (which is 0-100)
-  let bonusMultiplier = $derived(1 + playStore.bonusMultiplier/25);
+  let bonusMultiplier = $derived(1 + playStore.bonusPcnt/25);
 
   const stitchLevelMultipliers: Record<EStitchLevel, number> = {
     [EStitchLevel.normal]: 1,
@@ -84,13 +84,13 @@
       htmlId: string,
       origin: string,
     }) {
-    if (origin == 'rocketLaunch') {
-      uiBus.emit("resetBonusBar");
-    }
     flyToScore(htmlId, () => {
       const rocketMultiplier = origin == 'rocketLaunch' ? 10 : 1;
       const score = addScore(group.score * rocketMultiplier);
       uiBus.emit("groupExpiredScore", { group, score, origin });
+      if (origin == 'rocketLaunch') {
+        uiBus.emit("resetBonusBar");
+      }
     });
   }
 

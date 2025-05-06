@@ -12,7 +12,8 @@ class PlayStore {
   boardSizeY: number = $state(0);
   mergeBoardCellWidth: number = $state(0);
   // scores
-  bonusMultiplier: number = $state(1);
+  bonusPcnt: number = $state(1);
+  bonusMultiplier: number = $derived(1 + this.bonusPcnt / 25);
   score: number = $state(0);
 }
 
@@ -29,7 +30,7 @@ function initStore() {
   playStore.boardSizeX = 3;
   playStore.boardSizeY = 3;
   // score
-  playStore.bonusMultiplier = 1;
+  playStore.bonusPcnt = 0;
   playStore.score = 0;
   // playStore.score = 99125808;
 }
