@@ -79,7 +79,8 @@
       remainingTTL: number,
     }) {
     flyToScore(htmlId, () => {
-      const score = addScore(group.score);
+      const rocketMultiplier = origin == 'rocketLaunch' ? 10 : 1;
+      const score = addScore(group.score * rocketMultiplier);
       uiBus.emit("groupExpiredScore", { group, score, remainingTTL, origin: origin });
     });
   }

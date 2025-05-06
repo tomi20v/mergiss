@@ -98,7 +98,7 @@
             duration: 0.6,
             acceleration: 42,
             // duration: 50.6,
-            // acceleration: 0.1,
+            // acceleration: 0.01,
             removeOriginal: false,
             scale: 0.2,
             // scale: 1,
@@ -259,8 +259,6 @@
     .rocket-icon.rotating {
         animation: spin 2s linear infinite;
     }
-    .rocket-icon.rotating {
-    }
 
     @keyframes pulse {
         0%, 100% {
@@ -297,7 +295,26 @@
         height: 10vw !important;
         width: 10vw !important;
         transform-origin: center center !important;
-        transform: none;
+        filter: brightness(0) invert(1)
+                drop-shadow(0 0 6px #fff) 
+                drop-shadow(0 0 10px rgba(30, 144, 255, 0.8)) /* Dodger Blue */
+                drop-shadow(0 0 14px rgba(204, 102, 51, 0.7)); /* Terracotta */
+        animation: rocket-glow 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes rocket-glow {
+        0%, 100% { 
+            filter: brightness(0) invert(1) 
+                    drop-shadow(0 0 6px #fff) 
+                    drop-shadow(0 0 10px rgba(30, 144, 255, 0.8)) /* Dodger Blue */
+                    drop-shadow(0 0 14px rgba(204, 102, 51, 0.7)); /* Terracotta */
+        }
+        50% { 
+            filter: brightness(0) invert(1) 
+                    drop-shadow(0 0 8px #fff) 
+                    drop-shadow(0 0 15px rgba(65, 105, 225, 0.9)) /* Royal Blue */
+                    drop-shadow(0 0 20px rgba(227, 115, 54, 0.8)); /* Deeper Terracotta */
+        }
     }
 
 </style>
