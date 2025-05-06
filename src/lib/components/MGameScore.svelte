@@ -79,12 +79,10 @@
       group,
       htmlId,
       origin,
-      remainingTTL,
     }: {
       group: Group,
       htmlId: string,
       origin: string,
-      remainingTTL: number,
     }) {
     flyToScore(htmlId, () => {
       const rocketMultiplier = origin == 'rocketLaunch' ? 10 : 1;

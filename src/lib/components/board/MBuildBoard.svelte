@@ -236,41 +236,6 @@
     }
   }
 
-  function onRocketLaunch(event: {
-    origin: string,
-    flyingId: string,
-    flyOptions: object,
-  }) {
-
-    if (groups.length === 0) {
-        return; // No groups to expire
-    }
-
-    // Find the group with the maximum weight
-    let biggestGroup = groups[0];
-    for (let i = 1; i < groups.length; i++) {
-        if (groups[i].weight > biggestGroup.weight) {
-            biggestGroup = groups[i];
-        }
-    }
-
-    // flyTo(
-    projectile(
-      event.flyingId,
-      'group-countdown-' + biggestGroup.group,
-      Object.assign({}, event.flyOptions, {
-        onTransitionEnd: () => {
-          uiBus.emit('groupExpired', {
-            group: biggestGroup,
-            htmlId: 'group-countdown-' + biggestGroup.group,
-            origin: 'rocketLaunch',
-          });
-        }
-      })
-    );
-
-  }
-
   function onGroupExpired({group}: {group: Group}) {
     const index = groups.indexOf(group);
     fields.flat().forEach(field => {
@@ -346,12 +311,13 @@
   }
 
   function putOnBoard(piece: Piece, iterator: FlatteningIterator<number>) {
-    // first just create a new grooup. We'll merge it with connecting groups later
+    // calculate center for new group
     const p = [...iterator]
       .filter(each => each.value)
       .reduce(
         (acc, each) => ({ x: acc.x + each.x + 0.5, y: acc.y + each.y + 0.5, cnt: acc.cnt + 1 }),
         {x: 0, y: 0, cnt: 0});
+    // first just create a new grooup. We'll merge it with connecting groups later
     const newGroup = Group.fromPiece(new Position(p.x/p.cnt, p.y/p.cnt), piece);
     const groupIdsToMerge: Set<number> = new Set();
     let overlaps = 0;
@@ -399,6 +365,7 @@
         })
     }
 
+    // merge groups as needed
     if (groupIdsToMerge.size > 0) {
 
       mergedGroup = mergeGroups(groupIdsToMerge, stitches.length, newGroup);
@@ -425,6 +392,46 @@
       expandBoard();
       expireEmptyGroup();
     }, 300);
+
+  }
+
+  function onRocketLaunch(event: {
+    origin: string,
+    flyingId: string,
+    flyOptions: object,
+  }) {
+
+    // deny launch if there's no groups
+    if (groups.length === 0) {
+      uiBus.emit('rocketLaunchFailed');
+      return;
+    }
+  
+    // Find the group with the maximum weight
+    let biggestGroup = groups[0];
+    for (let i = 1; i < groups.length; i++) {
+      if (groups[i].weight > biggestGroup.weight) {
+        biggestGroup = groups[i];
+      }
+    }
+  
+    // flyTo(
+    projectile(
+      event.flyingId,
+      'group-countdown-' + biggestGroup.group,
+      Object.assign({}, event.flyOptions, {
+        onTransitionEnd: () => {
+          uiBus.emit('groupExpired', {
+            group: biggestGroup,
+            htmlId: 'group-countdown-' + biggestGroup.group,
+            origin: 'rocketLaunch',
+          });
+        }
+      })
+    );
+
+    // Emit rocketLaunched event after the animation completes
+    uiBus.emit('rocketLaunched');
 
   }
 

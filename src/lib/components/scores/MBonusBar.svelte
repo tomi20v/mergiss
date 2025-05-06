@@ -25,7 +25,8 @@
   onMount(() => {
     // Subscribe to the 'pieceDropped' event
     uiBus.on('pieceDropped', onPieceDropped);
-  
+    uiBus.on('rocketLaunched', onRocketLaunched);
+
     // Start the depletion timer
     depleteTimerId = setInterval(() => {
       if (!playStore.paused && !suspendDepletion) {
@@ -35,7 +36,7 @@
         playStore.bonusMultiplier = Math.max(0, playStore.bonusMultiplier - depleteAmount);
       }
     }, depletionInterval);
-  
+
     // It's crucial to unsubscribe when the component is destroyed
     // to prevent memory leaks.
     return () => {
@@ -48,8 +49,10 @@
       }
     };
   });
-  
+
   onDestroy(() => {
+    uiBus.off('pieceDropped', onPieceDropped);
+    uiBus.off('rocketLaunched', onRocketLaunched);
     // Additional safety to clear the interval
     if (depleteTimerId) {
       clearInterval(depleteTimerId);
@@ -58,14 +61,14 @@
       clearTimeout(suspendTimeoutId);
     }
   });
-  
+
   // Define your listener function
-  const onPieceDropped = (event: {
+  function onPieceDropped (event: {
     origin: string;
     piece: Piece;
     dragTime: number;
     rotationCount: number;
-  }) => {
+  }) {
     // Update the bonusMultiplier in the store directly
     playStore.bonusMultiplier = Math.min(playStore.bonusMultiplier + event.piece.weight * 6.5, maxBonus);
     
@@ -83,6 +86,10 @@
     }, value == 100 ? 1000 : 500);
     
     // No need to update local state 'value' as it's derived
-  };
+  }
+
+  function onRocketLaunched() {
+    playStore.bonusMultiplier = 0;
+  }
 
 </script>

@@ -30,7 +30,8 @@
   const opacityStart = 0.2; // Opacity at scaleCompleteAt
 
   let fill = $state(0);
-  let isRotating = $derived(fill == 1);
+  let isLaunching = $state(false);
+  let isRotating = $derived((fill == 1) && !isLaunching);
   let currentScale = $state(scaleMinimum);
   let targetScale = $state(scaleMinimum);
   let animationId: number | null = null;
@@ -50,23 +51,22 @@
   });
 
   onMount(() => {
-    uiBus.on("pieceDropped", onPieceDropped);
     uiBus.on("launchButtonFill", onFill);
+    uiBus.on("pieceDropped", onPieceDropped);
+    uiBus.on("rocketLaunched", onRocketLaunched);
+    uiBus.on("rocketLaunchFailed", onRocketLaunchFailed);
   });
-
+  
   onDestroy(() => {
+    uiBus.off("launchButtonFill", onFill);
     uiBus.off("pieceDropped", onPieceDropped);
+    uiBus.off("rocketLaunched", onRocketLaunched);
+    uiBus.off("rocketLaunchFailed", onRocketLaunchFailed);
     if (animationId) {
       cancelAnimationFrame(animationId);
     }
   });
 
-  // function onPieceDropped(event: {
-  //   origin: string;
-  //   piece: Piece;
-  //   dragTime: number;
-  //   rotationCount: number;
-  // }) {
   function onPieceDropped() {
     const oldFill = fill;
     // Increase fill by random value between 0-0.1, capped at 1
@@ -83,12 +83,10 @@
       updateScale(fill, oldFill);
     }
     else {
-      isRotating = false;
+      isLaunching = true;
 
       // setTimeout() is added so isRotating is updated (removed) before cloning
       setTimeout(() => {
-
-
         // Emit event to expire the biggest group
         uiBus.emit('rocketLaunch', {
           origin: 'launchButton',
@@ -104,13 +102,6 @@
             // scale: 1,
           },
         });
-
-        // Reset fill and rotation state after activation
-        const oldFill = fill;
-        fill = 0;
-
-        // Explicitly call updateScale to reset the scale
-        updateScale(fill, oldFill);
       })
     }
   }
@@ -118,6 +109,20 @@
   function onFill() {
     fill = 0.99;
     updateScale(fill, fill);
+  }
+
+  function onRocketLaunched() {
+    isLaunching = false;
+    // Reset fill and rotation state after launch is complete
+    const oldFill = fill;
+    fill = 0;
+
+    // Explicitly call updateScale to reset the scale
+    updateScale(fill, oldFill);
+  }
+
+  function onRocketLaunchFailed() {
+    isLaunching = false;
   }
 
   function triggerOvershootAnimation(increase: number): void {
