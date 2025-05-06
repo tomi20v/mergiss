@@ -18,8 +18,20 @@
         {:else}
         <button onclick={() => playStore.paused=true}>||</button>
         {/if}
-        <button onclick={() => uiBus.emit('launchButtonFill')}>R</button>
+        <button onclick={() => { uiBus.emit('launchButtonFill'); onRocketArrivedLate();}}>R</button>
       </div>
+    </div>
+  {/if}
+  {#if showRocketLate}
+    <div class="absolute inset-0 flex items-center justify-center" style="z-index: 1000">
+      <img 
+        src="/rocketLate.png"
+        alt="Rocket arrived late"
+        class="w-[90%] h-auto object-contain select-none pointer-events-none"
+        style="transform: rotate(-12deg); user-drag: none;"
+        draggable="false"
+        in:scale={{ duration: 600, easing: elasticInOut }}
+      />
     </div>
   {/if}
   <MBoardFields fields={fields} groups={groups} cellWidth={cellWidth} startX={startX} startY={startY} />
@@ -28,6 +40,8 @@
 
   import {dev} from "$app/environment";
   import {onMount, onDestroy} from "svelte";
+  import {scale} from 'svelte/transition';
+  import {elasticInOut} from 'svelte/easing';
   import Position from "$lib/game/geometry/Position";
   import Piece from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util/uiBus";
@@ -44,6 +58,7 @@
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
+  let showRocketLate: boolean = $state(false);
 
   let sizeX: number = $derived(playStore.boardSizeX);
   let sizeY: number = $derived(playStore.boardSizeY);
@@ -395,6 +410,14 @@
 
   }
 
+  function onRocketArrivedLate() {
+    showRocketLate = true;
+    // Hide the image after a few seconds
+    setTimeout(() => {
+      showRocketLate = false;
+    }, 999);
+  }
+  
   function onRocketLaunch(event: {
     origin: string,
     flyingId: string,
@@ -414,13 +437,23 @@
         biggestGroup = groups[i];
       }
     }
-  
+
+    function groupExists(groupId: number): boolean {
+      return groups.some(each => each.group == groupId);
+    }
+
     // flyTo(
     projectile(
       event.flyingId,
       'group-countdown-' + biggestGroup.group,
       Object.assign({}, event.flyOptions, {
         onTransitionEnd: () => {
+          // if group expired meanwhile, don't do anything. It could actually show an explosion
+          if (!groupExists(biggestGroup.group)) {
+            uiBus.emit('rocketArrivedLate');
+            onRocketArrivedLate();
+            return;
+          }
           uiBus.emit('groupExpired', {
             group: biggestGroup,
             htmlId: 'group-countdown-' + biggestGroup.group,

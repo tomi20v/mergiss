@@ -93,12 +93,12 @@
           flyingId: 'rocket-icon',
           flyOptions: {
             // I could tweak this based on aspect/screen size?
-            duration: 0.6,
-            acceleration: 42,
-            // duration: 50.6,
-            // acceleration: 0.01,
+            duration: 1.2,
+            acceleration: 12,
+            // duration: 6.1,
+            // duration: 1.1,
             removeOriginal: false,
-            scale: 0.2,
+            scale: 0.3,
             // scale: 1,
           },
         });
