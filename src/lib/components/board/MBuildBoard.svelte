@@ -40,6 +40,7 @@
   import {EDirection} from "$lib/game/geometry/EDirection";
   import throttle from 'lodash.throttle';
   import {type Stitch, stitchLevel} from "$lib/game/stitches";
+  import {projectile} from "html-trajectory";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -73,13 +74,13 @@
     );
     uiBus.on('pieceDrop', onPieceDrop);
     uiBus.on('groupExpired', onGroupExpired);
-    uiBus.on('expireBiggestGroup', onExpireBiggestGroup);
+    uiBus.on('rocketLaunch', onRocketLaunch);
   })
 
   onDestroy(() => {
     uiBus.off('pieceDrop', onPieceDrop);
     uiBus.off('groupExpired', onGroupExpired);
-    uiBus.off('expireBiggestGroup', onExpireBiggestGroup);
+    uiBus.off('rocketLaunch', onRocketLaunch);
   });
 
   function areValidCoordinates(x: number, y: number): boolean {
@@ -175,7 +176,7 @@
     const group: Group = groups.slice(-1).pop() as Group;
     if (!fields.flat().find(each => each.group == group.group)) {
       group.ttl = 0;
-      uiBus.emit('groupExpired', {group});
+      uiBus.emit('groupExpired', {group, origin: 'emptyGroup'});
     }
   }
 
@@ -235,7 +236,12 @@
     }
   }
 
-  function onExpireBiggestGroup(event: {origin: string}) {
+  function onRocketLaunch(event: {
+    origin: string,
+    flyingId: string,
+    flyOptions: object,
+  }) {
+
     if (groups.length === 0) {
         return; // No groups to expire
     }
@@ -248,13 +254,21 @@
         }
     }
 
-    // Emit the standard groupExpired event with the CORRECT htmlId format
-    uiBus.emit('groupExpired', { 
-      group: biggestGroup,
-      htmlId: `group-countdown-${biggestGroup.group}`,
-      remainingTTL: biggestGroup.ttl,
-      origin: event.origin,
-    });
+    // flyTo(
+    projectile(
+      event.flyingId,
+      'group-countdown-' + biggestGroup.group,
+      Object.assign({}, event.flyOptions, {
+        onTransitionEnd: () => {
+          uiBus.emit('groupExpired', {
+            group: biggestGroup,
+            htmlId: 'group-countdown-' + biggestGroup.group,
+            origin: 'rocketLaunch',
+            remainingTTL: biggestGroup.ttl,
+          });
+        }
+      })
+    );
 
   }
 

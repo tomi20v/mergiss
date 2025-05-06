@@ -19,10 +19,8 @@
 <!--{isRotating}-->
 
 <script lang="ts">
-  import type Piece from "$lib/game/piece/Piece";
   import { uiBus } from "$lib/util/uiBus";
   import { onDestroy, onMount } from "svelte";
-  import { projectile } from "html-trajectory";
 
   // const increment = 0.05;
   const increment = 0.1;
@@ -63,12 +61,13 @@
     }
   });
 
-  function onPieceDropped(event: {
-    origin: string;
-    piece: Piece;
-    dragTime: number;
-    rotationCount: number;
-  }) {
+  // function onPieceDropped(event: {
+  //   origin: string;
+  //   piece: Piece;
+  //   dragTime: number;
+  //   rotationCount: number;
+  // }) {
+  function onPieceDropped() {
     const oldFill = fill;
     // Increase fill by random value between 0-0.1, capped at 1
     const randomIncrease = Math.random() * increment;
@@ -85,16 +84,25 @@
     }
     else {
       isRotating = false;
-      // Emit event to expire the biggest group
-      uiBus.emit('expireBiggestGroup', {origin: 'launchButton'});
+
       // setTimeout() is added so isRotating is updated (removed) before cloning
       setTimeout(() => {
-        projectile('rocket-icon', 'game-score', {
-          // I could tweak this based on aspect/screen size?
-          duration: 0.6,
-          acceleration: 50,
-          removeOriginal: false,
-          scale: 0.1,
+
+
+        // Emit event to expire the biggest group
+        uiBus.emit('rocketLaunch', {
+          origin: 'launchButton',
+          flyingId: 'rocket-icon',
+          flyOptions: {
+            // I could tweak this based on aspect/screen size?
+            duration: 0.6,
+            acceleration: 42,
+            // duration: 50.6,
+            // acceleration: 0.1,
+            removeOriginal: false,
+            scale: 0.2,
+            // scale: 1,
+          },
         });
 
         // Reset fill and rotation state after activation
@@ -240,11 +248,11 @@
     @keyframes spin {
         from {
             /* Keep the rocket positioned correctly while rotating with tighter radius */
-            transform: translate(-50%, -50%) rotate(0deg);
+            transform: translate(-45%, -50%) rotate(0deg);
         }
         to {
             /* Keep the rocket positioned correctly while rotating with tighter radius */
-            transform: translate(-50%, -50%) rotate(360deg);
+            transform: translate(-45%, -50%) rotate(360deg);
         }
     }
 
@@ -285,7 +293,11 @@
 
     /** this sets a useful size, since original "60%" would translate to 60% screen height when attached to body */
     :global(.rocket-icon.html-trajectory-cloned) {
+        /*height: 10vw !important;*/
         height: 10vw !important;
+        width: 10vw !important;
+        transform-origin: center center !important;
+        transform: none;
     }
 
 </style>
