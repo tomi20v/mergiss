@@ -64,7 +64,15 @@
   }
 
   function flyToScore(flyId: string, onTransitionEnd: () => void = () => {}) {
-    flyTo(flyId, 'game-score', {onTransitionEnd, removeOriginal: false});
+    const element = document.getElementById(flyId);
+    if (!element || !flyId) {
+      // If there's no HTML ID or it's not valid, just execute the callback
+      onTransitionEnd();
+      // setTimeout(onTransitionEnd, 1);
+    } else {
+      // Otherwise, call flyTo as before
+      flyTo(flyId, 'game-score', {onTransitionEnd, removeOriginal: false});
+    }
   }
 
   function onGroupExpired({
