@@ -264,7 +264,6 @@
             group: biggestGroup,
             htmlId: 'group-countdown-' + biggestGroup.group,
             origin: 'rocketLaunch',
-            remainingTTL: biggestGroup.ttl,
           });
         }
       })

@@ -167,7 +167,6 @@
 
   function onGroupExpired(event: {
     group: Group;
-    remainingTTL: number;
     score: number;
     origin: string;
   }) {
@@ -175,7 +174,7 @@
       acceleratedTime: event.group.acceleratedTime,
       baseScore: event.group.score,
       lifeTime: elapsed(event.group.createdAt),
-      remainingTTL: event.remainingTTL,
+      remainingTTL: event.group.ttl,
       score: event.score,
       origin: event.origin,
       weight: event.group.weight,

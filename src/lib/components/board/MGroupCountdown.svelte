@@ -125,8 +125,7 @@
           uiBus.emit('groupExpired', {
             group,
             htmlId: "group-countdown-" + group.group,
-            origin: origin,
-            remainingTTL: 0,
+            origin: 'countdown',
           });
         })
       }
