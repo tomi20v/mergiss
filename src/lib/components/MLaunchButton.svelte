@@ -19,10 +19,8 @@
 <!--{isRotating}-->
 
 <script lang="ts">
-  import type Piece from "$lib/game/piece/Piece";
   import { uiBus } from "$lib/util/uiBus";
   import { onDestroy, onMount } from "svelte";
-  import { flyTo } from "$lib/util/flyTo";
 
   // const increment = 0.05;
   const increment = 0.1;
@@ -32,7 +30,8 @@
   const opacityStart = 0.2; // Opacity at scaleCompleteAt
 
   let fill = $state(0);
-  let isRotating = $derived(fill == 1);
+  let isLaunching = $state(false);
+  let isRotating = $derived((fill == 1) && !isLaunching);
   let currentScale = $state(scaleMinimum);
   let targetScale = $state(scaleMinimum);
   let animationId: number | null = null;
@@ -52,23 +51,23 @@
   });
 
   onMount(() => {
-    uiBus.on("pieceDropped", onPieceDropped);
     uiBus.on("launchButtonFill", onFill);
+    uiBus.on("pieceDropped", onPieceDropped);
+    uiBus.on("rocketLaunched", onRocketLaunched);
+    uiBus.on("rocketLaunchFailed", onRocketLaunchFailed);
   });
-
+  
   onDestroy(() => {
+    uiBus.off("launchButtonFill", onFill);
     uiBus.off("pieceDropped", onPieceDropped);
+    uiBus.off("rocketLaunched", onRocketLaunched);
+    uiBus.off("rocketLaunchFailed", onRocketLaunchFailed);
     if (animationId) {
       cancelAnimationFrame(animationId);
     }
   });
 
-  function onPieceDropped(event: {
-    origin: string;
-    piece: Piece;
-    dragTime: number;
-    rotationCount: number;
-  }) {
+  function onPieceDropped() {
     const oldFill = fill;
     // Increase fill by random value between 0-0.1, capped at 1
     const randomIncrease = Math.random() * increment;
@@ -84,23 +83,46 @@
       updateScale(fill, oldFill);
     }
     else {
-      // Emit event to expire the biggest group
-      uiBus.emit('expireBiggestGroup', {origin: 'launchButton'});
+      isLaunching = true;
 
-      flyTo('rocket-icon', 'game-score');
-
-      // Reset fill and rotation state after activation
-      const oldFill = fill;
-      fill = 0;
-
-      // Explicitly call updateScale to reset the scale
-      updateScale(fill, oldFill);
+      // setTimeout() is added so isRotating is updated (removed) before cloning
+      setTimeout(() => {
+        // Emit event to expire the biggest group
+        uiBus.emit('rocketLaunch', {
+          origin: 'launchButton',
+          flyingId: 'rocket-icon',
+          flyOptions: {
+            // I could tweak this based on aspect/screen size?
+            duration: 1.2,
+            acceleration: 12,
+            // duration: 6.1,
+            // duration: 1.1,
+            removeOriginal: false,
+            scale: 0.3,
+            // scale: 1,
+          },
+        });
+      })
     }
   }
 
   function onFill() {
     fill = 0.99;
     updateScale(fill, fill);
+  }
+
+  function onRocketLaunched() {
+    isLaunching = false;
+    // Reset fill and rotation state after launch is complete
+    const oldFill = fill;
+    fill = 0;
+
+    // Explicitly call updateScale to reset the scale
+    updateScale(fill, oldFill);
+  }
+
+  function onRocketLaunchFailed() {
+    isLaunching = false;
   }
 
   function triggerOvershootAnimation(increase: number): void {
@@ -231,18 +253,16 @@
     @keyframes spin {
         from {
             /* Keep the rocket positioned correctly while rotating with tighter radius */
-            transform: translate(-50%, -50%) rotate(0deg);
+            transform: translate(-45%, -50%) rotate(0deg);
         }
         to {
             /* Keep the rocket positioned correctly while rotating with tighter radius */
-            transform: translate(-50%, -50%) rotate(360deg);
+            transform: translate(-45%, -50%) rotate(360deg);
         }
     }
 
     .rocket-icon.rotating {
         animation: spin 2s linear infinite;
-    }
-    .rocket-icon.rotating {
     }
 
     @keyframes pulse {
@@ -273,4 +293,33 @@
         text-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
         animation: pulse 0.8s ease-in-out infinite;
     }
+
+    /** this sets a useful size, since original "60%" would translate to 60% screen height when attached to body */
+    :global(.rocket-icon.html-trajectory-cloned) {
+        /*height: 10vw !important;*/
+        height: 10vw !important;
+        width: 10vw !important;
+        transform-origin: center center !important;
+        filter: brightness(0) invert(1)
+                drop-shadow(0 0 6px #fff) 
+                drop-shadow(0 0 10px rgba(30, 144, 255, 0.8)) /* Dodger Blue */
+                drop-shadow(0 0 14px rgba(204, 102, 51, 0.7)); /* Terracotta */
+        animation: rocket-glow 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes rocket-glow {
+        0%, 100% { 
+            filter: brightness(0) invert(1) 
+                    drop-shadow(0 0 6px #fff) 
+                    drop-shadow(0 0 10px rgba(30, 144, 255, 0.8)) /* Dodger Blue */
+                    drop-shadow(0 0 14px rgba(204, 102, 51, 0.7)); /* Terracotta */
+        }
+        50% { 
+            filter: brightness(0) invert(1) 
+                    drop-shadow(0 0 8px #fff) 
+                    drop-shadow(0 0 15px rgba(65, 105, 225, 0.9)) /* Royal Blue */
+                    drop-shadow(0 0 20px rgba(227, 115, 54, 0.8)); /* Deeper Terracotta */
+        }
+    }
+
 </style>

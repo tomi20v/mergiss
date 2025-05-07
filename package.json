@@ -50,6 +50,7 @@
   "dependencies": {
     "@tomi20v/iterators": "^0.14.0",
     "eventemitter3": "^5.0.1",
+    "html-trajectory": "^0.3.6",
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1",
     "lui-g": "^1.0.2",

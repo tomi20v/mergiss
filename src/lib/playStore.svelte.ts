@@ -12,7 +12,10 @@ class PlayStore {
   boardSizeY: number = $state(0);
   mergeBoardCellWidth: number = $state(0);
   // scores
-  bonusMultiplier: number = $state(1);
+  bonusPcnt: number = $state(1);
+  // bonus: 1-5 deplending on bonus multiplier (which is 0-100)
+  bonusMultiplier: number = $derived(1 + this.bonusPcnt / 25);
+  rocketMultiplier: number = 10;
   score: number = $state(0);
 }
 
@@ -29,7 +32,7 @@ function initStore() {
   playStore.boardSizeX = 3;
   playStore.boardSizeY = 3;
   // score
-  playStore.bonusMultiplier = 1;
+  playStore.bonusPcnt = 0;
   playStore.score = 0;
   // playStore.score = 99125808;
 }

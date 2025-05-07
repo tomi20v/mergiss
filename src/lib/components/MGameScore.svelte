@@ -19,7 +19,7 @@
   import { Spring, Tween, } from "svelte/motion";
   import { expoOut } from "svelte/easing";
   import type Group from "$lib/game/Group.svelte";
-  import {flyTo} from "$lib/util/flyTo";
+  import {flyTo} from "html-trajectory";
   import {EStitchLevel, type Stitch} from "$lib/game/stitches";
   import {leetize} from "../../util/texts";
 
@@ -28,8 +28,7 @@
   let scaleSpring = new Spring(1, { stiffness: 0.3, damping: 0.25 });
   let score = Tween.of(() => playStore.score, {duration: 300, easing: expoOut});
   let formattedScore = $derived(Math.floor(score.current).toLocaleString());
-  // bonus: 1-5 deplending on bonus multiplier (which is 0-100)
-  let bonusMultiplier = $derived(1 + playStore.bonusMultiplier/25);
+  let bonusMultiplier = $derived(playStore.bonusMultiplier);
 
   const stitchLevelMultipliers: Record<EStitchLevel, number> = {
     [EStitchLevel.normal]: 1,
@@ -64,23 +63,33 @@
   }
 
   function flyToScore(flyId: string, onTransitionEnd: () => void = () => {}) {
-    flyTo(flyId, 'game-score', onTransitionEnd);
+    const element = document.getElementById(flyId);
+    if (!element || !flyId) {
+      // If there's no HTML ID or it's not valid, just execute the callback
+      onTransitionEnd();
+      // setTimeout(onTransitionEnd, 1);
+    } else {
+      // Otherwise, call flyTo as before
+      flyTo(flyId, 'game-score', {onTransitionEnd, removeOriginal: false});
+    }
   }
 
   function onGroupExpired({
       group,
       htmlId,
       origin,
-      remainingTTL,
     }: {
       group: Group,
       htmlId: string,
       origin: string,
-      remainingTTL: number,
     }) {
     flyToScore(htmlId, () => {
-      const score = addScore(group.score);
-      uiBus.emit("groupExpiredScore", { group, score, remainingTTL, origin: origin });
+      const rocketMultiplier = origin == 'rocketLaunch' ? playStore.rocketMultiplier : 1;
+      const score = addScore(group.score * rocketMultiplier);
+      uiBus.emit("groupExpiredScore", { group, score, origin });
+      if (origin == 'rocketLaunch') {
+        uiBus.emit("resetBonusBar");
+      }
     });
   }
 

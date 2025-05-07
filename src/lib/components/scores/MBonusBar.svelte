@@ -20,22 +20,23 @@
   let suspendTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   // Use $derived to reactively read the bonusMultiplier from the store
-  let value = $derived(playStore.bonusMultiplier);
+  let value = $derived(playStore.bonusPcnt);
   
   onMount(() => {
     // Subscribe to the 'pieceDropped' event
     uiBus.on('pieceDropped', onPieceDropped);
-  
+    uiBus.on('resetBonusBar', onReset);
+
     // Start the depletion timer
     depleteTimerId = setInterval(() => {
       if (!playStore.paused && !suspendDepletion) {
         // Calculate depletion amount per interval
         const depleteAmount = depletionRate * (depletionInterval / 1000);
         // Ensure bonus doesn't go below 0
-        playStore.bonusMultiplier = Math.max(0, playStore.bonusMultiplier - depleteAmount);
+        playStore.bonusPcnt = Math.max(0, playStore.bonusPcnt - depleteAmount);
       }
     }, depletionInterval);
-  
+
     // It's crucial to unsubscribe when the component is destroyed
     // to prevent memory leaks.
     return () => {
@@ -48,8 +49,10 @@
       }
     };
   });
-  
+
   onDestroy(() => {
+    uiBus.off('pieceDropped', onPieceDropped);
+    uiBus.off('rocketLaunched', onReset);
     // Additional safety to clear the interval
     if (depleteTimerId) {
       clearInterval(depleteTimerId);
@@ -58,16 +61,16 @@
       clearTimeout(suspendTimeoutId);
     }
   });
-  
+
   // Define your listener function
-  const onPieceDropped = (event: {
+  function onPieceDropped (event: {
     origin: string;
     piece: Piece;
     dragTime: number;
     rotationCount: number;
-  }) => {
+  }) {
     // Update the bonusMultiplier in the store directly
-    playStore.bonusMultiplier = Math.min(playStore.bonusMultiplier + event.piece.weight * 6.5, maxBonus);
+    playStore.bonusPcnt = Math.min(playStore.bonusPcnt + event.piece.weight * 6.5, maxBonus);
     
     // Suspend depletion for half a second
     suspendDepletion = true;
@@ -83,6 +86,10 @@
     }, value == 100 ? 1000 : 500);
     
     // No need to update local state 'value' as it's derived
-  };
+  }
+
+  function onReset() {
+    playStore.bonusPcnt = 0;
+  }
 
 </script>

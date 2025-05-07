@@ -18,8 +18,35 @@
         {:else}
         <button onclick={() => playStore.paused=true}>||</button>
         {/if}
-        <button onclick={() => uiBus.emit('launchButtonFill')}>R</button>
+        <button onclick={() => { uiBus.emit('launchButtonFill'); onRocketArrivedLate();}}>R</button>
       </div>
+    </div>
+  {/if}
+  {#if showRocketLate}
+    <div class="absolute inset-0 flex items-center justify-center" style="z-index: 1000; transform: rotate(-12deg);">
+      <img
+        src="/rocketLate.png"
+        alt="Rocket arrived late"
+        class="w-[90%] h-auto object-contain select-none pointer-events-none"
+        style="user-drag: none;"
+        draggable="false"
+        in:scale={{ duration: 600, easing: elasticInOut }}
+      />
+    </div>
+  {/if}
+  {#if showRocketBoom}
+    <div class="absolute inset-0 w-2/3 place-self-center flex items-center justify-center" style="z-index: 1000; transform: rotate(-12deg);">
+        <img
+          src="/rocketBoom.png"
+          alt="Rocket boom"
+          class="w-[90%] h-auto object-contain select-none pointer-events-none"
+          style="user-drag: none;"
+          draggable="false"
+          in:scale={{ duration: 450, easing: elasticInOut }}
+        />
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="boom-text">{rocketBoomMultiplier}x</span>
+        </div>
     </div>
   {/if}
   <MBoardFields fields={fields} groups={groups} cellWidth={cellWidth} startX={startX} startY={startY} />
@@ -28,6 +55,8 @@
 
   import {dev} from "$app/environment";
   import {onMount, onDestroy} from "svelte";
+  import {scale} from 'svelte/transition';
+  import {elasticInOut} from 'svelte/easing';
   import Position from "$lib/game/geometry/Position";
   import Piece from "$lib/game/piece/Piece";
   import {uiBus} from "$lib/util/uiBus";
@@ -40,6 +69,7 @@
   import {EDirection} from "$lib/game/geometry/EDirection";
   import throttle from 'lodash.throttle';
   import {type Stitch, stitchLevel} from "$lib/game/stitches";
+  import {projectile} from "html-trajectory";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -53,6 +83,10 @@
   const groups: Group[] = $state([]);
 
   let cursorAt: Position|null = $state(null);
+
+  let rocketBoomMultiplier: number = $state(0);
+  let showRocketBoom: boolean = $state(false);
+  let showRocketLate: boolean = $state(false);
 
   let cellWidth: number = $derived.by(() => {
     const extraWidth = sizeX >= 5 ? 1 : 1.2;
@@ -73,13 +107,13 @@
     );
     uiBus.on('pieceDrop', onPieceDrop);
     uiBus.on('groupExpired', onGroupExpired);
-    uiBus.on('expireBiggestGroup', onExpireBiggestGroup);
+    uiBus.on('rocketLaunch', onRocketLaunch);
   })
 
   onDestroy(() => {
     uiBus.off('pieceDrop', onPieceDrop);
     uiBus.off('groupExpired', onGroupExpired);
-    uiBus.off('expireBiggestGroup', onExpireBiggestGroup);
+    uiBus.off('rocketLaunch', onRocketLaunch);
   });
 
   function areValidCoordinates(x: number, y: number): boolean {
@@ -175,7 +209,7 @@
     const group: Group = groups.slice(-1).pop() as Group;
     if (!fields.flat().find(each => each.group == group.group)) {
       group.ttl = 0;
-      uiBus.emit('groupExpired', {group});
+      uiBus.emit('groupExpired', {group, origin: 'emptyGroup'});
     }
   }
 
@@ -235,30 +269,10 @@
     }
   }
 
-  function onExpireBiggestGroup(event: {origin: string}) {
-    if (groups.length === 0) {
-        return; // No groups to expire
+  function onGroupExpired({group, origin}: {group: Group, origin: string}) {
+    if (origin == "rocketLaunch") {
+      onRocketBoom();
     }
-
-    // Find the group with the maximum weight
-    let biggestGroup = groups[0];
-    for (let i = 1; i < groups.length; i++) {
-        if (groups[i].weight > biggestGroup.weight) {
-            biggestGroup = groups[i];
-        }
-    }
-
-    // Emit the standard groupExpired event with the CORRECT htmlId format
-    uiBus.emit('groupExpired', { 
-      group: biggestGroup,
-      htmlId: `group-countdown-${biggestGroup.group}`,
-      remainingTTL: biggestGroup.ttl,
-      origin: event.origin,
-    });
-
-  }
-
-  function onGroupExpired({group}: {group: Group}) {
     const index = groups.indexOf(group);
     fields.flat().forEach(field => {
       if (field.group == group.group) {
@@ -333,12 +347,13 @@
   }
 
   function putOnBoard(piece: Piece, iterator: FlatteningIterator<number>) {
-    // first just create a new grooup. We'll merge it with connecting groups later
+    // calculate center for new group
     const p = [...iterator]
       .filter(each => each.value)
       .reduce(
         (acc, each) => ({ x: acc.x + each.x + 0.5, y: acc.y + each.y + 0.5, cnt: acc.cnt + 1 }),
         {x: 0, y: 0, cnt: 0});
+    // first just create a new grooup. We'll merge it with connecting groups later
     const newGroup = Group.fromPiece(new Position(p.x/p.cnt, p.y/p.cnt), piece);
     const groupIdsToMerge: Set<number> = new Set();
     let overlaps = 0;
@@ -386,6 +401,7 @@
         })
     }
 
+    // merge groups as needed
     if (groupIdsToMerge.size > 0) {
 
       mergedGroup = mergeGroups(groupIdsToMerge, stitches.length, newGroup);
@@ -412,6 +428,73 @@
       expandBoard();
       expireEmptyGroup();
     }, 300);
+
+  }
+
+  function onRocketArrivedLate() {
+    showRocketLate = true;
+    // Hide the image after a few seconds
+    setTimeout(() => {
+      showRocketLate = false;
+    }, 999);
+  }
+
+  function onRocketBoom() {
+    rocketBoomMultiplier = Number((playStore.bonusMultiplier * playStore.rocketMultiplier).toFixed(1));
+    showRocketBoom = true;
+    // Hide the image after a few seconds
+    setTimeout(() => {
+      showRocketBoom = false;
+    }, 799);
+  }
+
+  function onRocketLaunch(event: {
+    origin: string,
+    flyingId: string,
+    flyOptions: object,
+  }) {
+
+    // deny launch if there's no groups
+    if (groups.length === 0) {
+      uiBus.emit('rocketLaunchFailed');
+      return;
+    }
+  
+    // Find the group with the maximum weight
+    let biggestGroup = groups[0];
+    for (let i = 1; i < groups.length; i++) {
+      if (groups[i].weight > biggestGroup.weight) {
+        biggestGroup = groups[i];
+      }
+    }
+
+    function groupExists(groupId: number): boolean {
+      return groups.some(each => each.group == groupId);
+    }
+
+    // flyTo(
+    projectile(
+      event.flyingId,
+      'group-countdown-' + biggestGroup.group,
+      Object.assign({}, event.flyOptions, {
+        onTransitionEnd: () => {
+          // if group expired meanwhile, don't do anything. It could actually show an explosion
+          if (!groupExists(biggestGroup.group)) {
+            uiBus.emit('rocketArrivedLate');
+            onRocketArrivedLate();
+            return;
+          }
+          uiBus.emit('groupExpired', {
+            group: biggestGroup,
+            htmlId: 'group-countdown-' + biggestGroup.group,
+            origin: 'rocketLaunch',
+          });
+        }
+      })
+    );
+
+    // Emit rocketLaunched event after the animation completes
+    uiBus.emit('rocketLaunched');
 
   }
 
@@ -458,3 +541,31 @@
   }
 
 </script>
+
+<style lang="postcss">
+  .boom-text {
+    font-size: 5vw;
+    font-weight: bold;
+    color: #ff0000;
+    text-shadow:
+      -2px -2px 0 #fff,
+      2px -2px 0 #fff,
+      -2px 2px 0 #fff,
+      2px 2px 0 #fff,
+      0 0 15px #ff9900,
+      0 0 30px #ff9900;
+    transform: rotate(8deg);
+    animation: pulse-boom 0.2s ease-in-out infinite alternate;
+    letter-spacing: 0.5vw;
+    user-select: none;
+  }
+
+  @keyframes pulse-boom {
+    from {
+      transform: scale(1) rotate(8deg);
+    }
+    to {
+      transform: scale(1.2) rotate(-8deg);
+    }
+  }
+</style>
