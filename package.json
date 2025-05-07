@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.8.3",
-  "description": "bonus bar",
+  "version": "0.8.4",
+  "description": "fix initial loading",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
