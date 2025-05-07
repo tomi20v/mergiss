@@ -505,6 +505,7 @@
     }
     fields.forEach(each => direction == EDirection.left ? each.unshift(emptyField()) : each.push(emptyField()));
     // fields.forEach(each => setTimeout(() => each.push(emptyField()), 400*Math.random()));
+    uiBus.emit("boardResized");
   }
   function resizeAddRow(direction: EDirection) {
     playStore.boardSizeY++;
@@ -516,6 +517,7 @@
     else {
       fields.push(row);
     }
+    uiBus.emit("boardResized");
   }
   function resizeRemoveColumn() {
     if (sizeX <= 3) {
@@ -525,6 +527,7 @@
     fields.forEach(each => each.pop());
     // funky effect :D
     // fields.forEach(each => setTimeout(() => each.pop(), 400*Math.random()));
+    uiBus.emit("boardResized");
   }
   function resizeRemoveRow() {
     if (sizeY <= 3) {
@@ -532,6 +535,7 @@
     }
     playStore.boardSizeY--;
     fields.pop();
+    uiBus.emit("boardResized");
   }
 
   function testScore() {

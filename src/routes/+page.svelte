@@ -9,13 +9,20 @@
 
   import "../app.css";
   import MBuildBoard from "$lib/components/board/MBuildBoard.svelte";
-  import {onMount} from "svelte";
+  import {onDestroy, onMount} from "svelte";
+  import {uiBus} from "$lib/util/uiBus";
 
   let boardHeight = $state(150);
   let boardWidth = $state(200);
 
   onMount(() => {
     onResize();
+    setTimeout(onResize, 500);
+    uiBus.on("boardResized", onResize);
+  })
+
+  onDestroy(() => {
+    uiBus.off("boardResized", onResize);
   })
 
   function onResize() {
