@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.8.4",
-  "description": "fix initial loading",
+  "version": "0.8.5",
+  "description": "bonusMultiplier is tracked/applied consistently",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {

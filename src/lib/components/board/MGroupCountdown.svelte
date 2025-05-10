@@ -126,6 +126,7 @@
             group,
             htmlId: "group-countdown-" + group.group,
             origin: 'countdown',
+            bonusMultiplier: playStore.bonusMultiplier,
           });
         })
       }

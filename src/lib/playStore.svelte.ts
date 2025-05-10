@@ -13,7 +13,7 @@ class PlayStore {
   mergeBoardCellWidth: number = $state(0);
   // scores
   bonusPcnt: number = $state(1);
-  // bonus: 1-5 deplending on bonus multiplier (which is 0-100)
+  // bonus: 1-5 deplending on bonus multiplier (which is 0-100) - might better off with a logarithmic calc
   bonusMultiplier: number = $derived(1 + this.bonusPcnt / 25);
   rocketMultiplier: number = 10;
   score: number = $state(0);

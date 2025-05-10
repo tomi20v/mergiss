@@ -52,10 +52,11 @@
     uiBus.off("stitchExpired");
   })
 
-  function addScore(score: number): number {
+  function addScore(score: number, bonusMultiplier?: number): number {
     // here we can apply bonuses later
     // const scoreToAdd = score;
-    const scoreToAdd = score * bonusMultiplier;
+    const realMultiplier = bonusMultiplier || playStore.bonusMultiplier;
+    const scoreToAdd = score * realMultiplier;
     playStore.score += scoreToAdd;
     scaleSpring.set(1.25);
     setTimeout(() => scaleSpring.set(1), 150);
@@ -74,19 +75,23 @@
     }
   }
 
-  function onGroupExpired({
-      group,
-      htmlId,
-      origin,
-    }: {
+  function onGroupExpired(event: {
       group: Group,
       htmlId: string,
       origin: string,
+      bonusMultiplier: number,
     }) {
-    flyToScore(htmlId, () => {
+    // @todo? score could be increased when one color is dominant. and/or colors can have different
+    //  scores which don't increase linearly
+    flyToScore(event.htmlId, () => {
       const rocketMultiplier = origin == 'rocketLaunch' ? playStore.rocketMultiplier : 1;
-      const score = addScore(group.score * rocketMultiplier);
-      uiBus.emit("groupExpiredScore", { group, score, origin });
+      const score = addScore(event.group.score * rocketMultiplier, event.bonusMultiplier);
+      uiBus.emit("groupExpiredScore", {
+        group: event.group,
+        score,
+        origin: event.origin,
+        bonusMultiplier: event.bonusMultiplier,
+      });
       if (origin == 'rocketLaunch') {
         uiBus.emit("resetBonusBar");
       }

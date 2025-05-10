@@ -209,7 +209,11 @@
     const group: Group = groups.slice(-1).pop() as Group;
     if (!fields.flat().find(each => each.group == group.group)) {
       group.ttl = 0;
-      uiBus.emit('groupExpired', {group, origin: 'emptyGroup'});
+      uiBus.emit('groupExpired', {
+        group,
+        origin: 'emptyGroup',
+        bonusMultiplier: playStore.bonusMultiplier,
+      });
     }
   }
 
@@ -269,9 +273,9 @@
     }
   }
 
-  function onGroupExpired({group, origin}: {group: Group, origin: string}) {
+  function onGroupExpired({group, origin, bonusMultiplier}: {group: Group, origin: string, bonusMultiplier: number}) {
     if (origin == "rocketLaunch") {
-      onRocketBoom();
+      onRocketBoom(bonusMultiplier);
     }
     const index = groups.indexOf(group);
     fields.flat().forEach(field => {
@@ -439,8 +443,8 @@
     }, 999);
   }
 
-  function onRocketBoom() {
-    rocketBoomMultiplier = Number((playStore.bonusMultiplier * playStore.rocketMultiplier).toFixed(1));
+  function onRocketBoom(bonusMultiplier: number) {
+    rocketBoomMultiplier = Number((bonusMultiplier * playStore.rocketMultiplier).toFixed(1));
     showRocketBoom = true;
     // Hide the image after a few seconds
     setTimeout(() => {
@@ -488,6 +492,7 @@
             group: biggestGroup,
             htmlId: 'group-countdown-' + biggestGroup.group,
             origin: 'rocketLaunch',
+            bonusMultiplier: playStore.bonusMultiplier,
           });
         }
       })
