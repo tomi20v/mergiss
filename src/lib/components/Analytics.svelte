@@ -38,6 +38,8 @@
   let lastGroupExpired = 0;
   let lastPieceToBoard = 0;
   let lastStitchScore = 0;
+  let pieceToBoardAvgElapsed = 0;
+  let pieceToBoardCount = 0;
   let versionNumber: number = $derived.by(() => {
     const v = version.split('.').reverse();
     let ret = 0;
@@ -169,6 +171,7 @@
     group: Group;
     score: number;
     origin: string;
+    bonusMultiplier: number;
   }) {
     gtag("event", "groupExpired", {
       acceleratedTime: event.group.acceleratedTime,
@@ -179,6 +182,7 @@
       origin: event.origin,
       weight: event.group.weight,
       ...commonProperties(lastGroupExpired),
+      bonusMultiplier: event.bonusMultiplier,
     });
     lastGroupExpired = now();
   }
@@ -190,12 +194,29 @@
     rotationCount: number;
   }) {
     if (event.origin == "mergeBoard") {
+      let currentElapsed = elapsed(lastPieceToBoard);
+      let reportedElapsed = currentElapsed;
+      
+      // Don't record elapsed if the current elapsed time is 4x greater than the average
+      // eg. the user takes a break or looks around in the UI, it's not relevant when
+      // tuning for piece to board avg time
+      if (pieceToBoardCount > 0 && currentElapsed > pieceToBoardAvgElapsed * 4) {
+        reportedElapsed = 0;
+      }
+      
+      // Update the running average (always include the real elapsed time)
+      pieceToBoardAvgElapsed = pieceToBoardCount === 0 
+        ? currentElapsed 
+        : (pieceToBoardAvgElapsed * pieceToBoardCount + currentElapsed) / (pieceToBoardCount + 1);
+      pieceToBoardCount++;
+      
       gtag("event", "pieceToBoard", {
         dragTime: event.dragTime,
         rotationCount: event.rotationCount,
         life: elapsed(event.piece.createdTime),
         shape: event.piece.shape,
-        ...commonProperties(lastPieceToBoard),
+        ...commonProperties(),
+        elapsed: reportedElapsed,
       });
       lastPieceToBoard = now();
     }
