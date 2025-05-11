@@ -1,3 +1,4 @@
+<svelte:window oncontextmenu={event => event.preventDefault()} />
 <div class="h-screen">
   <div id="app-grid"
        class="grow grid">
