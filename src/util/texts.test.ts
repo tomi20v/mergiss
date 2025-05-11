@@ -230,4 +230,19 @@ describe('bigNumber', () => {
     expect(bigNumber(1000000000000)).toBe('1T');
     expect(bigNumber(9900000000000)).toBe('9.9T');
   });
+  
+  it('should format quadrillions with "P" suffix', () => {
+    expect(bigNumber(1000000000000000)).toBe('1P');
+    expect(bigNumber(1500000000000000)).toBe('1.5P');
+    expect(bigNumber(9900000000000000)).toBe('9.9P');
+    expect(bigNumber(10000000000000000)).toBe('10P');
+    expect(bigNumber(123000000000000000)).toBe('123P');
+  });
+  
+  it('should format quintillions with "E" suffix', () => {
+    expect(bigNumber(1000000000000000000)).toBe('1E');
+    expect(bigNumber(2800000000000000000)).toBe('2.8E');
+    expect(bigNumber(9900000000000000000)).toBe('9.9E');
+    expect(bigNumber(42000000000000000000)).toBe('42E');
+  });
 });

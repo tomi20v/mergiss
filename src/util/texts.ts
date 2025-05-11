@@ -27,8 +27,8 @@ export function leetize(text: string): string {
  * - 1000 to 1099 returns "1k"
  * - 1100 to 1199 returns "1.1k"
  * - Numbers 10000+ in the 'k' tier show no decimals
- * - Higher tiers (M, G, T) show decimal places for values under 10
- * - Larger numbers use appropriate suffixes: M (million), G (billion), T (trillion)
+ * - Higher tiers (M, G, T, P, E) show decimal places for values under 10
+ * - Larger numbers use appropriate suffixes: M (million), G (billion), T (trillion), P (quadrillion), E (quintillion)
  * @param num The number to format
  * @returns A formatted string representation of the number
  */
@@ -39,7 +39,7 @@ export function bigNumber(num: number): string {
   }
   
   // Define suffixes and thresholds
-  const suffixes = ['', 'k', 'M', 'G', 'T'];
+  const suffixes = ['', 'k', 'M', 'G', 'T', 'P', 'E'];
   
   // Find the appropriate suffix and divide number accordingly
   let tier = 0;
