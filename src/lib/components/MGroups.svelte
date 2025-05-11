@@ -30,9 +30,11 @@
         <div class="flex flex-col justify-center min-w-24">
           <div class="font-bold text-[0.9rem] text-orange-400">
             {leetize('E')} = {Math.floor(group.score)}
+            <b>{leetize('E')}</b> {bigNumber(Math.floor(group.score)*123)}
           </div>
           <div class="flex justify-between text-[0.8rem] text-gray-400 mt-1">
             {leetize('T')}: {group.ttl.toFixed(1)}
+            <b>{leetize('Ω')}</b> {group.ttl >= 100 ? Math.round(group.ttl) : group.ttl.toFixed(1)}
           </div>
         </div>
       </div>
@@ -43,7 +45,7 @@
 <script lang="ts">
   // Computed property to get groups sorted by score in ascending order
   import playStore from "$lib/playStore.svelte";
-  import { leetize } from "$lib/../util/texts";
+  import {bigNumber, leetize} from "$lib/../util/texts";
   import Group from "$lib/game/Group.svelte";
 
   let sortedGroups: Group[] = $state([]);
