@@ -14,7 +14,6 @@
 </div>
 
 <script lang="ts">
-  // Computed property to get groups sorted by score in ascending order
   import playStore from "$lib/playStore.svelte";
   import Group from "$lib/game/Group.svelte";
   import MGroupItem from "$lib/components/MGroupItem.svelte";

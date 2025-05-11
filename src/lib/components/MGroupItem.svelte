@@ -1,4 +1,4 @@
-<div class="group-item flex p-2 rounded-[10px] bg-white/15">
+<div class="group-item flex p-2 rounded-[10px] bg-white/15" transition:fade >
   <svg
     class="bbg-white/5 rounded flex items-center justify-center"
     style="width: 50%; flex-shrink: 0; margin: 0 auto;"
@@ -33,6 +33,7 @@
 
 <script lang="ts">
 
+  import {fade} from "svelte/transition";
   import { Spring, Tween, } from "svelte/motion";
   import { expoOut } from "svelte/easing";
   import playStore from "$lib/playStore.svelte";
