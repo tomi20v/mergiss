@@ -28,7 +28,6 @@
   let scaleSpring = new Spring(1, { stiffness: 0.3, damping: 0.25 });
   let score = Tween.of(() => playStore.score, {duration: 300, easing: expoOut});
   let formattedScore = $derived(Math.floor(score.current).toLocaleString());
-  let bonusMultiplier = $derived(playStore.bonusMultiplier);
 
   const stitchLevelMultipliers: Record<EStitchLevel, number> = {
     [EStitchLevel.normal]: 1,
