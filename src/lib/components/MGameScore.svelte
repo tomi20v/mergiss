@@ -100,7 +100,7 @@
     // @todo? score could be increased when one color is dominant. and/or colors can have different
     //  scores which don't increase linearly
     flyToScore(event.htmlId, () => {
-      const rocketMultiplier = origin == 'rocketLaunch' ? playStore.rocketMultiplier : 1;
+      const rocketMultiplier = event.origin == 'rocketLaunch' ? playStore.rocketMultiplier : 1;
       const score = addScore(event.group.score * rocketMultiplier, event.bonusMultiplier);
       uiBus.emit("groupExpiredScore", {
         group: event.group,
@@ -108,7 +108,7 @@
         origin: event.origin,
         bonusMultiplier: event.bonusMultiplier,
       });
-      if (origin == 'rocketLaunch') {
+      if (event.origin == 'rocketLaunch') {
         uiBus.emit("resetBonusBar");
       }
     });
