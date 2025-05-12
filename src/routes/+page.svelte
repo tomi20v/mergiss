@@ -1,7 +1,4 @@
-<svelte:window
-        onresize={onResize}
-        oncontextmenu={event => event.preventDefault()}
-/>
+<svelte:window onresize={onResize} />
 <div id="main-inner" class="flex grow">
   <MBuildBoard boardWidth={boardWidth} boardHeight={boardHeight}/>
 </div>
@@ -17,7 +14,7 @@
 
   onMount(() => {
     onResize();
-    setTimeout(onResize, 500);
+    setInterval(onResize, 333);
     uiBus.on("boardResized", onResize);
   })
 

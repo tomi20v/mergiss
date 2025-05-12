@@ -1,4 +1,4 @@
-{#each fields as row, iY}
+{#each playStore.fields as row, iY}
   <div id="board-row-{iY+startY}"
        class="flex gap-0 justify-center m-board-row"
        in:blur={{duration: 200}}
@@ -30,8 +30,8 @@
           />
         {/each}
 
-        {#if (fields[iY][iX].color)}
-          {@const color = fields[iY][iX].color}
+        {#if (playStore.fields[iY][iX].color)}
+          {@const color = playStore.fields[iY][iX].color}
           <div id="{field.id}"
               class="flex grow m-0.5 m-board-field-inner items-center justify-center"
               style="border-radius: 15%; background-color: {color}; box-shadow: inset 2px 2px 3px, 1px 1px 3px dimgray;"
@@ -56,24 +56,14 @@
   import {onMount, onDestroy} from "svelte";
   import {blur} from "svelte/transition";
   import elasticTransition from "$lib/transitions/elasticTransition";
-  import type {FieldType} from "$lib/game/fields.svelte";
   import MGroupCountdown from "$lib/components/board/MGroupCountdown.svelte";
   import Group from "$lib/game/Group.svelte.js";
   import {uiBus} from "$lib/util/uiBus";
   import type {PositionPair} from "$lib/game/geometry/positionPair";
+  import playStore from "$lib/playStore.svelte.js";
 
-  let {
-    fields,
-    groups,
-    cellWidth,
-    startX,
-    startY,
-  }: {
-    cellWidth: number,
-    groups: Group[],
-    fields: FieldType[][],
-    startX: number,
-    startY: number,
+  let {cellWidth, startX, startY,}: {
+    cellWidth: number, startX: number, startY: number,
   } = $props();
 
   // image size: 115*96, 272 is a very big cell (3*3 on some very high resolution), so
@@ -96,15 +86,15 @@
 
   function groupCenterAt(atX: number, atY: number): Group | undefined {
     // I have to take the floor() to match with group centers like 1.5, 4.8 etc. These could be offset later
-    return groups.find(each => (Math.floor(each.centerX) == atX) && (Math.floor(each.centerY) == atY));
+    return playStore.groups.find(each => (Math.floor(each.centerX) == atX) && (Math.floor(each.centerY) == atY));
     // return groups.find(each => (Math.ceil(each.centerX) == atX) && (Math.ceil(each.centerY) == atY));
     // return groups.find(each => (Math.round(each.centerX) == atX) && (Math.round(each.centerY) == atY));
   }
 
   function onMouseDown(atX: number, atY: number) {
-    const field = fields[atY][atX];
+    const field = playStore.fields[atY][atX];
     if (field.group) {
-      uiBus.emit('accelerateGroup', fields[atY][atX].group);
+      uiBus.emit('accelerateGroup', playStore.fields[atY][atX].group);
     }
   }
 

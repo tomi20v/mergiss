@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.8.5",
-  "description": "bonusMultiplier is tracked/applied consistently",
+  "version": "0.8.6",
+  "description": "I can see a list of groups on the right",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {

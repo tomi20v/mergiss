@@ -1,4 +1,6 @@
 import {uiBus} from "$lib/util/uiBus";
+import {emptyField, type FieldType} from "$lib/game/fields.svelte";
+import Group from "$lib/game/Group.svelte";
 
 // at least for, this store is limited to "game" scope. A "game" is one "game session" which can restart etc.
 //  for high scores and permanent achievements we'll probably need another store
@@ -11,6 +13,8 @@ class PlayStore {
   boardSizeX: number = $state(0);
   boardSizeY: number = $state(0);
   mergeBoardCellWidth: number = $state(0);
+  fields: FieldType[][] = $state([]);
+  groups: Group[] = $state([]);
   // scores
   bonusPcnt: number = $state(1);
   // bonus: 1-5 deplending on bonus multiplier (which is 0-100) - might better off with a logarithmic calc
@@ -31,6 +35,8 @@ function initStore() {
   // board
   playStore.boardSizeX = 3;
   playStore.boardSizeY = 3;
+  playStore.fields = [];
+  playStore.groups = [];
   // score
   playStore.bonusPcnt = 0;
   playStore.score = 0;

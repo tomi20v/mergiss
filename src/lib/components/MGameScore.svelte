@@ -1,15 +1,23 @@
+<svelte:window onresize={onResized} />
 <!-- I can't use classes on components, but I can use styles :/ -->
-<div class="score-card panel-border panel-padding-small">
+{#if showFullVariant}
+  <div class="score-card panel-border panel-padding-small" in:fade={{duration: 200}} out:fade={{duration: 200}}>
   <div class="h1">
-    {leetize("score")}
+      {leetize("score")}
+    </div>
+    <div class="score-box">
+      <div id="game-score" class="score" style="transform: scale({scaleSpring.current});">
+        {formattedScore}
+      </div>
+    </div>
   </div>
-  <div class="score-box">
+{:else if showMiniVariant}
+  <div class="score-card panel-border panel-padding-small" in:fade={{duration: 200}} out:fade={{duration: 200}}>
     <div id="game-score" class="score" style="transform: scale({scaleSpring.current});">
       {formattedScore}
     </div>
   </div>
-</div>
-
+{/if}
 
 <script lang="ts">
 
@@ -18,6 +26,7 @@
   import { onMount, onDestroy } from "svelte";
   import { Spring, Tween, } from "svelte/motion";
   import { expoOut } from "svelte/easing";
+  import {fade} from "svelte/transition";
   import type Group from "$lib/game/Group.svelte";
   import {flyTo} from "html-trajectory";
   import {EStitchLevel, type Stitch} from "$lib/game/stitches";
@@ -28,7 +37,10 @@
   let scaleSpring = new Spring(1, { stiffness: 0.3, damping: 0.25 });
   let score = Tween.of(() => playStore.score, {duration: 300, easing: expoOut});
   let formattedScore = $derived(Math.floor(score.current).toLocaleString());
-  let bonusMultiplier = $derived(playStore.bonusMultiplier);
+
+  // Separate state variables for variant control
+  let showFullVariant = $state(true);
+  let showMiniVariant = $state(false);
 
   const stitchLevelMultipliers: Record<EStitchLevel, number> = {
     [EStitchLevel.normal]: 1,
@@ -43,8 +55,12 @@
   }
 
   onMount(() => {
-    uiBus.on("groupExpired", onGroupExpired)
-    uiBus.on("stitchExpired", onStitchExpired)
+    uiBus.on("groupExpired", onGroupExpired);
+    uiBus.on("stitchExpired", onStitchExpired);
+    setInterval(onResized, 1000);
+    
+    // Initialize the variant state based on current window size
+    onResized();
   })
 
   onDestroy(() => {
@@ -84,7 +100,7 @@
     // @todo? score could be increased when one color is dominant. and/or colors can have different
     //  scores which don't increase linearly
     flyToScore(event.htmlId, () => {
-      const rocketMultiplier = origin == 'rocketLaunch' ? playStore.rocketMultiplier : 1;
+      const rocketMultiplier = event.origin == 'rocketLaunch' ? playStore.rocketMultiplier : 1;
       const score = addScore(event.group.score * rocketMultiplier, event.bonusMultiplier);
       uiBus.emit("groupExpiredScore", {
         group: event.group,
@@ -92,7 +108,7 @@
         origin: event.origin,
         bonusMultiplier: event.bonusMultiplier,
       });
-      if (origin == 'rocketLaunch') {
+      if (event.origin == 'rocketLaunch') {
         uiBus.emit("resetBonusBar");
       }
     });
@@ -110,7 +126,23 @@
     });
   }
 
+  function onResized() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const smallerDimension = Math.min(width, height);
+    
+    // Update both variant variables based on screen size
+    if (smallerDimension > 700) {
+      showMiniVariant = false;
+      setTimeout(() => showFullVariant = true, 201);
+    } else {
+      showFullVariant = false;
+      setTimeout(() => showMiniVariant = true, 201);
+    }
+  }
+
 </script>
+
 <style lang="postcss">
   @keyframes pop {
       0% { transform: scale(1); }

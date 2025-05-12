@@ -49,7 +49,7 @@
         </div>
     </div>
   {/if}
-  <MBoardFields fields={fields} groups={groups} cellWidth={cellWidth} startX={startX} startY={startY} />
+  <MBoardFields cellWidth={cellWidth} startX={startX} startY={startY} />
 </div>
 <script lang="ts">
 
@@ -79,9 +79,6 @@
   // we'll need these so that [0;0] keeps the same ID when unshifting (when unshifting, we'll sub 1 from these)
   let startX: number = $state(0);
   let startY: number = $state(0);
-  let fields: FieldType[][] = $state([]);
-  const groups: Group[] = $state([]);
-
   let cursorAt: Position|null = $state(null);
 
   let rocketBoomMultiplier: number = $state(0);
@@ -101,10 +98,11 @@
   })
 
   onMount(() => {
-    fields = Array.from(
-            {length: sizeY},
-            () => Array.from({length: sizeX}, emptyField)
-    );
+    setTimeout(() => {
+      playStore.fields = Array.from(
+              {length: sizeY},
+              () => Array.from({length: sizeX}, emptyField)
+      )}, 500);
     uiBus.on('pieceDrop', onPieceDrop);
     uiBus.on('groupExpired', onGroupExpired);
     uiBus.on('rocketLaunch', onRocketLaunch);
@@ -139,7 +137,7 @@
         return false;
       }
       // can put only on empty board field or same color
-      const field = fields[i.y][i.x];
+      const field = playStore.fields[i.y][i.x];
       if (field.color && field.color != color) {
         return false;
       }
@@ -149,30 +147,30 @@
 
   function clearRow(row: number) {
     for (let i=0; i<sizeX; i++) {
-      fields[row][i].group = 0;
-      fields[row][i].color = null;
+      playStore.fields[row][i].group = 0;
+      playStore.fields[row][i].color = null;
     }
   }
   function clearColumn(column: number) {
     for (let i=0; i<sizeY; i++) {
-      fields[i][column].group = 0;
-      fields[i][column].color = null;
+      playStore.fields[i][column].group = 0;
+      playStore.fields[i][column].color = null;
     }
   }
 
   function expandBoard() {
-    const rowCounts: number[] = fields.map(
+    const rowCounts: number[] = playStore.fields.map(
       eachRow => eachRow.filter(eachField => eachField.color != null).length
     );
-    const columnCounts: number[] = fields.reduce(
+    const columnCounts: number[] = playStore.fields.reduce(
       (acc: number[], row) => row.map((field, x) => acc[x] + (field.color == null ? 0 : 1)),
-      Array(fields[0].length).fill(0)
+      Array(playStore.fields[0].length).fill(0)
     )
     const expansions: EDirection[] = [];
-
+  
     const oSizeX = sizeX;
     const oSizeY = sizeY;
-
+  
     // @todo re-count and/or adjust group center
     if (rowCounts[0] == oSizeX) {
       clearRow(0);
@@ -206,8 +204,8 @@
   function expireEmptyGroup() {
     // no need to check all groups, only the last group can be empty
     // for (const group of groups) {
-    const group: Group = groups.slice(-1).pop() as Group;
-    if (!fields.flat().find(each => each.group == group.group)) {
+    const group: Group = playStore.groups.slice(-1).pop() as Group;
+    if (!playStore.fields.flat().find(each => each.group == group.group)) {
       group.ttl = 0;
       uiBus.emit('groupExpired', {
         group,
@@ -218,23 +216,23 @@
   }
 
   function mergeGroups(groupIdsToMerge: Set<number>, stitchCount: number, newGroup: Group): Group {
-    const groupsToMerge: Group[] = groups
+    const groupsToMerge: Group[] = playStore.groups
       .filter(each => groupIdsToMerge.has(each.group));
     const mergedGroup = groupsToMerge
       .reduce(mergeMapper(groupsToMerge.length, stitchCount), newGroup);
 
     // update group ID in fields which belong to a merged group
-    fields.flat().forEach(eachField => {
+    playStore.fields.flat().forEach(eachField => {
       if (groupIdsToMerge.has(eachField.group)) {
         eachField.group = mergedGroup.group;
       }
     })
     // remove merged ones, and add the new one
     groupsToMerge.forEach(each => {
-      groups.splice(groups.indexOf(each), 1);
+      playStore.groups.splice(playStore.groups.indexOf(each), 1);
     });
     // note: we shall not use a timeout here as it causes more problems than it solves
-    groups.push(mergedGroup);
+    playStore.groups.push(mergedGroup);
     return mergedGroup;
   }
 
@@ -277,14 +275,14 @@
     if (origin == "rocketLaunch") {
       onRocketBoom(bonusMultiplier);
     }
-    const index = groups.indexOf(group);
-    fields.flat().forEach(field => {
+    const index = playStore.groups.indexOf(group);
+    playStore.fields.flat().forEach(field => {
       if (field.group == group.group) {
         field.color = null;
         field.group = 0;
       }
     })
-    groups.splice(index, 1);
+    playStore.groups.splice(index, 1);
   }
 
   // throttling this probably helps with performance
@@ -367,21 +365,21 @@
     // set fields to contain new color and group, gather groups with which the new piece overlaps
     for (const i of iterator) {
       if (!i.value) continue;
-      let groupUnder = fields[i.y][i.x].group;
+      let groupUnder = playStore.fields[i.y][i.x].group;
       if (groupUnder) {
         overlaps++;
         groupIdsToMerge.add(groupUnder);
         const p = new Position(i.x, i.y);
         stitches.push({
           ...sortedPositionPair(p, p),
-          level: stitchLevel(p, piece.color, p, fields[i.y][i.x].color ?? ''),
+          level: stitchLevel(p, piece.color, p, playStore.fields[i.y][i.x].color ?? ''),
           group: newGroup.group,
         });
       }
-      fields[i.y][i.x].color = piece.color;
-      fields[i.y][i.x].group = newGroup.group;
+      playStore.fields[i.y][i.x].color = piece.color;
+      playStore.fields[i.y][i.x].group = newGroup.group;
     }
-
+  
     // look around each field and check touching groups
     // stitches for underlying fields were added already
     for (const i of iterator) {
@@ -389,7 +387,7 @@
       const position = new Position(i.x, i.y);
       boardPositionsAround(position)
         .forEach(otherPosition => {
-          const otherField = fields[otherPosition.atY][otherPosition.atX];
+          const otherField = playStore.fields[otherPosition.atY][otherPosition.atX];
           const otherGroupId = otherField.group;
           if (!otherGroupId) return;
           // this will pick up newGroup.id as well, so it will be merged too
@@ -416,7 +414,7 @@
 
     }
     else {
-      groups.push(newGroup);
+      playStore.groups.push(newGroup);
     }
 
     uiBus.emit('groupCreated', {
@@ -459,21 +457,21 @@
   }) {
 
     // deny launch if there's no groups
-    if (groups.length === 0) {
+    if (playStore.groups.length === 0) {
       uiBus.emit('rocketLaunchFailed');
       return;
     }
   
     // Find the group with the maximum weight
-    let biggestGroup = groups[0];
-    for (let i = 1; i < groups.length; i++) {
-      if (groups[i].weight > biggestGroup.weight) {
-        biggestGroup = groups[i];
+    let biggestGroup = playStore.groups[0];
+    for (let i = 1; i < playStore.groups.length; i++) {
+      if (playStore.groups[i].weight > biggestGroup.weight) {
+        biggestGroup = playStore.groups[i];
       }
     }
 
     function groupExists(groupId: number): boolean {
-      return groups.some(each => each.group == groupId);
+      return playStore.groups.some(each => each.group == groupId);
     }
 
     // flyTo(
@@ -508,7 +506,7 @@
     if (direction == EDirection.left) {
       startX--;
     }
-    fields.forEach(each => direction == EDirection.left ? each.unshift(emptyField()) : each.push(emptyField()));
+    playStore.fields.forEach(each => direction == EDirection.left ? each.unshift(emptyField()) : each.push(emptyField()));
     // fields.forEach(each => setTimeout(() => each.push(emptyField()), 400*Math.random()));
     uiBus.emit("boardResized");
   }
@@ -516,11 +514,11 @@
     playStore.boardSizeY++;
     const row: FieldType[] = Array.from({length: sizeX}, emptyField);
     if (direction == EDirection.up) {
-      fields.unshift(row);
+      playStore.fields.unshift(row);
       startY--;
     }
     else {
-      fields.push(row);
+      playStore.fields.push(row);
     }
     uiBus.emit("boardResized");
   }
@@ -529,7 +527,7 @@
       return;
     }
     playStore.boardSizeX--;
-    fields.forEach(each => each.pop());
+    playStore.fields.forEach(each => each.pop());
     // funky effect :D
     // fields.forEach(each => setTimeout(() => each.pop(), 400*Math.random()));
     uiBus.emit("boardResized");
@@ -539,7 +537,7 @@
       return;
     }
     playStore.boardSizeY--;
-    fields.pop();
+    playStore.fields.pop();
     uiBus.emit("boardResized");
   }
 

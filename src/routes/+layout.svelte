@@ -1,3 +1,4 @@
+<svelte:window oncontextmenu={event => event.preventDefault()} />
 <div class="h-screen">
   <div id="app-grid"
        class="grow grid">
@@ -28,9 +29,10 @@
       {@render children()}
     </div>
     <div id="right-column"
-         class=""
+         class="flex flex-col"
          style="background-color: {devDraw ? '#fc8' : ''};">
       <MGameScore />
+      <MGroups />
     </div>
     <div id="bottom-container"
          class="panel-border"
@@ -54,6 +56,7 @@
   import MLaunchButton from "$lib/components/MLaunchButton.svelte";
   import { leetize } from "$lib/../util/texts";
   import MBonusBar from "$lib/components/scores/MBonusBar.svelte";
+  import MGroups from "$lib/components/MGroups.svelte";
   import { version } from '$app/environment';
 
   let { children } = $props();
@@ -182,6 +185,9 @@
     }
     #left-column > div {
         gap: 1.2vw;
+    }
+    #right-column {
+        gap: 0.5vw;
     }
     #bottom-container {
         grid-area: bottom;
