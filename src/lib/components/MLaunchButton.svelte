@@ -3,6 +3,7 @@
         style="transform: scale({currentScale});"
         onclick={onClick}
         class:pulsating={isRotating}
+        tabindex="-1"
 >
   <img
           id="rocket-icon"

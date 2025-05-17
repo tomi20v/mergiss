@@ -5,7 +5,17 @@
     <div id="app-bar" class="h1 flex flex-row justify-between items-center w-full">
       <div class="w-1/6"></div>
       <div class="flex-grow flex justify-center">{leetize("MERGIS")}<div class="reverse">S</div></div>
-      <div class="w-1/6 text-right text-xs tracking-normal">v{versionString}</div>
+      <div class="w-1/6 text-right tracking-normal flex items-center justify-end gap-2">
+<!--        <div class="app-bar-button material-symbols-rounded">trophy</div>-->
+<!--        <div class="app-bar-button material-symbols-rounded">browse_activity</div>-->
+        <button class="app-bar-button material-symbols-rounded"
+                onclick={() => alert(`v${versionString}-pre`)}
+                tabindex="-1"
+        >settings</button>
+<!--      </div>-->
+<!--      <div class="w-1/6 text-right text-xs tracking-normal">-->
+<!--        <span class="text-xs">v{versionString}</span>-->
+      </div>
     </div>
     <div id="top-container"
          class="text-white"
@@ -197,7 +207,7 @@
     /*    grid-template-columns: 30% auto;*/
     /*}*/
     .h1 {
-        padding-top: 2vh;
+        padding-top: 1vh;
         font-size: 3vw;
         font-weight: bold;
         line-height: 1.6vw;
@@ -211,5 +221,52 @@
         transform: scale(-1,1);
         display: inline-block;
         letter-spacing: 0;
+    }
+    .h1 .material-symbols-rounded {
+        font-size: clamp(16px, 2.5vw, 32px);
+    }
+    .app-bar-button {
+        border: 1px solid transparent;
+        border-radius: 10px;
+        padding: 6px;
+        position: relative;
+        background-color: rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: orange;
+        box-sizing: border-box;
+        width: clamp(32px, 5vw, 64px);  /* Max size at 1280px viewport */
+        height: clamp(20px, 3vw, 38px); /* Max size at 1280px viewport */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .app-bar-button:hover {
+        transform: scale(1.1);
+        border-color: orange;
+        box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.5), 0 0 10px rgba(255, 165, 0, 0.3);
+    }
+    .app-bar-button:active {
+        transform: scale(0.95);
+        border-color: rgb(255, 100, 0);
+        box-shadow: inset 0 0 8px rgba(255, 165, 0, 0.5);
+        background-color: rgba(255, 165, 0, 0.1);
+    }
+    .app-bar-button::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 8px;
+        pointer-events: none;
+        background: radial-gradient(circle, transparent 1%, rgba(0, 0, 0, 0) 1%) center/15000%;
+        transition: background 0.5s;
+    }
+    .app-bar-button:active::after {
+        background-color: rgba(255, 165, 0, 0.2);
+        background-size: 100%;
+        transition: background 0s;
     }
 </style>
