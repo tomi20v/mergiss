@@ -32,12 +32,12 @@
         {@render children?.()}
       </div>
 
-      {#if footer}
-        <div class="dialog-footer flex justify-end">
+      {#if footer === true}
+        <button class="close-button" onclick={onClose}>OK</button>
+      {:else if footer}
+        <div class="dialog-footer golden-dark-border flex justify-end">
           {@render footer?.()}
         </div>
-      {:else}
-        <button class="close-button" onclick={onClose}>OK</button>
       {/if}
 
     </div>
@@ -49,13 +49,13 @@
   import type { Snippet } from 'svelte';
 
   interface Props {
-    open: boolean;
+    open?: boolean;
     icon?: string;
     subTitle?: string;
     title?: string;
     activator?: Snippet;
     children?: Snippet;
-    footer?: Snippet;
+    footer?: Snippet|boolean;
   }
 
   let { open = $bindable(), icon, subTitle, title, activator, children, footer }: Props = $props();
@@ -182,7 +182,7 @@
     .dialog-body {
         margin-bottom: 0.5vh;
         padding-bottom: 1vh;
-        border-bottom: 1px solid;
+        /*border-bottom: 1px solid;*/
         /*border-color: var(--game-gold, #FFD030);*/
         border-color: orange;
         /*overflow-y: auto;*/
@@ -193,6 +193,11 @@
     /* Prevent scrolling on body when dialog is open */
     :global(body:has(.dialog-overlay.visible)) {
         overflow: hidden;
+    }
+
+    .dialog-footer {
+        border-width: 1px 0 0 0;
+        border-style: solid;
     }
 
     .close-button {

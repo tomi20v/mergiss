@@ -8,20 +8,7 @@
       <div class="w-1/6 tracking-normal flex items-center justify-end gap-2">
         <MAchievements/>
         <MAppBarButton icon="browse_activity"/>
-        <!--
-        <MDialog bind:open={x}>
-          {#snippet activator()}
-            <MAppBarButton icon="browse_activity"/>
-          {/snippet}
-          <div class="flex justify-center align-middle">
-          Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet
-          </div>
-        </MDialog>
-        -->
-        <MAppBarButton
-                icon="settings"
-                onclick={() => alert(`v${versionString}-pre`)}
-        />
+        <MSettings />
       </div>
     </div>
     <div id="top-container"
@@ -75,8 +62,8 @@
   import MBonusBar from "$lib/components/scores/MBonusBar.svelte";
   import MGroups from "$lib/components/MGroups.svelte";
   import MAchievements from "$lib/components/achievement/MAchievements.svelte";
-  import { version } from '$app/environment';
   import MAppBarButton from "$lib/components/MAppBarButton.svelte";
+  import MSettings from "$lib/components/MSettings.svelte";
 
   let { children } = $props();
 
@@ -85,7 +72,6 @@
 
   var documentElement!: HTMLElement;
   let isFullScreen = false;
-  let versionString = $derived(version.split('.').slice(0, 2).join('.'));
 
   onMount(() => {
     documentElement = document.documentElement;
