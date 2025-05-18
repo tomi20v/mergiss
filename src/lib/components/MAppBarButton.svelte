@@ -1,4 +1,4 @@
-<button class="app-bar-button material-symbols-rounded"
+<button class="app-bar-button golden-text material-symbols-rounded"
         onclick={onclick}
         tabindex="-1"
 >{icon}</button>

@@ -2,17 +2,26 @@
 <div class="h-screen">
   <div id="app-grid"
        class="grow grid">
-    <div id="app-bar" class="h1 flex flex-row justify-between items-center w-full">
+    <div id="app-bar" class="flex flex-row justify-between items-center w-full">
       <div class="w-1/6"></div>
-      <div class="flex-grow flex justify-center">{leetize("MERGIS")}<div class="reverse">S</div></div>
-      <div class="w-1/6 text-right tracking-normal flex items-center justify-end gap-2">
+      <div class="h1 flex-grow flex justify-center">{leetize("MERGIS")}<div class="reverse">S</div></div>
+      <div class="w-1/6 tracking-normal flex items-center justify-end gap-2">
         <MAchievements/>
         <MAppBarButton icon="browse_activity"/>
+        <!--
+        <MDialog bind:open={x}>
+          {#snippet activator()}
+            <MAppBarButton icon="browse_activity"/>
+          {/snippet}
+          <div class="flex justify-center align-middle">
+          Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet
+          </div>
+        </MDialog>
+        -->
         <MAppBarButton
                 icon="settings"
                 onclick={() => alert(`v${versionString}-pre`)}
         />
-<!--        <span class="text-xs">v{versionString}</span>-->
       </div>
     </div>
     <div id="top-container"
@@ -185,6 +194,7 @@
     #app-bar {
         /*background-color: #262626;*/
         grid-area: app-bar;
+        padding-top: max(1vh, 5px);
     }
     #top-container {
         grid-area: top;
