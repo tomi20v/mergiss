@@ -1,5 +1,6 @@
 <!-- Add at the bottom of your template -->
-<MDialog bind:open={open} onclose={onToggle}>
+<MDialog bind:open={open} onclose={onToggle}
+         title="Achievements" subTitle="2 of 6 unlocked">
 
   {#snippet activator()}
     <MAppBarButton icon="trophy" onclick={openAchievementDialog} />
@@ -13,14 +14,14 @@
     {/if}
   </div>
 
-  <!--{#snippet footer()}-->
+  {#snippet footer()}
   <!--  <button-->
   <!--      class="px-3 py-1 bg-game-gold text-black rounded hover:opacity-90 transition text-sm"-->
   <!--      onclick={onToggle}-->
   <!--  >-->
   <!--  Close-->
   <!--  </button>-->
-  <!--{/snippet}-->
+  {/snippet}
 
 </MDialog>
 

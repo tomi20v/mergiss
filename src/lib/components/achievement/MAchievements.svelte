@@ -1,9 +1,9 @@
-<MAppBarButton icon="trophy" />
+<MAchievementsDialog />
 
 <script lang="ts">
 
   import {onMount} from "svelte";
-  import MAppBarButton from "$lib/components/MAppBarButton.svelte";
+  import MAchievementsDialog from "$lib/components/achievement/MAchievementsDialog.svelte";
   // import {a} from "$lib/game/entropy";
 
   // const achievements = _a;

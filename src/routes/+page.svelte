@@ -39,4 +39,26 @@
     * :global(.myClass) {
         font-style: italic;
     }
+
+    :global(.golden-text) {
+        /*color: #FFD030;*/
+        color: gold;
+    }
+
+    :global(.golden-border) {
+        border-color: rgba(255, 208, 48, 0.8);
+        border-style: solid;
+    }
+    :global(.golden-dark-border) {
+        border-color: orange;
+        border-style: solid;
+    }
+    :global(.golden-shadow-border) {
+        border-color: rgba(255, 208, 48, 0.3);
+        border-style: solid;
+    }
+
+    :global(.golden-bg) {
+        background-color: gold;
+    }
 </style>
