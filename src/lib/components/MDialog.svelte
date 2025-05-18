@@ -28,12 +28,12 @@
         </div>
       {/if}
 
-      <div class="dialog-body">
+      <div class="dialog-body {hasOnlyBody ? 'dialog-body-only' : ''}">
         {@render children?.()}
       </div>
 
       {#if footer === true}
-        <button class="close-button" onclick={onClose}>OK</button>
+        <button class="golden-button close-button" onclick={onClose}>OK</button>
       {:else if footer}
         <div class="dialog-footer golden-dark-border flex justify-end">
           {@render footer?.()}
@@ -59,6 +59,7 @@
   }
 
   let { open = $bindable(), icon, subTitle, title, activator, children, footer }: Props = $props();
+  let hasOnlyBody = $derived(!footer && !title && !subTitle);
 
   function onOpen() {
     open = true;
@@ -189,6 +190,10 @@
         flex-grow: 1;
         overflow-y: auto;
     }
+    .dialog-body.dialog-body-only {
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
 
     /* Prevent scrolling on body when dialog is open */
     :global(body:has(.dialog-overlay.visible)) {
@@ -201,22 +206,12 @@
     }
 
     .close-button {
-        background: linear-gradient(to bottom right, #FFD030, #FFCC30, #FFCC30);
-        color: black;
-        border-radius: 0.375rem;
-        padding: 0.75rem 1.75rem;
-        font-size: 0.75rem;
-        font-weight: bold;
-        letter-spacing: 0.09em;
-        box-shadow:
-                0 1px 12px rgba(255, 208, 48, 0.53),
-                0 0 4px rgba(255, 230, 150, 0.73);
-        border: 2px solid rgba(255, 208, 48, 0.9);
-        cursor: pointer;
-        transition: all 0.2s;
+        align-self: flex-end;
+        margin: 0.5rem;
     }
 
     .close-button:hover {
         filter: brightness(1.1);
     }
+
 </style>
