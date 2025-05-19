@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@tomi20v/iterators": "^0.14.0",
+    "buffer": "^6.0.3",
     "eventemitter3": "^5.0.1",
     "html-trajectory": "^0.3.6",
     "lodash.debounce": "^4.0.8",

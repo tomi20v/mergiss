@@ -1,4 +1,4 @@
-<MDialog bind:open={open} title="ANOTHER STELLAR SYNDICATE">
+<MDialog bind:open={open} title={leetize("ANOTHER STELLAR SYNDICATE")}>
 
   {#snippet activator()}
     <MAppBarButton icon="trophy" onclick={openAchievementDialog} />

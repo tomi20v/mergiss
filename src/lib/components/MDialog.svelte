@@ -17,13 +17,13 @@
             <h2 class="material-symbols-rounded self-center mr-2">{icon}</h2>
           {/if}
           {#if title}
-            <h2 class="font-bold font-noto xuppercase text-left">
+            <h2 class="dialog-title font-bold font-noto text-left">
               {title}
             </h2>
           {/if}
           </div>
           {#if subTitle}
-            <h3 class="font-noto uppercase text-gray-400 text-left">{subTitle}</h3>
+            <h3 class="font-noto text-gray-400 text-left">{subTitle}</h3>
           {/if}
         </div>
       {/if}
