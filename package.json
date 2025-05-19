@@ -19,12 +19,8 @@
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.3",
-    "@smui/button": "^8.0.0-beta.3",
     "@smui/common": "^8.0.0-beta.3",
-    "@smui/dialog": "^8.0.0-beta.3",
     "@smui/image-list": "^8.0.0-beta.3",
-    "@smui/layout-grid": "^8.0.0-beta.3",
-    "@smui/top-app-bar": "^8.0.0-beta.3",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/adapter-netlify": "^4.4.2",
     "@sveltejs/adapter-static": "^3.0.8",
@@ -49,6 +45,7 @@
   },
   "dependencies": {
     "@tomi20v/iterators": "^0.14.0",
+    "buffer": "^6.0.3",
     "eventemitter3": "^5.0.1",
     "html-trajectory": "^0.3.6",
     "lodash.debounce": "^4.0.8",

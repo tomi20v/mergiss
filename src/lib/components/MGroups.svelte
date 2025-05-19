@@ -63,32 +63,6 @@
     }
   }
 
-  .group-item {
-      border: 3px solid #333;
-      padding: 0.3vw 0.3vw;
-      background-color: #111;
-      box-shadow: 0 0 10px #111;
-      gap: 0vw;
-      max-height: 9vh;
-  }
-
-  .group-info-column {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 0.5vw;
-      padding-right: 0;
-      gap: 1vh;
-      width: 50%; /* Explicit width for remaining space */
-  }
-  .group-info-score {
-      font-size: max(1.33vw, 0.6rem);
-      gap: 0.5rem;
-  }
-  .group-info-ttl {
-      font-size: max(1.5vw, 0.75rem);
-  }
-
   .shadow-gradient {
     position: absolute;
     bottom: 0;
