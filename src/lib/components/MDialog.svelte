@@ -23,7 +23,7 @@
           {/if}
           </div>
           {#if subTitle}
-            <h3 class="font-noto text-gray-400 text-left">{subTitle}</h3>
+            <h3 class="dialog-subtitle font-noto text-gray-400 text-left">{subTitle}</h3>
           {/if}
         </div>
       {/if}

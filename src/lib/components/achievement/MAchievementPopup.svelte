@@ -1,6 +1,6 @@
 <div class="achievement-popup">
   <!-- @todo add dynamic title "achieved!" -->
-  <MDialog bind:open={open} {title}>
+  <MDialog bind:open={open} {title} subTitle="The C-suite Chronicles">
     <div class="container">
       <div class="icon-column">
         <span class="achievement-icon golden-border">
@@ -68,13 +68,14 @@
         }
     }
 
+    :global(.achievement-popup .dialog-subtitle) {
+        justify-self: center !important;
+    }
     :global(.achievement-popup .dialog-body) {
         padding-bottom: 0;
         margin-bottom: 0;
     }
     :global(.achievement-popup .dialog-content) {
-        /*padding-bottom: 0;*/
-        padding: 0.5vh;
         margin-bottom: 0;
     }
     :global(.achievement-popup .dialog-header .dialog-title) {
