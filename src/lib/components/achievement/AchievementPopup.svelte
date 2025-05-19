@@ -1,33 +1,60 @@
 <div class="achievement-popup">
   <!-- @todo add dynamic title "achieved!" -->
-  <MDialog bind:open={open}>
+  <MDialog bind:open={open} {title}>
     <div class="container">
       <div class="icon-column">
         <span class="achievement-icon golden-border">
-          <img src="/achievements/astro-1.png" alt="" width="75%"/>
+          <img src="/achievements/{achievement.id}.png" alt="" width="75%"/>
         </span>
       </div>
       <div class="content-column">
-        <div class="achievement-title golden-text golden-text-shadow">{title}</div>
+        <div class="achievement-title golden-text golden-text-shadow">{achievement.title}</div>
         <div class="achievement-description gray-title">
-          {description}
+          {achievement.description}
         </div>
-        <button class="golden-button" on:click={handleClose} aria-label="Close">OK</button>
+<!--        <button class="golden-button" onclick={handleClose} aria-label="Close">OK</button>-->
       </div>
     </div>
   </MDialog>
 </div>
 
 <script lang="ts">
+
+  import {onMount} from "svelte";
   import MDialog from "$lib/components/MDialog.svelte";
+  import type {IAchievement} from "$lib/game/achievement/IAchievement";
+  import {uiBus} from "$lib/util/uiBus";
 
-  export let open: boolean = true;
-  export let title: string = "First Fix";
-  export let description: string = "You fixed your first bug. Ready for more challenges!";
+  let open: boolean = $state(false);
+  let title: string = $state("aaa");
 
-  function handleClose() {
-    open = false;
+  let achievement: IAchievement = $state({} as IAchievement);
+
+  onMount(() => {
+    uiBus.on("achieved", onAchieved);
+    uiBus.on("showAchievement", onShow);
+  })
+
+  // function handleClose() {
+  //   open = false;
+  // }
+
+  function onAchieved(a: IAchievement) {
+    console.log("achieved", arguments);
+    title = "ACHIEVED!";
+    show(a);
   }
+
+  function onShow(a: IAchievement) {
+    title = "";
+    show(a);
+  }
+
+  function show(a: IAchievement) {
+    achievement = a;
+    open = true;
+  }
+
 </script>
 
 <style>
@@ -49,6 +76,11 @@
         /*padding-bottom: 0;*/
         padding: 0.5vh;
         margin-bottom: 0;
+    }
+    :global(.achievement-popup .dialog-header .dialog-title) {
+        /*padding-bottom: 0;*/
+        justify-content: center;
+        text-shadow: 0 0 19px #ff9933, 0 0 10px #ff8000;
     }
 
     .achievement-popup {
