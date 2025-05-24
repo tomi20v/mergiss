@@ -9,5 +9,4 @@ services:
     volumes:
       - ./:/app
     command: npm run dev
-#    command: tail -F anything
     tty: true

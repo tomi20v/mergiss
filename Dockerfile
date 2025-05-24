@@ -18,5 +18,4 @@ COPY . .
 RUN npm run build
 #RUN npm prune --production
 
-#CMD [ "npm", "run", "serve:storybook" ]
-CMD [ "/bin/ash" ]
+#CMD [ "/bin/ash" ]
