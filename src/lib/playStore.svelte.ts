@@ -21,6 +21,8 @@ class PlayStore {
   bonusMultiplier: number = $derived(1 + this.bonusPcnt / 25);
   rocketMultiplier: number = 10;
   score: number = $state(0);
+  // achievements
+  achievementIds: string[] = [];
 }
 
 const playStore: PlayStore = new PlayStore();
@@ -41,6 +43,7 @@ function initStore() {
   playStore.bonusPcnt = 0;
   playStore.score = 0;
   // playStore.score = 99125808;
+  playStore.achievementIds = [];
 }
 initStore();
 
