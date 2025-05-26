@@ -9,12 +9,14 @@
       <div class="category-row">
         {#each category.achievements as item}
           <div class="achievement-icon">
-            {#if playStore.achievementIds.includes(item.id)}
-              <img src="/achievements/{item.id}.png" alt="" />
-            {:else if isAchievementUnlocked(category, item)}
-              <img src="/achievements/paperhead.png" alt="" class="unlocked" />
+            {#if achieved(item.id)}
+              <button class="avatar-button" onclick={() => uiBus.emit('showAchievement', item)} >
+                <img src="/achievements/{item.id}.png" alt="" loading="lazy" />
+              </button>
+            {:else if unlocked(category, item)}
+              <img src="/achievements/paperhead.png" alt="" class="unlocked" loading="lazy" />
             {:else}
-              <img src="/achievements/locked.png" alt="" class="locked" />
+              <img src="/achievements/locked.png" alt="" class="locked" loading="lazy" />
             {/if}
           </div>
         {/each}
@@ -37,13 +39,14 @@
   import playStore from "$lib/playStore.svelte";
   import type {IAchievement} from "$lib/game/achievement/IAchievement";
   import type {IAchievementCategory} from "$lib/game/achievement/IAchievementCategory";
+  import { uiBus } from '$lib/util/uiBus';
 
   const textsToScroll = [
     "Build your space agency and shoot the moon",
     "Earn achievements to unlock more achievements",
     "Space Agency As A Service SAAAS",
     "You should fill all positions at your agency",
-    "Achievements give you big bonus... . . sometimes",
+    "Achievements give big bonus... sometimes",
     "There are many achievements to unlock",
   ];
 
@@ -54,9 +57,11 @@
   let textToScroll = $state(textsToScroll[0]);
   let lastTextIndex = $state(0);
 
-  // Add a function to open the dialog
-  function openAchievementDialog() {
-    open = true;
+  /**
+   * Check if an achievement is earned by checking if its ID exists in playStore.achievementIds
+   */
+  function achieved(id: string): boolean {
+    return playStore.achievementIds.includes(id);
   }
 
   // Called when text completely scrolls out of view on the left
@@ -67,6 +72,11 @@
     } while (nextIndex === lastTextIndex);
     lastTextIndex = nextIndex;
     textToScroll = textsToScroll[nextIndex];
+  }
+
+  // Add a function to open the dialog
+  function openAchievementDialog() {
+    open = true;
   }
 
   /**
@@ -86,7 +96,7 @@
    * EEEUL - Earning 1st, 2nd, and 3rd unlocks 4th
    * ...and so on
    */
-  function isAchievementUnlocked(category: IAchievementCategory, item: IAchievement) {
+  function unlocked(category: IAchievementCategory, item: IAchievement) {
     const achievements = category.achievements;
 
     // Get the index of this achievement in its category
@@ -128,73 +138,82 @@
 </script>
 
 <style>
-  .achievements-container {
-    width: 90%;
-    /*max-height: 70vh;*/
-    /*overflow-y: auto;*/
-    overflow-x: hidden;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
-    padding-left: 5%;
-    padding-right: 5%;
-  }
 
-  .achievements-container::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-  }
+    .achievements-container {
+        width: 90%;
+        /*max-height: 70vh;*/
+        /*overflow-y: auto;*/
+        overflow-x: hidden;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+        padding-left: 5%;
+        padding-right: 5%;
+    }
 
-  .category-row {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: center;
-    margin-bottom: 1rem;
-    gap: 0.5rem;
-  }
+    .achievements-container::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
 
-  .achievement-icon {
-    flex: 0 0 16%; /* Reduced from 18% to account for added margins */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-  }
+    .category-row {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: center;
+        margin-bottom: 1rem;
+        gap: 0.5rem;
+    }
 
-  .achievement-icon img {
-    max-width: 100%;
-    height: auto;
-    object-fit: contain;
-  }
+    .avatar-button {
+        border: none;
+        background: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+    }
 
-  .scrolling-container {
-      width: 100%;
-      overflow: hidden;
-      position: relative;
-  }
+    .achievement-icon {
+        flex: 0 0 16%; /* Reduced from 18% to account for added margins */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+    }
 
-  .scrolling-text {
-      animation: scroll-left 15s linear infinite;
-      white-space: nowrap;
-      position: relative;
-  }
+    .achievement-icon img {
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
 
-  .unlocked {
-      opacity: 0.85;
-      filter: grayscale(20%);
-  }
+    .scrolling-container {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+    }
 
-  .locked {
-      opacity: 0.65;
-      filter: grayscale(50%);
-  }
+    .scrolling-text {
+        animation: scroll-left 15s linear infinite;
+        white-space: nowrap;
+        position: relative;
+    }
 
-  @keyframes scroll-left {
-      0% {
-          transform: translateX(100%); /* Start from right edge */
-      }
-      100% {
-          transform: translateX(-100%); /* Completely exit left edge */
-      }
-  }
+    .unlocked {
+        opacity: 0.85;
+        filter: grayscale(20%);
+    }
+
+    .locked {
+        opacity: 0.65;
+        filter: grayscale(50%);
+    }
+
+    @keyframes scroll-left {
+        0% {
+            transform: translateX(100%); /* Start from right edge */
+        }
+        100% {
+            transform: translateX(-100%); /* Completely exit left edge */
+        }
+    }
 
 </style>

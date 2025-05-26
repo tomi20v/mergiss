@@ -42,10 +42,15 @@
 
     :global(.golden-text) {
         /*color: #FFD030;*/
-        color: gold;
+        color: gold !important;
     }
     :global(.golden-text-shadow) {
         text-shadow: 0 0 9px #ffe066, 0 0 2px #f7b801;
+    }
+
+    :global(.golden-dark-text) {
+        /*color: #FFD030;*/
+        color: darkgoldenrod !important;
     }
 
     :global(.golden-border) {

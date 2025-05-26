@@ -158,6 +158,7 @@
     }
     .dialog-header h2,
     :global(.dialog-footer h2) {
+        letter-spacing: 0.1em;
         font-weight: bold;
         font-size: min(4vw, 8vh);
         /*font-size: min(4vw, 4vw);*/
@@ -172,6 +173,7 @@
     }
     .dialog-header h3,
     :global(.dialog-footer h3) {
+        letter-spacing: 0.2em;
         margin-top: 0;
         padding-top: 0;
         margin-bottom: 0;

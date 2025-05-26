@@ -162,6 +162,9 @@
     :global(.panel-padding) {
         padding: 1.5vw;
     }
+    :global(.tracking-extreme) {
+        letter-spacing: 0.2rem;
+    }
     #app-grid {
         /** with this we don't have to use padding which'd mess with height:100% */
         position: absolute;

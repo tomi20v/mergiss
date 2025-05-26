@@ -12,9 +12,16 @@
         <div class="achievement-description gray-title">
           {achievement.description}
         </div>
-<!--        <button class="golden-button" onclick={handleClose} aria-label="Close">OK</button>-->
+        <div class="golden-text achievement-description gray-title">
+          "{achievement.hint}"
+        </div>
       </div>
     </div>
+    {#snippet footer()}
+      <h3 class="golden-text golden-text-shadow tracking-extreme">
+        <span class="p-4 flex">{achievement.gain}</span>
+      </h3>
+    {/snippet}
   </MDialog>
 </div>
 
@@ -40,7 +47,7 @@
   // }
 
   function onAchieved(a: IAchievement) {
-    console.log("achieved", arguments);
+//    console.log("achieved", arguments);
     title = "ACHIEVED!";
     show(a);
   }
@@ -104,6 +111,8 @@
         justify-content: center;
         width: 10rem;
         min-width: 128px;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
     .achievement-icon {
         display: inline-flex;
@@ -126,9 +135,8 @@
     .achievement-title {
         font-size: 1.5rem;
         letter-spacing: 0.2em;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.5rem;
         font-weight: bold;
-        line-height: 1.3;
     }
     .achievement-description {
         font-size: 0.875rem;

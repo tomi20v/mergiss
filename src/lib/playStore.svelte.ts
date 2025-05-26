@@ -1,5 +1,5 @@
 import {uiBus} from "$lib/util/uiBus";
-import {emptyField, type FieldType} from "$lib/game/fields.svelte";
+import {type FieldType} from "$lib/game/fields.svelte";
 import Group from "$lib/game/Group.svelte";
 
 // at least for, this store is limited to "game" scope. A "game" is one "game session" which can restart etc.
@@ -22,7 +22,7 @@ class PlayStore {
   rocketMultiplier: number = 10;
   score: number = $state(0);
   // achievements
-  achievementIds: string[] = [];
+  achievementIds: string[] = $state([]);
 }
 
 const playStore: PlayStore = new PlayStore();
