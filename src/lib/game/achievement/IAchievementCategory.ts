@@ -1,4 +1,4 @@
-import type {IAchievement} from "$lib/game/achievement/IAchievement";
+import type { IAchievement } from "./IAchievement";
 
 export interface IAchievementCategory {
   category: string;

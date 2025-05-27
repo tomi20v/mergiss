@@ -1,71 +1,99 @@
 <div class="achievement-popup">
-  <!-- @todo add dynamic title "achieved!" -->
-  <MDialog bind:open={open} {title} subTitle="The C-suite Chronicles">
+  <MDialog bind:open={open} {title} subTitle={category?.category}>
     <div class="container">
       <div class="icon-column">
-        <span class="achievement-icon golden-border">
-          <img src="/achievements/{achievement.id}.png" alt="" width="75%"/>
+        <span class:achievement-icon={true} class:achievement-icon-bounce={isAchieved} class:golden-border={isAchieved} class:unlocked-border={isUnlocked} class:locked-border={isLocked}>
+          {#if isAchieved}
+            <img src="/achievements/{achievement.id}.png" alt="" width="75%"/>
+          {:else if isUnlocked}
+            <img src="/achievements/paperhead.png" alt="" class="unlocked" width="75%"/>
+          {:else}
+            <img src="/achievements/locked.png" alt="" class="locked" width="75%"/>
+          {/if}
         </span>
       </div>
       <div class="content-column">
-        <div class="achievement-title golden-text golden-text-shadow">{achievement.title}</div>
-        <div class="achievement-description gray-title">
-          {achievement.description}
-        </div>
-        <div class="golden-text achievement-description gray-title">
-          "{achievement.hint}"
-        </div>
+        {#if isAchieved}
+          <div class="achievement-title golden-text golden-text-shadow">{achievement.title}</div>
+          <div class="achievement-description gray-title">
+            {achievement.description}
+          </div>
+          <div class="golden-text achievement-description gray-title">
+            "{achievement.hint}"
+          </div>
+        {:else if isUnlocked}
+          <div class="achievement-title silver-text silver-text-shadow">{category?.category}</div>
+          <div class="golden-text achievement-description gray-title">
+            "{achievement.hint}"
+          </div>
+        {:else}
+          <div class="achievement-title locked-text locked-text-shadow">Locked Achievement</div>
+          <div class="achievement-description gray-title">
+            Unlock more achievements to discover this one.
+          </div>
+        {/if}
       </div>
     </div>
     {#snippet footer()}
-      <h3 class="golden-text golden-text-shadow tracking-extreme">
-        <span class="p-4 flex">{achievement.gain}</span>
-      </h3>
+      {#if isAchieved}
+        <h3 class="golden-text golden-text-shadow tracking-extreme">
+          <span class="p-4 flex">{achievement.gain}</span>
+        </h3>
+      {:else if isUnlocked}
+        <h3 class="silver-text silver-text-shadow tracking-extreme">
+          <span class="p-4 flex">Complete this achievement to earn rewards</span>
+        </h3>
+      {:else}
+        <h3 class="locked-text locked-text-shadow tracking-extreme">
+          <span class="p-4 flex">Keep exploring!</span>
+        </h3>
+      {/if}
     {/snippet}
   </MDialog>
 </div>
 
 <script lang="ts">
-
   import {onMount} from "svelte";
   import MDialog from "$lib/components/MDialog.svelte";
   import type {IAchievement} from "$lib/game/achievement/IAchievement";
   import {uiBus} from "$lib/util/uiBus";
+  import { achieved, unlocked } from "$lib/game/achievement/achievements";
+  import type { IAchievementCategory } from "$lib/game/achievement/IAchievementCategory";
 
   let open: boolean = $state(false);
-  let title: string = $state("aaa");
-
+  let title: string = $state("");
   let achievement: IAchievement = $state({} as IAchievement);
+  let category: IAchievementCategory | null = $state(null);
+  
+  // Computed properties for achievement state
+  let isAchieved: boolean = $derived(achievement.id ? achieved(achievement.id) : false);
+  let isUnlocked: boolean = $derived(category && achievement.id ? unlocked(category, achievement) && !isAchieved : false);
+  let isLocked: boolean = $derived(!isAchieved && !isUnlocked);
 
   onMount(() => {
     uiBus.on("achieved", onAchieved);
     uiBus.on("showAchievement", onShow);
-  })
+  });
 
-  // function handleClose() {
-  //   open = false;
-  // }
-
-  function onAchieved(a: IAchievement) {
-//    console.log("achieved", arguments);
+  function onAchieved(a: IAchievement, c?: IAchievementCategory) {
     title = "ACHIEVED!";
-    show(a);
+    show(a, c);
   }
 
-  function onShow(a: IAchievement) {
+  function onShow(a: IAchievement, c?: IAchievementCategory) {
+    // No titles for any achievement states
     title = "";
-    show(a);
+    show(a, c);
   }
 
-  function show(a: IAchievement) {
+  function show(a: IAchievement, c?: IAchievementCategory) {
     achievement = a;
+    category = c || null;
     open = true;
   }
-
 </script>
 
 <style>
-
     @keyframes pulseGlow {
         0%, 100% {
             box-shadow: 0 0 10px #ffeb3b;
@@ -124,27 +152,86 @@
         background: black;
         border-width: 3px;
         border-style: solid;
-        box-shadow: 0 0 16px 4px rgba(255,232,67,0.38);
+    }
+    
+    .achievement-icon-bounce {
         animation: bounceSlow 2.6s cubic-bezier(.7,-0.3,.5,1.3) infinite;
     }
+    
+    .golden-border {
+        border-color: #ffd700;
+        box-shadow: 0 0 16px 4px rgba(255,232,67,0.38);
+    }
+    
+    .unlocked-border {
+        border-color: #c0c0c0;
+        box-shadow: 0 0 12px 3px rgba(192,192,192,0.3);
+    }
+    
+    .locked-border {
+        border-color: #696969;
+        box-shadow: 0 0 8px 2px rgba(105,105,105,0.2);
+    }
+    
     .content-column {
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
+    
     .achievement-title {
         font-size: 1.5rem;
         letter-spacing: 0.2em;
         margin-bottom: 0.5rem;
         font-weight: bold;
     }
+    
     .achievement-description {
         font-size: 0.875rem;
-        text-shadow: 0 0 3px rgba(81,172,255,0.57);
         max-width: 30rem;
         margin-bottom: 0.5rem;
         font-family: 'Noto Sans', monospace;
     }
+    
+    .golden-text {
+        color: #ffd700;
+    }
+    
+    .golden-text-shadow {
+        text-shadow: 0 0 3px rgba(255, 215, 0, 0.57);
+    }
+    
+    .silver-text {
+        color: #c0c0c0;
+    }
+    
+    .silver-text-shadow {
+        text-shadow: 0 0 3px rgba(192, 192, 192, 0.57);
+    }
+    
+    .locked-text {
+        color: #a0a0a0;
+    }
+    
+    .locked-text-shadow {
+        text-shadow: 0 0 3px rgba(160, 160, 160, 0.4);
+    }
+    
+    .gray-title {
+        color: #e0e0e0;
+        text-shadow: 0 0 3px rgba(81,172,255,0.57);
+    }
+    
+    .unlocked {
+        opacity: 0.85;
+        filter: grayscale(20%);
+    }
+
+    .locked {
+        opacity: 0.65;
+        filter: grayscale(50%);
+    }
+    
     /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; }
