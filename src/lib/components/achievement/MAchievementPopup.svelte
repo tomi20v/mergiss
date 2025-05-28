@@ -1,5 +1,5 @@
 <div class="achievement-popup">
-  <MDialog bind:open={open} {title} subTitle={category?.category}>
+  <MDialog bind:open={open} {title} subTitle={category?.category} onclose={handleClose}>
     <div class="container">
       <div class="icon-column">
         <span class:achievement-icon={true} class:achievement-icon-bounce={isAchieved} class:golden-border={isAchieved} class:unlocked-border={isUnlocked} class:locked-border={isLocked}>
@@ -91,6 +91,12 @@
     category = c || null;
     open = true;
   }
+
+  function handleClose() {
+    open = false;
+    uiBus.emit("showAchievements");
+  }
+
 </script>
 
 <style>

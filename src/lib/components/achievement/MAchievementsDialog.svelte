@@ -9,7 +9,7 @@
       <div class="category-row">
         {#each category.achievements as item}
           <div class="achievement-icon">
-            <button class="avatar-button" onclick={() => uiBus.emit('showAchievement', item, category)}>
+            <button class="avatar-button" onclick={() => handleAchievementClick(item, category)}>
               {#if achievements.achieved(item.id)}
                 <img src="/achievements/{item.id}.png" alt="" loading="lazy" />
               {:else if achievements.unlocked(category, item)}
@@ -36,8 +36,11 @@
   import MDialog from "$lib/components/MDialog.svelte";
   import MAppBarButton from "$lib/components/MAppBarButton.svelte";
   import {leetize} from "../../../util/texts";
+  import {onMount, onDestroy} from "svelte";
   import { uiBus } from '$lib/util/uiBus';
   import * as achievements from "$lib/game/achievement/achievements";
+  import type { IAchievement } from '$lib/game/achievement/IAchievement';
+  import type { IAchievementCategory } from '$lib/game/achievement/IAchievementCategory';
 
   const textsToScroll = [
     "Build your space agency and shoot the moon",
@@ -55,6 +58,25 @@
   let textToScroll = $state(textsToScroll[0]);
   let lastTextIndex = $state(0);
 
+  // Mount and destroy handlers for event subscription
+  onMount(() => {
+    // Subscribe to showAchievements event
+    uiBus.on('showAchievements', openAchievementDialog);
+  });
+
+  onDestroy(() => {
+    // Unsubscribe from showAchievements event
+    uiBus.off('showAchievements', openAchievementDialog);
+  });
+  
+  // Function to handle achievement click
+  function handleAchievementClick(item: IAchievement, category: IAchievementCategory) {
+    // First close the dialog
+    open = false;
+    // Then emit the event
+    uiBus.emit('showAchievement', item, category);
+  }
+  
   // Called when text completely scrolls out of view on the left
   function onTextScrollComplete() {
     let nextIndex;

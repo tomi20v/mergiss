@@ -1,12 +1,12 @@
 <!-- Activator -->
 {#if activator}
-  <section onclick={onOpen} role="none">
+  <section onclick={handleOpen} role="none">
     {@render activator?.()}
   </section>
 {/if}
 
 <!-- Template -->
-<div class="dialog-overlay" class:visible={open} onclick={onClose} role="none">
+<div class="dialog-overlay" class:visible={open} onclick={handleClose} role="none">
   <div class="dialog-container golden-border flex" onclick={event => event.stopPropagation()} role="none">
     <div class="dialog-content golden-shadow-border golden-border golden-text p-4">
 
@@ -33,7 +33,7 @@
       </div>
 
       {#if footer === true}
-        <button class="golden-button close-button" onclick={onClose}>OK</button>
+        <button class="golden-button close-button" onclick={handleClose}>OK</button>
       {:else if footer}
         <div class="dialog-footer golden-dark-border flex justify-end">
           {@render footer?.()}
@@ -56,23 +56,36 @@
     activator?: Snippet;
     children?: Snippet;
     footer?: Snippet|boolean;
+    onclose?: () => void;
   }
 
-  let { open = $bindable(), icon, subTitle, title, activator, children, footer }: Props = $props();
+  let {
+    open = $bindable(),
+    icon,
+    subTitle,
+    title,
+    activator,
+    children,
+    footer,
+    onclose = () => null,
+  }: Props = $props();
   let hasOnlyBody = $derived(!footer && !title && !subTitle);
 
-  function onOpen() {
+  function handleOpen() {
     open = true;
   }
 
-  function onClose() {
+  // onclose is the prop coming in. onClose is the internal handler
+  function handleClose() {
     open = false;
+    // this defaults to empty function so we can always call it
+    setTimeout(onclose);
   }
 
   // Close on Escape key press
   function handleKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape' && open) {
-      onClose();
+      handleClose();
     }
   }
 
