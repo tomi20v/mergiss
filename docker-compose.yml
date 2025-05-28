@@ -1,8 +1,9 @@
-version: '3.0'
 services:
   mergiss:
     build:
       context: .
+      args:
+        NODE_ENV: development
     container_name: mergiss_mergiss
     ports:
       - 5173:5173
