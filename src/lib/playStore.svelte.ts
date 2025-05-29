@@ -23,13 +23,19 @@ class PlayStore {
   score: number = $state(0);
   // achievements
   achievementIds: string[] = $state([]);
+  piecesDropped: number = $state(0);
 }
 
 const playStore: PlayStore = new PlayStore();
 
 // uiBus.on("playStart", (play: PlayConfigType) => {
-uiBus.on("playStart", initStore)
+uiBus.on("pieceDropped", onPieceDropped);
 
+function onPieceDropped() {
+  playStore.piecesDropped++;
+}
+
+uiBus.on("playStart", initStore);
 function initStore() {
   playStore.paused = false;
   // generator
@@ -44,6 +50,7 @@ function initStore() {
   playStore.score = 0;
   // playStore.score = 99125808;
   playStore.achievementIds = [];
+  playStore.piecesDropped = 0;
 }
 initStore();
 

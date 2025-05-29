@@ -5,7 +5,7 @@ import type { IAchievementCategory } from "./IAchievementCategory";
 /**
  * Check if an achievement is earned by checking if its ID exists in playStore.achievementIds
  */
-export function achieved(id: string): boolean {
+function achieved(id: string): boolean {
   return playStore.achievementIds.includes(id);
 }
 
@@ -26,7 +26,7 @@ export function achieved(id: string): boolean {
  * EEEUL - Earning 1st, 2nd, and 3rd unlocks 4th
  * ...and so on
  */
-export function unlocked(category: IAchievementCategory, item: IAchievement): boolean {
+function unlocked(category: IAchievementCategory, item: IAchievement): boolean {
   const achievements = category.achievements;
 
   // Get the index of this achievement in its category
@@ -64,3 +64,5 @@ export function unlocked(category: IAchievementCategory, item: IAchievement): bo
   // Default to locked for any other cases
   return false;
 }
+
+export default {achieved, unlocked};

@@ -57,7 +57,7 @@
   import MDialog from "$lib/components/MDialog.svelte";
   import type {IAchievement} from "$lib/game/achievement/IAchievement";
   import {uiBus} from "$lib/util/uiBus";
-  import { achieved, unlocked } from "$lib/game/achievement/achievements";
+  import achievements from "$lib/game/achievement/achievements";
   import type { IAchievementCategory } from "$lib/game/achievement/IAchievementCategory";
 
   let open: boolean = $state(false);
@@ -66,8 +66,8 @@
   let category: IAchievementCategory | null = $state(null);
   
   // Computed properties for achievement state
-  let isAchieved: boolean = $derived(achievement.id ? achieved(achievement.id) : false);
-  let isUnlocked: boolean = $derived(category && achievement.id ? unlocked(category, achievement) && !isAchieved : false);
+  let isAchieved: boolean = $derived(achievement.id ? achievements.achieved(achievement.id) : false);
+  let isUnlocked: boolean = $derived(category && achievement.id ? achievements.unlocked(category, achievement) && !isAchieved : false);
   let isLocked: boolean = $derived(!isAchieved && !isUnlocked);
 
   onMount(() => {

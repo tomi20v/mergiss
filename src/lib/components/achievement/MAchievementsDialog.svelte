@@ -38,7 +38,7 @@
   import {leetize} from "../../../util/texts";
   import {onMount, onDestroy} from "svelte";
   import { uiBus } from '$lib/util/uiBus';
-  import * as achievements from "$lib/game/achievement/achievements";
+  import achievements from "$lib/game/achievement/achievements";
   import type { IAchievement } from '$lib/game/achievement/IAchievement';
   import type { IAchievementCategory } from '$lib/game/achievement/IAchievementCategory';
 
