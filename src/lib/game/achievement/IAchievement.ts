@@ -1,3 +1,5 @@
+import type {UnknownObject} from "../../../util/UnknownObject";
+
 export interface IAchievement {
   id: string,
   title: string,
@@ -5,5 +7,6 @@ export interface IAchievement {
   gain: string,
   hint: string,
   req: string,
-  callback?: () => boolean,
+  eventNames?: string[],
+  callback?: (state: UnknownObject, eventName: string, eventData: object) => boolean,
 }

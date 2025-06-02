@@ -75,13 +75,9 @@
     uiBus.on("showAchievement", onShow);
   });
 
-  // function onAchieved(a: IAchievement, c?: IAchievementCategory) {
-  function onAchieved(achievementId: string) {
-    // {iCategory, iAchievement} =
-    //   achievements.lookup(achievementId);
-    console.log("onAchieved", category, achievement);
-    // title = "ACHIEVED!";
-    // show(a, c);
+  function onAchieved({achievement, category}: {achievement: IAchievement, category: IAchievementCategory}) {
+    title = "ACHIEVED!";
+    show(achievement, category);
   }
 
   function onShow(a: IAchievement, c?: IAchievementCategory) {
