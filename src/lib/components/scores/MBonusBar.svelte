@@ -13,7 +13,7 @@
   import playStore from "$lib/playStore.svelte";
 
   const maxBonus = 100;
-  const depletionRate = 14; // Bonus depletes by this per second
+  const depletionMin = 14; // this was a convenient value, just to remember.
   const depletionInterval = 100; // Check every 100ms
   let depleteTimerId: ReturnType<typeof setInterval> | null = null;
   let suspendDepletion = false;
@@ -21,17 +21,19 @@
 
   // Use $derived to reactively read the bonusMultiplier from the store
   let value = $derived(playStore.bonusPcnt);
-  
+
   onMount(() => {
     // Subscribe to the 'pieceDropped' event
     uiBus.on('pieceDropped', onPieceDropped);
     uiBus.on('resetBonusBar', onReset);
+    uiBus.on('achieved', onAchieved);
+    uiBus.on('dev.bonus', () => addBonus(15));
 
     // Start the depletion timer
     depleteTimerId = setInterval(() => {
       if (!playStore.paused && !suspendDepletion) {
         // Calculate depletion amount per interval
-        const depleteAmount = depletionRate * (depletionInterval / 1000);
+        const depleteAmount = playStore.bonusDepletion * (depletionInterval / 1000);
         // Ensure bonus doesn't go below 0
         playStore.bonusPcnt = Math.max(0, playStore.bonusPcnt - depleteAmount);
       }
@@ -62,6 +64,19 @@
     }
   });
 
+  function has(achievementId: string): number {
+    return playStore.achievementIds.includes(achievementId) ? 1 : 0;
+  }
+
+  function onAchieved() {
+    playStore.bonusMax = Math.max(
+      5
+    );
+    playStore.bonusDepletion = Math.max(
+      50 - has("astro-1") * 20,
+      depletionMin);
+  }
+
   // Define your listener function
   function onPieceDropped (event: {
     origin: string;
@@ -69,8 +84,17 @@
     dragTime: number;
     rotationCount: number;
   }) {
+
+    const added = Math.floor(event.piece.weight * 6.5);
+
+    addBonus(added);
+
+  }
+
+  function addBonus(added: number) {
+
     // Update the bonusMultiplier in the store directly
-    playStore.bonusPcnt = Math.min(playStore.bonusPcnt + event.piece.weight * 6.5, maxBonus);
+    playStore.bonusPcnt = Math.min(playStore.bonusPcnt + added, maxBonus);
     
     // Suspend depletion for half a second
     suspendDepletion = true;
