@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { achieved, unlocked } from './achievements';
+import achievements from './achievements';
 import type { IAchievement } from './IAchievement';
 import type { IAchievementCategory } from './IAchievementCategory';
 
@@ -26,14 +26,14 @@ describe('Achievement functions', () => {
     vi.restoreAllMocks();
   });
 
-  describe('achieved function', () => {
+  describe('achievements.achieved function', () => {
     it('should return true if achievement ID exists in playStore.achievementIds', () => {
       // Arrange
       playStore.achievementIds = ['test-achievement-1', 'test-achievement-2'];
       
       // Act & Assert
-      expect(achieved('test-achievement-1')).toBe(true);
-      expect(achieved('test-achievement-2')).toBe(true);
+      expect(achievements.achieved('test-achievement-1')).toBe(true);
+      expect(achievements.achieved('test-achievement-2')).toBe(true);
     });
 
     it('should return false if achievement ID does not exist in playStore.achievementIds', () => {
@@ -41,8 +41,8 @@ describe('Achievement functions', () => {
       playStore.achievementIds = ['test-achievement-1', 'test-achievement-2'];
       
       // Act & Assert
-      expect(achieved('test-achievement-3')).toBe(false);
-      expect(achieved('non-existent-achievement')).toBe(false);
+      expect(achievements.achieved('test-achievement-3')).toBe(false);
+      expect(achievements.achieved('non-existent-achievement')).toBe(false);
     });
 
     it('should return false for an empty achievementIds array', () => {
@@ -50,11 +50,11 @@ describe('Achievement functions', () => {
       playStore.achievementIds = [];
       
       // Act & Assert
-      expect(achieved('test-achievement')).toBe(false);
+      expect(achievements.achieved('test-achievement')).toBe(false);
     });
   });
 
-  describe('unlocked function', () => {
+  describe('achievements.unlocked function', () => {
     // Setup test data
     let testCategory: IAchievementCategory;
     
@@ -78,10 +78,10 @@ describe('Achievement functions', () => {
 
     it('should always unlock the first two achievements', () => {
       // Test first achievement
-      expect(unlocked(testCategory, testCategory.achievements[0])).toBe(true);
+      expect(achievements.unlocked(testCategory, testCategory.achievements[0])).toBe(true);
       
       // Test second achievement
-      expect(unlocked(testCategory, testCategory.achievements[1])).toBe(true);
+      expect(achievements.unlocked(testCategory, testCategory.achievements[1])).toBe(true);
     });
 
     it('should keep the third achievement locked if neither first nor second is earned', () => {
@@ -89,23 +89,23 @@ describe('Achievement functions', () => {
       playStore.achievementIds = [];
       
       // Act & Assert - third achievement should be locked
-      expect(unlocked(testCategory, testCategory.achievements[2])).toBe(false);
+      expect(achievements.unlocked(testCategory, testCategory.achievements[2])).toBe(false);
     });
 
     it('should unlock the third achievement if the first achievement is earned', () => {
       // Arrange - first achievement is earned
       playStore.achievementIds = ['achievement-1'];
       
-      // Act & Assert - third achievement should be unlocked
-      expect(unlocked(testCategory, testCategory.achievements[2])).toBe(true);
+      // Act & Assert - third achievement should be achievements.unlocked
+      expect(achievements.unlocked(testCategory, testCategory.achievements[2])).toBe(true);
     });
 
     it('should unlock the third achievement if the second achievement is earned', () => {
       // Arrange - second achievement is earned
       playStore.achievementIds = ['achievement-2'];
       
-      // Act & Assert - third achievement should be unlocked
-      expect(unlocked(testCategory, testCategory.achievements[2])).toBe(true);
+      // Act & Assert - third achievement should be achievements.unlocked
+      expect(achievements.unlocked(testCategory, testCategory.achievements[2])).toBe(true);
     });
 
     it('should keep the fourth achievement locked if neither the first and second, nor the third are earned', () => {
@@ -113,23 +113,23 @@ describe('Achievement functions', () => {
       playStore.achievementIds = [];
       
       // Act & Assert - fourth achievement should be locked
-      expect(unlocked(testCategory, testCategory.achievements[3])).toBe(false);
+      expect(achievements.unlocked(testCategory, testCategory.achievements[3])).toBe(false);
     });
 
     it('should unlock the fourth achievement if both the first and second achievements are earned', () => {
       // Arrange - first and second achievements are earned
       playStore.achievementIds = ['achievement-1', 'achievement-2'];
       
-      // Act & Assert - fourth achievement should be unlocked
-      expect(unlocked(testCategory, testCategory.achievements[3])).toBe(true);
+      // Act & Assert - fourth achievement should be achievements.unlocked
+      expect(achievements.unlocked(testCategory, testCategory.achievements[3])).toBe(true);
     });
 
     it('should unlock the fourth achievement if the third achievement is earned', () => {
       // Arrange - third achievement is earned
       playStore.achievementIds = ['achievement-3'];
       
-      // Act & Assert - fourth achievement should be unlocked
-      expect(unlocked(testCategory, testCategory.achievements[3])).toBe(true);
+      // Act & Assert - fourth achievement should be achievements.unlocked
+      expect(achievements.unlocked(testCategory, testCategory.achievements[3])).toBe(true);
     });
 
     it('should keep the fifth achievement locked if the fourth achievement is not earned', () => {
@@ -137,15 +137,15 @@ describe('Achievement functions', () => {
       playStore.achievementIds = ['achievement-1', 'achievement-2', 'achievement-3'];
       
       // Act & Assert - fifth achievement should be locked
-      expect(unlocked(testCategory, testCategory.achievements[4])).toBe(false);
+      expect(achievements.unlocked(testCategory, testCategory.achievements[4])).toBe(false);
     });
 
     it('should unlock the fifth achievement if the fourth achievement is earned', () => {
       // Arrange - fourth achievement is earned
       playStore.achievementIds = ['achievement-4'];
       
-      // Act & Assert - fifth achievement should be unlocked
-      expect(unlocked(testCategory, testCategory.achievements[4])).toBe(true);
+      // Act & Assert - fifth achievement should be achievements.unlocked
+      expect(achievements.unlocked(testCategory, testCategory.achievements[4])).toBe(true);
     });
 
   });
