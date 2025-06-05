@@ -2,10 +2,24 @@
 <div class="h-screen">
   <div id="app-grid"
        class="grow grid">
-    <div id="app-bar" class="h1 flex flex-row justify-between items-center w-full">
+    <div id="app-bar" class="flex flex-row justify-between items-center w-full">
       <div class="w-1/6"></div>
-      <div class="flex-grow flex justify-center">{leetize("MERGIS")}<div class="reverse">S</div></div>
-      <div class="w-1/6 text-right text-xs tracking-normal">v{versionString}</div>
+      <div class="h1 flex-grow flex justify-center">{leetize("MERGIS")}<div class="reverse">S</div></div>
+      <div class="w-1/6 tracking-normal flex items-center justify-end gap-2">
+        <MAchievements/>
+        <MAppBarButton icon="browse_activity"/>
+        <MSettings />
+        <!--
+        <MDialog bind:open={x}>
+          {#snippet activator()}
+            <MAppBarButton icon="browse_activity"/>
+          {/snippet}
+          <div class="flex justify-center align-middle">
+          Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit  x amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet
+          </div>
+        </MDialog>
+        -->
+      </div>
     </div>
     <div id="top-container"
          class="text-white"
@@ -57,7 +71,9 @@
   import { leetize } from "$lib/../util/texts";
   import MBonusBar from "$lib/components/scores/MBonusBar.svelte";
   import MGroups from "$lib/components/MGroups.svelte";
-  import { version } from '$app/environment';
+  import MAchievements from "$lib/components/achievement/MAchievements.svelte";
+  import MAppBarButton from "$lib/components/MAppBarButton.svelte";
+  import MSettings from "$lib/components/MSettings.svelte";
 
   let { children } = $props();
 
@@ -66,7 +82,6 @@
 
   var documentElement!: HTMLElement;
   let isFullScreen = false;
-  let versionString = $derived(version.split('.').slice(0, 2).join('.'));
 
   onMount(() => {
     documentElement = document.documentElement;
@@ -147,6 +162,9 @@
     :global(.panel-padding) {
         padding: 1.5vw;
     }
+    :global(.tracking-extreme) {
+        letter-spacing: 0.2rem;
+    }
     #app-grid {
         /** with this we don't have to use padding which'd mess with height:100% */
         position: absolute;
@@ -175,6 +193,7 @@
     #app-bar {
         /*background-color: #262626;*/
         grid-area: app-bar;
+        padding-top: max(1vh, 5px);
     }
     #top-container {
         grid-area: top;
@@ -197,7 +216,7 @@
     /*    grid-template-columns: 30% auto;*/
     /*}*/
     .h1 {
-        padding-top: 2vh;
+        padding-top: 1vh;
         font-size: 3vw;
         font-weight: bold;
         line-height: 1.6vw;
@@ -212,4 +231,8 @@
         display: inline-block;
         letter-spacing: 0;
     }
+    .h1 .material-symbols-rounded {
+        font-size: clamp(16px, 2.5vw, 32px);
+    }
+
 </style>
