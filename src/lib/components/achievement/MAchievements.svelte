@@ -25,7 +25,7 @@
       }
     });
   })
-  
+
   // function onDev() {
   //   playStore.achievementIds = ['astro-1', 'astro-2', 'astro-3', 'astro-4', 'astro-5', 'spin-1', 'spin-2', 'side-1', 'side-3'];
   //   playStore.achievementIds = ['astro-1', 'astro-2', 'astro-4', 'spin-2', 'side-1', ];
