@@ -29,6 +29,7 @@
     <div id="left-column"
          class="flex flex-col text-white"
          style="background-color: {devDraw ? '#fc8' : 'cf8'};">
+      <MBonusCard />
       <div class="flex grow flex-row">
         <MBonusBar />
         <MProgressBar color="green" value={0} label={leetize("LEVEL")} markPositions={[21, 50, 90]} />
@@ -74,6 +75,7 @@
   import MAchievements from "$lib/components/achievement/MAchievements.svelte";
   import MAppBarButton from "$lib/components/MAppBarButton.svelte";
   import MSettings from "$lib/components/MSettings.svelte";
+  import MBonusCard from "$lib/components/scores/MBonusCard.svelte";
 
   let { children } = $props();
 
@@ -200,13 +202,13 @@
     }
     #left-column {
         grid-area: left;
-        gap: 0.5vw;
+        gap: 1.5vw;
     }
     #left-column > div {
         gap: 1.2vw;
     }
     #right-column {
-        gap: 0.5vw;
+      gap: 1.5vw;
     }
     #bottom-container {
         grid-area: bottom;
