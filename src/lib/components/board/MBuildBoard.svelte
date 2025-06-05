@@ -10,7 +10,10 @@
         </div>
         <button onclick={() => resizeAddColumn(EDirection.right)}>add</button>
       </div>
-      <div>{JSON.stringify(cursorAt)}</div>
+      <div>
+        {JSON.stringify(cursorAt)}
+        <button onclick={testBonus}>*</button>
+      </div>
       <div>
         <button onclick="{testScore}">score!</button>
         {#if (playStore.paused)}
@@ -539,6 +542,10 @@
     playStore.boardSizeY--;
     playStore.fields.pop();
     uiBus.emit("boardResized");
+  }
+
+  function testBonus() {
+    uiBus.emit('dev.bonus');
   }
 
   function testScore() {
