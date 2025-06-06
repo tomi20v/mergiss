@@ -17,6 +17,8 @@
   import now from "$lib/util/now";
   import type {Stitch} from "$lib/game/stitches";
   import debounce from 'lodash.debounce';
+  import type {IAchievement} from "$lib/game/achievement/IAchievement";
+  import type {IAchievementCategory} from "$lib/game/achievement/IAchievementCategory";
 
   let {
     measurementId,
@@ -65,6 +67,7 @@
     initAnalytics();
 
     for (const [eventName, handler] of Object.entries({
+      achieved: onAchieved,
       boardExpanded: onBoardExpanded,
       groupCreated: onGroupCreated,
       groupExpiredScore: onGroupExpired,
@@ -128,6 +131,16 @@
   }
 
   // Example usage of commonProperties in events below:
+
+  function onAchieved(event: {
+    achievement: IAchievement,
+    category: IAchievementCategory,
+  }) {
+    gtag("event", "unlock_achievement", {
+      achievement_id: event.achievement.id,
+      ...commonProperties(),
+    });
+  }
 
   function onBoardExpanded(event: {
     origin: string;
