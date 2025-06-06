@@ -65,6 +65,7 @@
   let cellStyle = $derived<string>('background-color: ' + piece.color + '; box-shadow: inset 2px 2px 3px white, 1px 1px 3px dimgray');
 
   let dragAtX: number = $derived.by<number>(() => {
+    if (!piece) return 0;
     const row = piece.pixelMap[dragAtY];
     let i = 0;
     switch (DragAtSetting) {
@@ -93,6 +94,7 @@
     }
   })
   let dragAtY: number = $derived.by<number>(() => {
+    if (!piece) return 0;
     const pixelMap = piece.pixelMap;
     switch (DragAtSetting) {
       case DragAtOptions.bottomRight:
@@ -110,10 +112,18 @@
   let dragStartTime = 0;
   let rotationCount = 0;
 
+  const RotationOrigin = {
+    LMB: 'LMB',
+    MMB: 'MMB',
+    RMB: 'RMB',
+    scroll: 'scroll',
+    keyRLower: 'r',
+    keyRUpper: 'R',
+    keySpace: ' ',
+  } as const;
+
   function dragDrop() {
-    // this eliminates flickering between mouseup and removing the piece (if it is to be removed)
-    setTimeout(() => dragButton = MouseButtons.NOBUTTON, 1);
-    document.body.removeChild(dragImage);
+    dragStop();
     // putting in a setTimeout results in better sequence: mouseUp here, enter on other (board cell), onPieceDrop on other (board)
     setTimeout(() => uiBus.emit('pieceDrop', {
       piece,
@@ -158,13 +168,23 @@
 
   }
 
+  // abstracted so drag can be stopped without dropping
+  function dragStop() {
+    // this eliminates flickering between mouseup and removing the piece (if it is to be removed)
+    setTimeout(() => dragButton = MouseButtons.NOBUTTON, 1);
+    document.body.removeChild(dragImage);
+  }
+
   function onkeydown(event: KeyboardEvent) {
     switch (event.key) {
-      case 'r':
-        rotate(true);
+      case RotationOrigin.keyRLower:
+        rotate(true, RotationOrigin.keyRUpper);
         break;
-      case 'R':
-        rotate(false);
+      case RotationOrigin.keyRUpper:
+        rotate(false, RotationOrigin.keyRLower);
+        break;
+      case ' ':
+        rotate(true, RotationOrigin.keySpace);
         break;
     }
   }
@@ -177,7 +197,7 @@
     // - when dragging with RMB then LMB and MMB  rotate CCW (left)
     // - when dragging with MMB then LMB rotates CCW and RMB rotates CW
     if (dragging && (event.button !== dragButton)) {
-      rotate(event.shiftKey !== (event.button > dragButton));
+      rotate(event.shiftKey !== (event.button > dragButton), `${event.button}`);
     }
   }
 
@@ -199,15 +219,26 @@
 
   function onWheel(event: WheelEvent) {
     if (dragging) {
-      rotate(event.shiftKey !== (event.deltaY > 0));
+      rotate(event.shiftKey !== (event.deltaY > 0), RotationOrigin.scroll);
     }
   }
 
-  function rotate(clockwise: boolean) {
+  function rotate(clockwise: boolean, origin: string) {
     if (dragging) {
       dragRotation += clockwise ? 90 : -90;
       dragImage.style.transform = `rotate(${dragRotation}deg)`;
       rotationCount++;
+      uiBus.emit('pieceRotated', {
+        clockwise,
+        origin,
+        piece,
+        rotationCount,
+        originsCnt: Object.keys(RotationOrigin).length
+      });
+      if ((rotationCount % 42) === 0) {
+        dragDrop();
+        uiBus.emit("changePieceColor", piece.uniqueId);
+      }
     }
   }
 

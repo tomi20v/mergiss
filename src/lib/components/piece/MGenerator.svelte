@@ -31,6 +31,7 @@
   import playStore from "$lib/playStore.svelte";
   import CircularProgress from '@smui/circular-progress';
   import now from "$lib/util/now";
+  import {randomColorPair} from "$lib/game/colors";
 
   let { disabled = false } = $props();
 
@@ -47,6 +48,7 @@
 
   onMount(() => {
     uiBus.on('pieceDropped', onPieceDropped);
+    uiBus.on('changePieceColor', onChangePieceColor);
     if (!disabled) {
       startProgress();
     }
@@ -61,6 +63,20 @@
   function generatePiece() {
     piece = null;
     setTimeout(() => piece = pieceFactory.randomPiece());
+  }
+
+  function onChangePieceColor(uniqueId: string) {
+    if (!piece || piece.uniqueId !== uniqueId) return;
+    const colors = randomColorPair();
+    const oPiece = new Piece(
+      piece.shape,
+      piece.pixelMap,
+      colors.color,
+      colors.otherColor,
+      piece.uniqueId
+    );
+    piece = null;
+    setTimeout(() => piece = oPiece);
   }
 
   function onClick() {
