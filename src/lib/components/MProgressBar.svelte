@@ -146,7 +146,8 @@
 <style lang="postcss">
     .progress-bar-container {
         width: 1fr;
-        height: 95%;
+        /* slightly improves padding */
+        height: 99%;
         display: flex;
         align-items: center;
         justify-content: center;

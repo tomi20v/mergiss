@@ -16,20 +16,29 @@ class PlayStore {
   fields: FieldType[][] = $state([]);
   groups: Group[] = $state([]);
   // scores
+  bonusDepletion = $state(0);
+  bonusMax: number = $state(0);
   bonusPcnt: number = $state(1);
   // bonus: 1-5 deplending on bonus multiplier (which is 0-100) - might better off with a logarithmic calc
-  bonusMultiplier: number = $derived(1 + this.bonusPcnt / 25);
+  // bonusMultiplier: number = $derived(1 + this.bonusPcnt / 25);
+  bonusMultiplier: number = $derived(1 + (this.bonusMax - 1) * this.bonusPcnt / 100);
   rocketMultiplier: number = 10;
   score: number = $state(0);
   // achievements
   achievementIds: string[] = $state([]);
+  piecesDropped: number = $state(0);
 }
 
 const playStore: PlayStore = new PlayStore();
 
 // uiBus.on("playStart", (play: PlayConfigType) => {
-uiBus.on("playStart", initStore)
+uiBus.on("pieceDropped", onPieceDropped);
 
+function onPieceDropped() {
+  playStore.piecesDropped++;
+}
+
+uiBus.on("playStart", initStore);
 function initStore() {
   playStore.paused = false;
   // generator
@@ -40,10 +49,16 @@ function initStore() {
   playStore.fields = [];
   playStore.groups = [];
   // score
+  playStore.bonusDepletion = 50;
+  playStore.bonusMax = 5;
   playStore.bonusPcnt = 0;
+
+  playStore.rocketMultiplier = 10;
+
   playStore.score = 0;
   // playStore.score = 99125808;
   playStore.achievementIds = [];
+  playStore.piecesDropped = 0;
 }
 initStore();
 

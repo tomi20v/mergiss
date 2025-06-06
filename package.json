@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.8.6",
-  "description": "I can see a list of groups on the right",
+  "version": "0.8.7",
+  "description": "astro-01",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
