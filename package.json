@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.8.8",
-  "description": "astro-02",
+  "version": "0.8.9",
+  "description": "spin-01",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
