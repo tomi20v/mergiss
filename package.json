@@ -1,8 +1,8 @@
 {
   "name": "mergiss",
   "private": true,
-  "version": "0.8.9",
-  "description": "spin-01",
+  "version": "0.8.10",
+  "description": "measure achievements",
   "type": "module",
   "prepare": "svelte-kit sync",
   "scripts": {
