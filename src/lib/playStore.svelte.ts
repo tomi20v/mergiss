@@ -50,7 +50,7 @@ function initStore() {
   playStore.groups = [];
   // score
   playStore.bonusDepletion = 50;
-  playStore.bonusMax = 5;
+  playStore.bonusMax = 3;
   playStore.bonusPcnt = 0;
 
   playStore.rocketMultiplier = 10;

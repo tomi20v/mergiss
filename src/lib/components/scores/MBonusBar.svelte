@@ -12,6 +12,7 @@
   import type Piece from "$lib/game/piece/Piece";
   import playStore from "$lib/playStore.svelte";
 
+  const minBonus = 3;
   const maxBonus = 100;
   const depletionMin = 14; // this was a convenient value, just to remember.
   const depletionInterval = 100; // Check every 100ms
@@ -70,7 +71,7 @@
 
   function onAchieved() {
     playStore.bonusMax = Math.max(
-      5
+      minBonus + has("astro-2") * 2,
     );
     playStore.bonusDepletion = Math.max(
       50 - has("astro-1") * 20,
