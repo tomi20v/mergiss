@@ -77,6 +77,7 @@
   import type PiecePositionOverBoardData from "$lib/events/PiecePositionOverBoardData";
   import type BoardExpandedData from "$lib/events/BoardExpandedData";
   import type RocketLaunchData from "$lib/events/RocketLaunchData";
+  import type GroupCreatedData from "$lib/events/GroupCreationInterface";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -446,12 +447,16 @@
       playStore.groups.push(newGroup);
     }
 
+    const filledCnt = playStore.fields.flat().filter((each: FieldType) => each.color).length;
+    let isCGroup = filledCnt === (sizeX - 2) * sizeY - 2 * sizeX + 4;
+
     uiBus.emit('groupCreated', {
       group: mergedGroup ?? newGroup,
       mergedGroupCount: groupIdsToMerge.size,
       overlaps: overlaps,
       stitchCount: stitches.length,
-    })
+      isCGroup,
+    } as GroupCreatedData);
 
     // delaying helps so that initially we show the piece in place, so that
     //  the stitches don't appeair in the middle of nothing

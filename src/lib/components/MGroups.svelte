@@ -1,7 +1,7 @@
 <div class="groups-container panel-border panel-padding-small flex flex-col">
   {#if playStore.groups.length === 0}
     <div class="groups-hint-container text-gray-500">
-      <div class="groups-hint">Kent Patch wanted to fix the code but he Kent Patch.</div>
+      <div class="groups-hint">Drop pieces on the board...</div>
     </div>
   {:else}
     {#each sortedGroups.slice(0, 30) as group}
