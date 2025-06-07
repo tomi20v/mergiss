@@ -9,11 +9,13 @@ export default class Piece {
   readonly pixelMap: PixelMapType;
   readonly color: string;
   readonly shadowColor: string;
-  protected _rotationCount: number = 0;
   // when re-constructed from JSON, this originalTs will hold original value
   readonly originalUniqueId: string = '';
   readonly uniqueId: string = uniqueId();
   readonly createdTime: number = now();
+
+  protected _rotationCount: number = 0;
+  protected _dropCount: number = 0;
 
   static fromJSON(json: string): Piece {
     const data = JSON.parse(json);
@@ -45,8 +47,16 @@ export default class Piece {
     return new FlatteningIterator<number>(this.pixelMap, ['y', 'x']);
   }
 
+  get dropCount(): number {
+    return this._dropCount;
+  }
+
   get rotationCount(): number {
     return this._rotationCount;
+  }
+
+  dropped() {
+    this._dropCount++;
   }
 
   equals(other: Piece): boolean {

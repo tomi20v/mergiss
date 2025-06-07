@@ -13,6 +13,7 @@
       <div>
         {JSON.stringify(cursorAt)}
         <button onclick={testBonus}>*</button>
+        <button onclick={testScoreMultiplier}>**</button>
       </div>
       <div>
         <button onclick="{testScore}">score!</button>
@@ -323,6 +324,7 @@
     dragTime: number,
   }) {
 
+    // piece was not dropped over the board
     if (!cursorAt) {
       return;
     }
@@ -334,7 +336,13 @@
         move({x: cursorAt.atX, y: cursorAt.atY})
       );
 
+    // when piece is dropped over the board, but doesn't fit
     if (!fitsOnBoard(iterator, piece.color)) {
+      piece.dropped();
+      uiBus.emit("pieceDoesntFit", {
+        piece,
+        origin: "mergeBoard",
+      })
       return;
     }
 
@@ -549,6 +557,10 @@
     if (import.meta.env.MODE === 'development') {
       uiBus.emit('dev.score', Math.floor(1000*Math.random()));
     }
+  }
+
+  function testScoreMultiplier() {
+    playStore.scoreMultiplier = playStore.scoreMultiplier + 1;
   }
 
 </script>

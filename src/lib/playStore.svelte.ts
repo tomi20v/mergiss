@@ -24,6 +24,17 @@ class PlayStore {
   bonusMultiplier: number = $derived(1 + (this.bonusMax - 1) * this.bonusPcnt / 100);
   rocketMultiplier: number = 10;
   score: number = $state(0);
+  // scoreMultiplier: number = $state(1);
+  scoreMultiplier: number = $derived.by(() => {
+    // Start with base multiplier of 1
+    let multiplier = 1;
+    // Double the multiplier for each side-* achievement
+    if (this.achievementIds.includes('side-1')) multiplier *= 2;
+    if (this.achievementIds.includes('side-2')) multiplier *= 2;
+    if (this.achievementIds.includes('side-3')) multiplier *= 2;
+    if (this.achievementIds.includes('side-4')) multiplier *= 2;
+    return multiplier;
+  });
   // achievements
   achievementIds: string[] = $state([]);
   piecesDropped: number = $state(0);

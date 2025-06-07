@@ -72,7 +72,7 @@
     // here we can apply bonuses later
     // const scoreToAdd = score;
     const realMultiplier = bonusMultiplier || playStore.bonusMultiplier;
-    const scoreToAdd = score * realMultiplier;
+    const scoreToAdd = score * realMultiplier * playStore.scoreMultiplier;
     playStore.score += scoreToAdd;
     scaleSpring.set(1.25);
     setTimeout(() => scaleSpring.set(1), 150);

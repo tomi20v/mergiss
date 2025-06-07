@@ -103,4 +103,13 @@ describe('Piece.ts', () => {
     expect(p.rotationCount).toEqual(5);
   })
 
+  it('should increment dropCount when dropped', () => {
+    const p = new Piece(anyShape, anyProtoMap, anyColor, anyShadowColor);
+    expect(p.dropCount).toEqual(0);
+    p.dropped();
+    expect(p.dropCount).toEqual(1);
+    p.dropped();
+    expect(p.dropCount).toEqual(2);
+  })
+
 })
