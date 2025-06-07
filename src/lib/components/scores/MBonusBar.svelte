@@ -72,7 +72,8 @@
   function onAchieved() {
     playStore.bonusMax = minBonus +
       has("astro-2") * 2 +
-      has("spin-1") * 1
+      has("spin-1") +
+      has("spin-3")
     ;
     playStore.bonusDepletion = Math.max(
       50 - has("astro-1") * 18 - has("spin-2") * 18,
