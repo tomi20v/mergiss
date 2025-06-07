@@ -96,7 +96,7 @@
       htmlId: string,
       origin: string,
       bonusMultiplier: number,
-    }) {
+  }) {
     // @todo? score could be increased when one color is dominant. and/or colors can have different
     //  scores which don't increase linearly
     flyToScore(event.htmlId, () => {

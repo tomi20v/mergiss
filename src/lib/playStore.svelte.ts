@@ -23,7 +23,11 @@ class PlayStore {
   // bonus: 1-5 deplending on bonus multiplier (which is 0-100) - might better off with a logarithmic calc
   // bonusMultiplier: number = $derived(1 + this.bonusPcnt / 25);
   bonusMultiplier: number = $derived(1 + (this.bonusMax - 1) * this.bonusPcnt / 100);
-  rocketMultiplier: number = 10;
+  rocketMultiplier: number = $derived.by(() => {
+    let multiplier = 5; // base value
+    if (this.achievementIds.includes('c-3')) multiplier += 5;
+    return multiplier;
+  });
   score: number = $state(0);
   // scoreMultiplier: number = $state(1);
   scoreMultiplier: number = $derived.by(() => {
