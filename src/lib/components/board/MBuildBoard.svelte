@@ -76,6 +76,7 @@
   import {projectile} from "html-trajectory";
   import type PiecePositionOverBoardData from "$lib/events/PiecePositionOverBoardData";
   import type BoardExpandedData from "$lib/events/BoardExpandedData";
+  import type RocketLaunchData from "$lib/events/RocketLaunchData";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -478,11 +479,7 @@
     }, 799);
   }
 
-  function onRocketLaunch(event: {
-    origin: string,
-    flyingId: string,
-    flyOptions: object,
-  }) {
+  function onRocketLaunch(event: RocketLaunchData) {
 
     // deny launch if there's no groups
     if (playStore.groups.length === 0) {

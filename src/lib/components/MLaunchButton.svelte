@@ -14,7 +14,7 @@
           style="opacity: {opacity};"
   />
   {#if fill === 1}
-    <span class="multiplier">10x</span>
+    <span class="multiplier">{playStore.rocketMultiplier}x</span>
   {/if}
 </button>
 <!--{isRotating}-->
@@ -22,6 +22,8 @@
 <script lang="ts">
   import { uiBus } from "$lib/util/uiBus";
   import { onDestroy, onMount } from "svelte";
+  import type RocketLaunchData from "$lib/events/RocketLaunchData";
+  import playStore from "$lib/playStore.svelte";
 
   // const increment = 0.05;
   const increment = 0.1;
@@ -102,7 +104,7 @@
             scale: 0.3,
             // scale: 1,
           },
-        });
+        } as RocketLaunchData);
       })
     }
   }
