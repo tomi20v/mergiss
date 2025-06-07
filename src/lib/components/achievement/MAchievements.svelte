@@ -1,6 +1,8 @@
 <MAchievementPopup />
 <MAchievementsDialog {entropy} />
-<button onclick={onDev}>DEV</button>
+{#if dev}
+    <button onclick={onDev}>DEV</button>
+{/if}
 <script lang="ts">
 
   import {onMount} from "svelte";
@@ -13,6 +15,7 @@
   import type {IAchievementCategory} from "$lib/game/achievement/IAchievementCategory";
   import type {IAchievement} from "$lib/game/achievement/IAchievement";
   import type {UnknownObject} from "../../../util/UnknownObject";
+  import { dev } from '$app/environment';
 
   const state: UnknownObject = $state({});
 
@@ -28,6 +31,7 @@
   })
 
   function onDev() {
+    if (!dev) return;
     playStore.achievementIds = ['astro-1', 'astro-2', 'astro-3', 'astro-4', 'astro-5', 'spin-1', 'spin-2', 'side-1', 'side-3'];
     playStore.achievementIds = ['astro-1', 'astro-2', 'astro-4', 'spin-2', 'side-1', ];
     uiBus.emit('achieved', {achievement: (entropy[3] as any).achievements[0], category: (entropy[3] as any)});
