@@ -38,6 +38,8 @@
   let lastBoardExpanded = 0;
   let lastGroupCreated = 0;
   let lastGroupExpired = 0;
+  let lastPieceChanged = 0;
+  let lastPieceColorChanged = 0;
   let lastPieceToBoard = 0;
   let lastStitchScore = 0;
   let pieceToBoardAvgElapsed = 0;
@@ -69,6 +71,8 @@
     for (const [eventName, handler] of Object.entries({
       achieved: onAchieved,
       boardExpanded: onBoardExpanded,
+      changePiece: onChangePiece,
+      changePieceColor: onChangePieceColor,
       groupCreated: onGroupCreated,
       groupExpiredScore: onGroupExpired,
       onFullScreen,
@@ -153,6 +157,14 @@
       ...commonProperties(lastBoardExpanded),
     });
     lastBoardExpanded = now();
+  }
+
+  function onChangePiece() {
+    gtag("event", "pieceChanged", commonProperties(lastPieceChanged));
+  }
+
+  function onChangePieceColor() {
+    gtag("event", "pieceColorChanged", commonProperties(lastPieceColorChanged));
   }
 
   function onFullScreen(fullscreen: boolean) {
