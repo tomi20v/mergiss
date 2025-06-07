@@ -74,6 +74,7 @@
   import throttle from 'lodash.throttle';
   import {type Stitch, stitchLevel} from "$lib/game/stitches";
   import {projectile} from "html-trajectory";
+  import type PiecePositionOverBoardData from "$lib/events/PiecePositionOverBoardData";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -160,6 +161,16 @@
       playStore.fields[i][column].group = 0;
       playStore.fields[i][column].color = null;
     }
+  }
+
+  // emit manually when changed, saving headaches with $effect() being too reactive
+  function emitPiecePosition() {
+    // emit piece position only when dragging a piece
+    if (!playStore.dragging) return;
+    uiBus.emit("piecePositionOverBoard", {
+      position: cursorAt,
+      boardSize: {sizeX, sizeY},
+    } as PiecePositionOverBoardData);
   }
 
   function expandBoard() {
@@ -298,7 +309,10 @@
     const p = field?.getBoundingClientRect();
     const w = cellWidth;
     if (!p || event.clientX < p.left || event.clientY < p.top) {
-      cursorAt = null;
+      if (cursorAt) {
+        cursorAt = null;
+        emitPiecePosition();
+      }
       return;
     }
     const relX = Math.floor((event.clientX - p.left) / w);
@@ -307,10 +321,14 @@
       // using the conditional it is measurably faster vs always creating a new Position, eg. 0.01 vs 0.03
       if (!cursorAt?.equals(relX, relY)) {
         cursorAt = new Position(relX, relY);
+        emitPiecePosition();
       }
     }
     else {
-      cursorAt = null;
+      if (cursorAt) {
+        cursorAt = null;
+        emitPiecePosition();
+      }
     }
   }
 
@@ -348,6 +366,7 @@
 
     putOnBoard(piece, iterator);
     cursorAt = null;
+    emitPiecePosition();
     uiBus.emit('pieceDropped', {
       origin: 'mergeBoard',
       piece: piece,
