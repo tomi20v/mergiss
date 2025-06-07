@@ -35,6 +35,7 @@
   import {bounceOut} from "svelte/easing";
   import MouseButtons from "$lib/MouseButtons";
   import now from "$lib/util/now";
+  import type PieceDragData from "$lib/events/PieceDragData";
 
   const DragAtOptions = {
     topLeft: 0,
@@ -170,6 +171,9 @@
 
     document.body.appendChild(dragImage);
 
+    playStore.dragging = true;
+    uiBus.emit('pieceDragStart', {piece} as PieceDragData)
+
   }
 
   // abstracted so drag can be stopped without dropping
@@ -183,6 +187,7 @@
     // this eliminates flickering between mouseup and removing the piece (if it is to be removed)
     setTimeout(() => dragButton = MouseButtons.NOBUTTON, 1);
     document.body.removeChild(dragImage);
+    playStore.dragging = false;
   }
 
   function onkeydown(event: KeyboardEvent) {

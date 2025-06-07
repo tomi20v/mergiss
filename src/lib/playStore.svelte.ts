@@ -6,6 +6,7 @@ import Group from "$lib/game/Group.svelte";
 //  for high scores and permanent achievements we'll probably need another store
 class PlayStore {
   paused: boolean = $state(false);
+  dragging: boolean = $state(false);
   // generator
   availableColors: string[] = $state([]);
   generatorTime: number = $state(0);
