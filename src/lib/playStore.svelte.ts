@@ -24,6 +24,7 @@ class PlayStore {
   bonusMultiplier: number = $derived(1 + (this.bonusMax - 1) * this.bonusPcnt / 100);
   rocketMultiplier: number = 10;
   score: number = $state(0);
+  scoreMultiplier: number = $state(1);
   // achievements
   achievementIds: string[] = $state([]);
   piecesDropped: number = $state(0);

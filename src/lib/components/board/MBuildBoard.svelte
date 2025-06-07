@@ -13,6 +13,7 @@
       <div>
         {JSON.stringify(cursorAt)}
         <button onclick={testBonus}>*</button>
+        <button onclick={testScoreMultiplier}>**</button>
       </div>
       <div>
         <button onclick="{testScore}">score!</button>
@@ -549,6 +550,10 @@
     if (import.meta.env.MODE === 'development') {
       uiBus.emit('dev.score', Math.floor(1000*Math.random()));
     }
+  }
+
+  function testScoreMultiplier() {
+    playStore.scoreMultiplier = playStore.scoreMultiplier + 1;
   }
 
 </script>
