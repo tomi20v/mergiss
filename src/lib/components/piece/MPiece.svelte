@@ -110,6 +110,7 @@
   let dragImage!: HTMLElement;
   let dragRotation = $state(0);
   let dragStartTime = 0;
+  let dragTimer: ReturnType<typeof setTimeout> | null = null; // Add timer reference
 
   const RotationOrigin = {
     LMB: 'LMB',
@@ -133,10 +134,16 @@
 
   // specific mouse down on piece itself (fires before generic onMouseDown)
   function dragStart(event: MouseEvent) {
-
     dragButton = event.button;
     dragRotation = 0;
     dragStartTime = now();
+
+    // Start the 42-second timer
+    dragTimer = setTimeout(() => {
+      if (dragging) {
+        uiBus.emit("pieceDragged42secs");
+      }
+    }, 42000); // 42 seconds in milliseconds
 
     // Ensure the target is an HTMLElement
     const target = event.currentTarget as HTMLElement;
@@ -167,6 +174,12 @@
 
   // abstracted so drag can be stopped without dropping
   function dragStop() {
+    // Clear the timer when dragging stops
+    if (dragTimer !== null) {
+      clearTimeout(dragTimer);
+      dragTimer = null;
+    }
+    
     // this eliminates flickering between mouseup and removing the piece (if it is to be removed)
     setTimeout(() => dragButton = MouseButtons.NOBUTTON, 1);
     document.body.removeChild(dragImage);
