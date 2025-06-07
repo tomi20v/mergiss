@@ -75,6 +75,7 @@
   import {type Stitch, stitchLevel} from "$lib/game/stitches";
   import {projectile} from "html-trajectory";
   import type PiecePositionOverBoardData from "$lib/events/PiecePositionOverBoardData";
+  import type BoardExpandedData from "$lib/events/BoardExpandedData";
 
   let { boardWidth, boardHeight } = $props();
   let elem: HTMLElement;
@@ -212,7 +213,7 @@
         origin: 'mergeBoard',
         boardSizeBefore: {sizeX: oSizeX, sizeY: oSizeY},
         expansions,
-      })
+      } as BoardExpandedData)
     }
   }
 

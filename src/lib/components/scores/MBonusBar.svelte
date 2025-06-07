@@ -73,7 +73,8 @@
     playStore.bonusMax = minBonus +
       has("astro-2") * 2 +
       has("spin-1") +
-      has("spin-3")
+      has("spin-3") * 2 +
+      has("c-1") * 3
     ;
     playStore.bonusDepletion = Math.max(
       50 - has("astro-1") * 18 - has("spin-2") * 18,
