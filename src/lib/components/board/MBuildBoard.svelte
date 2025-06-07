@@ -317,12 +317,10 @@
     piece,
     dragAt,
     dragTime,
-    rotationCount,
   }: {
     piece: Piece,
     dragAt: Position,
     dragTime: number,
-    rotationCount: number,
   }) {
 
     if (!cursorAt) {
@@ -346,7 +344,6 @@
       origin: 'mergeBoard',
       piece: piece,
       dragTime,
-      rotationCount,
     });
 
   }

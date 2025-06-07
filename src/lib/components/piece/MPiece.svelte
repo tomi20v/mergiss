@@ -110,7 +110,6 @@
   let dragImage!: HTMLElement;
   let dragRotation = $state(0);
   let dragStartTime = 0;
-  let rotationCount = 0;
 
   const RotationOrigin = {
     LMB: 'LMB',
@@ -129,7 +128,6 @@
       piece,
       dragAt: new Position(dragAtX, dragAtY, dragRotation),
       dragTime: now() - dragStartTime,
-      rotationCount,
     }));
   }
 
@@ -138,7 +136,6 @@
 
     dragButton = event.button;
     dragRotation = 0;
-    rotationCount = 0;
     dragStartTime = now();
 
     // Ensure the target is an HTMLElement
@@ -227,15 +224,19 @@
     if (dragging) {
       dragRotation += clockwise ? 90 : -90;
       dragImage.style.transform = `rotate(${dragRotation}deg)`;
-      rotationCount++;
+      piece.rotated();
       uiBus.emit('pieceRotated', {
         clockwise,
         origin,
         piece,
-        rotationCount,
+        rotationCount: piece.rotationCount,
         originsCnt: Object.keys(RotationOrigin).length
       });
-      if ((rotationCount % 42) === 0) {
+      if ((piece.rotationCount % 142) === 0) {
+        dragDrop();
+        uiBus.emit("changePiece", piece.uniqueId);
+      }
+      else if ((piece.rotationCount % 42) === 0) {
         dragDrop();
         uiBus.emit("changePieceColor", piece.uniqueId);
       }

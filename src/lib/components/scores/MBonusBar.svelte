@@ -84,7 +84,6 @@
     origin: string;
     piece: Piece;
     dragTime: number;
-    rotationCount: number;
   }) {
 
     const added = Math.floor(event.piece.weight * 6.5);

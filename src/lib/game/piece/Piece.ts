@@ -9,6 +9,7 @@ export default class Piece {
   readonly pixelMap: PixelMapType;
   readonly color: string;
   readonly shadowColor: string;
+  protected _rotationCount: number = 0;
   // when re-constructed from JSON, this originalTs will hold original value
   readonly originalUniqueId: string = '';
   readonly uniqueId: string = uniqueId();
@@ -16,7 +17,7 @@ export default class Piece {
 
   static fromJSON(json: string): Piece {
     const data = JSON.parse(json);
-    return new Piece(data.shape, data.pixelMap, data.color, data.shadowColor, data.uniqueId);
+    return new Piece(data.shape, data.pixelMap, data.color, data.shadowColor, data.rotationCount, data.uniqueId);
   }
 
   constructor(
@@ -24,6 +25,7 @@ export default class Piece {
     pixelMap: PixelMapType,
     color: string,
     shadowColor: string,
+    rotationCount: number = 0,
     originalUniqueId: string = ''
   ) {
     this.shape = shape;
@@ -32,6 +34,7 @@ export default class Piece {
     this.shadowColor = shadowColor;
     this.originalUniqueId = originalUniqueId;
     this.createdTime = now();
+    this._rotationCount = rotationCount;
   }
 
   get weight(): number {
@@ -42,8 +45,16 @@ export default class Piece {
     return new FlatteningIterator<number>(this.pixelMap, ['y', 'x']);
   }
 
+  get rotationCount(): number {
+    return this._rotationCount;
+  }
+
   equals(other: Piece): boolean {
     return this.uniqueId === other.uniqueId;
+  }
+
+  rotated() {
+    this._rotationCount++;
   }
 
   sizeX(): number {

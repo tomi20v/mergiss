@@ -204,7 +204,6 @@
     origin: string;
     piece: Piece;
     dragTime: number;
-    rotationCount: number;
   }) {
     if (event.origin == "mergeBoard") {
       let currentElapsed = elapsed(lastPieceToBoard);
@@ -225,7 +224,7 @@
       
       gtag("event", "pieceToBoard", {
         dragTime: event.dragTime,
-        rotationCount: event.rotationCount,
+        rotationCount: event.piece.rotationCount,
         life: elapsed(event.piece.createdTime),
         shape: event.piece.shape,
         ...commonProperties(),
