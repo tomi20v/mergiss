@@ -324,6 +324,7 @@
     dragTime: number,
   }) {
 
+    // piece was not dropped over the board
     if (!cursorAt) {
       return;
     }
@@ -335,7 +336,13 @@
         move({x: cursorAt.atX, y: cursorAt.atY})
       );
 
+    // when piece is dropped over the board, but doesn't fit
     if (!fitsOnBoard(iterator, piece.color)) {
+      piece.dropped();
+      uiBus.emit("pieceDoesntFit", {
+        piece,
+        origin: "mergeBoard",
+      })
       return;
     }
 
