@@ -57,7 +57,7 @@
   const cellHeight = $derived((svgHeight - 10) / rows);
 
   let scaleSpring = new Spring(1, { stiffness: 0.3, damping: 0.25 });
-  let score = Tween.of(() => group.score, {duration: 300, easing: expoOut});
+  let score = Tween.of(() => group.score*playStore.scoreMultiplier, {duration: 300, easing: expoOut});
   let formattedScore = $derived(bigNumber(Math.floor(score.current)));
 
   $effect(() => {
