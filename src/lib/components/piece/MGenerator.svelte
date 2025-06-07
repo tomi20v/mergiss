@@ -49,6 +49,7 @@
   onMount(() => {
     uiBus.on('pieceDropped', onPieceDropped);
     uiBus.on('changePieceColor', onChangePieceColor);
+    uiBus.on('changePiece', onChangePiece);
     if (!disabled) {
       startProgress();
     }
@@ -57,12 +58,19 @@
 
   onDestroy(() => {
     uiBus.off('pieceDropped', onPieceDropped);
+    uiBus.off('changePiece', onChangePiece);
     clearInterval(timer);
   })
 
   function generatePiece() {
     piece = null;
     setTimeout(() => piece = pieceFactory.randomPiece());
+  }
+
+  function onChangePiece(uniqueId: string) {
+    if (!piece || piece.uniqueId !== uniqueId) return;
+    piece = null;
+    startProgress();
   }
 
   function onChangePieceColor(uniqueId: string) {
@@ -73,6 +81,7 @@
       piece.pixelMap,
       colors.color,
       colors.otherColor,
+      piece.rotationCount,
       piece.uniqueId
     );
     piece = null;

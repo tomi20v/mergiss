@@ -38,8 +38,14 @@ describe('Piece.ts', () => {
     expect(p.sizeX()).toEqual(0);
   })
 
+  it('should set rotationCount in constructor', () => {
+    const rotationCount = 2;
+    const p = new Piece(anyShape, anyProtoMap, anyColor, anyShadowColor, rotationCount);
+    expect(p.rotationCount).toEqual(rotationCount);
+  })
+
   it('should take original unique ID', () => {
-    const p = new Piece(anyShape, pieceCatalogue[anyShape], anyColor, anyShadowColor, anyUniqueId);
+    const p = new Piece(anyShape, pieceCatalogue[anyShape], anyColor, anyShadowColor, 0, anyUniqueId);
     expect(p.originalUniqueId).toEqual(anyUniqueId);
   });
 
@@ -84,6 +90,17 @@ describe('Piece.ts', () => {
   ])('should return false when not equal', (otherPiece) => {
     const p1 = new Piece(anyShape, anyProtoMap, anyColor, anyShadowColor);
     expect(p1.equals(otherPiece)).toBe(false);
+  })
+
+  it('should rotate', () => {
+    const p = new Piece(anyShape, anyProtoMap, anyColor, anyShadowColor);
+    p.rotated();
+    expect(p.rotationCount).toEqual(1);
+    p.rotated();
+    p.rotated();
+    p.rotated();
+    p.rotated();
+    expect(p.rotationCount).toEqual(5);
   })
 
 })
