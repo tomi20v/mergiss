@@ -149,4 +149,56 @@ describe('Achievement functions', () => {
     });
 
   });
+
+  describe('achievements.implemented function', () => {
+
+    let achievement: IAchievement;
+
+    beforeEach(() => {
+      achievement = {
+        id: 'test-achievement',
+        title: 'Test Achievement',
+        description: 'Test description',
+        hint: 'Test hint',
+        gain: 'Test gain',
+        eventNames: ['testEvent'],
+        callback: () => true
+      } as unknown as IAchievement;
+    });
+
+    it('should return true for an achievement with both eventNames and callback defined', () => {
+      // Act & Assert
+      expect(achievements.implemented(achievement)).toBe(true);
+    });
+
+    it('should return false for an achievement with eventNames but no callback', () => {
+      // Arrange
+      achievement.callback = undefined;
+      const category = {
+        category: 'Test Category',
+        achievements: [achievement]
+      };
+
+      // Act & Assert
+      expect(achievements.implemented(achievement)).toBe(false);
+    });
+
+    it('should return false for an achievement with callback but no eventNames', () => {
+      // Arrange
+      achievement.eventNames = undefined;
+
+      // Act & Assert
+      expect(achievements.implemented(achievement)).toBe(false);
+    });
+
+    it('should return false for an achievement with neither eventNames nor callback', () => {
+      // Arrange
+      delete achievement.eventNames;
+      delete achievement.callback;
+
+      // Act & Assert
+      expect(achievements.implemented(achievement)).toBe(false);
+    });
+  });
+
 });

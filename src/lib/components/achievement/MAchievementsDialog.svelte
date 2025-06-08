@@ -8,14 +8,21 @@
     {#each entropy as category}
       <div class="category-row">
         {#each category.achievements as item}
-          <div class="achievement-icon">
+          <div class="achievement-icon" class:not-implemented={!achievements.implemented(item)}>
             <button class="avatar-button" onclick={() => handleAchievementClick(item, category)}>
+
               {#if achievements.achieved(item.id)}
                 <img src="/achievements/{item.id}.png" alt="" loading="lazy" />
               {:else if achievements.unlocked(category, item)}
                 <img src="/achievements/paperhead.png" alt="" class="unlocked" loading="lazy" />
               {:else}
                 <img src="/achievements/locked.png" alt="" class="locked" loading="lazy" />
+              {/if}
+
+              {#if !achievements.implemented(item)}
+                <div class="not-implemented-overlay">
+                  <span class="not-implemented-text golden-text golden-text-shadow">WIP</span>
+                </div>
               {/if}
             </button>
           </div>
@@ -125,6 +132,7 @@
         padding: 0;
         margin: 0;
         cursor: pointer;
+        position: relative;
     }
 
     .achievement-icon {
@@ -140,6 +148,29 @@
         max-width: 100%;
         height: auto;
         object-fit: contain;
+    }
+
+    .not-implemented {
+        position: relative;
+    }
+
+    .not-implemented-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        border-radius: 4px;
+    }
+
+    .not-implemented-text {
+        font-weight: bold;
+        font-size: min(2vw, 0.8rem);
     }
 
     .scrolling-container {
