@@ -65,4 +65,11 @@ function unlocked(category: IAchievementCategory, item: IAchievement): boolean {
   return false;
 }
 
-export default {achieved, unlocked};
+/**
+ * Check if an achievement is implemented
+ */
+function implemented(item: IAchievement): boolean {
+  return !!item.eventNames && !!item.callback;
+}
+
+export default {achieved, unlocked, implemented};
